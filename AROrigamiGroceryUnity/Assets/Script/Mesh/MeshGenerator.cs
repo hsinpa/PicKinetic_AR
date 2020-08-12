@@ -14,11 +14,18 @@ public class MeshGenerator : MonoBehaviour
     public class SquareGrid {
         public Square[,] sqaures;
 
+
+        private float _mapWidth;
+        private float _mapHeight;
+
+        public float mapWidth => _mapWidth;
+        public float mapHeight => _mapHeight;
+
         public SquareGrid(Color[] map, int width, int height,  float squareSize) {
             int nodeCountX = width;
             int nodeCountY = height;
-            float mapWidth = nodeCountX * squareSize;
-            float mapHeight = nodeCountY * squareSize;
+            _mapWidth = nodeCountX * squareSize;
+            _mapHeight = nodeCountY * squareSize;
 
             int totalLen = map.Length;
 
@@ -28,11 +35,10 @@ public class MeshGenerator : MonoBehaviour
             for (int x = 0; x < nodeCountX; x++) {
                 for (int y = 0; y < nodeCountY; y++)
                 {
-
                     int mapIndex = (nodeCountY * y) + x;
-
-
+                    
                     Vector3 pos = new Vector3(-(mapWidth / 2f) + x * squareSize + (squareSize / 2f), 0, -(mapHeight / 2f) + y * squareSize + (squareSize / 2));
+                    
                     controlNodes[x, y] = new ControlNode(pos, map[mapIndex].r <= 0.1f, squareSize);
                 }
             }
@@ -57,6 +63,7 @@ public class MeshGenerator : MonoBehaviour
     public class Square {
         public ControlNode topLeft, topRight, bottomRight, bottomLeft;
         public Node centerTop, centerRight, centerLeft, centerBottom;
+        public int configuration;
 
         public Square(ControlNode topLeft, ControlNode topRight, ControlNode bottomRight, ControlNode bottomLeft)
         {
@@ -69,6 +76,12 @@ public class MeshGenerator : MonoBehaviour
             this.centerRight = bottomRight.above;
             this.centerBottom = bottomLeft.right;
             this.centerLeft = bottomLeft.above;
+
+            configuration = GetConfigurationCode(topLeft.activeInt, topRight.activeInt, bottomRight.activeInt, bottomLeft.activeInt);
+        }
+
+        private int GetConfigurationCode(int topLeft, int topRight, int bottomRight, int bottomLeft) {
+            return (topLeft * 8) + (topRight * 4) + (bottomRight * 2) + (bottomLeft * 1);
         }
     }
 
@@ -83,6 +96,7 @@ public class MeshGenerator : MonoBehaviour
 
     public class ControlNode : Node {
         public bool active;
+        public int activeInt => (active) ? 1 : 0;
         public Node above, right;
 
         public ControlNode(Vector3 _pos, bool _active, float squareSize) : base(_pos) {
