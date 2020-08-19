@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -17,12 +18,14 @@ public class MooreNeighborhood
     private int _height;
     private float _threshold;
 
-    private List<Vector2> _eightNeighbors;
+    private List<Vector2Int> _eightNeighbors;
     private int _neighbourCount;
 
 
     public int[] Execute(int[] grayImages, int width, int height, float threshold = 0.1f)
     {
+        int maxStep = 5000;
+        int step = 0;
         contourImage = ResetOutputImage(width * height);
         _images = grayImages;
         _width = width;
@@ -31,18 +34,21 @@ public class MooreNeighborhood
         _eightNeighbors = SetEightNeighbor();
         _neighbourCount = _eightNeighbors.Count;
 
-        Point startPoint = SearchForFirstContact(0, 0);
+        Point startPoint = SearchForFirstContact(0, height);
 
         p = startPoint;
+        DrawDotOnContour(p.GetIndex(_width));
 
         c = GetMooreNeighborhood(p, p.backTracePoint);
+
+
         //While c not equal to s do
-        while (!IsTerminatePoint(c, startPoint)) {
+        while (!IsTerminatePoint(c, startPoint) && step <= maxStep) {
             //If c is black
             if (c.value <= _threshold)
             {
                 //insert c in B
-                contourImage[c.GetIndex(_width)] = 0;
+                DrawDotOnContour(c.GetIndex(_width));
 
                 //set p=c
                 p = c;
@@ -54,12 +60,14 @@ public class MooreNeighborhood
             //advance the current pixel c to the next clockwise pixel in M(p)
             else
             {
-                c = GetMooreNeighborhood(p, c.position);
+                c = GetMooreNeighborhood(p, c.position, c.neighborIndex);
             }
 
             //Something went wrong
             if (c.neighborIndex == -1)
                 break;
+
+            step++;
         }
 
         return contourImage;
@@ -69,11 +77,11 @@ public class MooreNeighborhood
 
         Point currentPoint = new Point();
 
-        currentPoint.position = new Vector2(0, 0);
-        currentPoint.backTracePoint = new Vector2(0, 0);
+        currentPoint.position = new Vector2Int(0, 0);
+        currentPoint.backTracePoint = new Vector2Int(0, 0);
 
-        for (int x = startX; x < _width; x++) {
-            for (int y = startY; y < _height; y++) {
+        for (int y = startY - 1; y >= 0; y--) {
+            for (int x = startX; x < _width; x++) {
                 int index = x + (y * _width);
 
                 currentPoint.position.Set(x, y);
@@ -102,11 +110,18 @@ public class MooreNeighborhood
 
         if (currentNeighborIndex >= 0)
         {
-            int nextNIndex = (currentNeighborIndex + 1) % _neighbourCount;
+            int nextNIndex = currentNeighborIndex;
 
             boundaryPixel.backTracePoint = boundaryPixel.position + _eightNeighbors[currentNeighborIndex];
 
-            boundaryPixel.position = boundaryPixel.position + _eightNeighbors[nextNIndex];
+            bool isValidPosition = false;
+            while (!isValidPosition) {
+                nextNIndex = (nextNIndex + 1) % _neighbourCount;
+
+                boundaryPixel.position = boundaryPixel.position + _eightNeighbors[nextNIndex];
+
+                isValidPosition = boundaryPixel.position.x >= 0 && boundaryPixel.position.y >= 0;
+            }
 
             int mapIndex = (int)((boundaryPixel.position.y * _width) + boundaryPixel.position.x);
 
@@ -119,14 +134,17 @@ public class MooreNeighborhood
         return boundaryPixel;
     }
 
-    private List<Vector2> SetEightNeighbor() {
-        return new List<Vector2> {
-            new Vector2(-1, 1), new Vector2(0, 1),new Vector2(1, 1),
-            new Vector2(1, 0), new Vector2(1, -1),
-            new Vector2(0, -1), new Vector2(-1, -1), new Vector2(-1, 0)
+    private List<Vector2Int> SetEightNeighbor() {
+        return new List<Vector2Int> {
+            new Vector2Int(-1, 1), new Vector2Int(0, 1),new Vector2Int(1, 1),
+            new Vector2Int(1, 0), new Vector2Int(1, -1),
+            new Vector2Int(0, -1), new Vector2Int(-1, -1), new Vector2Int(-1, 0)
         };
     }
 
+    private void DrawDotOnContour(int index) {
+        contourImage[index] = 0;
+    }
 
     private int[] ResetOutputImage(int length) {
         int[] output = new int[length];
@@ -144,14 +162,14 @@ public class MooreNeighborhood
     }
 
     private struct Point {
-        public Vector2 position;
+        public Vector2Int position;
         public int value;
-        public Vector2 backTracePoint;
+        public Vector2Int backTracePoint;
 
         public int neighborIndex;
 
         public int GetIndex(int width) {
-            return (int) ((position.y * width) + position.x);
+            return Mathf.RoundToInt((position.y * width) + position.x);
         }
 
     }
