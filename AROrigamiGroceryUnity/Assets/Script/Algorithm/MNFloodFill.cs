@@ -9,22 +9,14 @@ public class MNFloodFill
     int _width, _height;
     List<Vector2Int> _NeighborList = MaskUtility.FourNeighborList;
 
-    public Color[] DrawMask(Color[] contourImage, int width, int height) {
+    public Color[] Execute(Color[] contourImage, int width, int height) {
+        Color[] templateImage = GetNewImage(width * height);
         _width = width;
         _height = height;
-
-        contourImage = FloodFill(contourImage, width, height);
-
-        return contourImage;
-    }
-
-
-    private Color[] FloodFill(Color[] images, int width, int height) {
-        Color[] outputImage = GetNewImage(width * height);
         Color white = Color.white;
 
         List<Vector2Int> opened = new List<Vector2Int>();
-        List<Vector2Int> closed = new List<Vector2Int>();
+        HashSet<int> closed = new HashSet<int>();
         Vector2Int point = new Vector2Int(0, 0);
 
         //Four Corner
@@ -40,27 +32,40 @@ public class MNFloodFill
         //Bottom Left
         opened.Add(new Vector2Int(0, height - 1));
 
-        while (opened.Count > 0) {
+        while (opened.Count > 0)
+        {
             var nextPoint = opened[0];
             opened.RemoveAt(0);
 
             int imageIndex = nextPoint.x + (nextPoint.y * width);
-            Color contourValue = images[imageIndex];
-
+            Color contourValue = contourImage[imageIndex];
             //Is Not Wall
-            if (contourValue.r >= 0.9f) {
-                outputImage[imageIndex] = white;
-            } else
+            if (contourValue.grayscale >= 0.7f)
+            {
+                templateImage[imageIndex] = white;
+            }
+            else
             {
                 continue;
             }
 
-            var possiblePoint = FilterOpenPoint(nextPoint, closed);
-            opened.AddRange(possiblePoint);
-            closed.AddRange(possiblePoint);
+            int possibleDirCount = _NeighborList.Count;
+
+            for (int i = 0; i < possibleDirCount; i++)
+            {
+                var newPoint = _NeighborList[i] + nextPoint;
+                int index = newPoint.x + (newPoint.y * width);
+
+                if (newPoint.x >= 0 && newPoint.x < _width && newPoint.y >= 0 && newPoint.y < _height && !closed.Contains(index))
+                {
+                    opened.Add(newPoint);
+                    closed.Add(index);
+                }
+            }
+
         }
 
-        return outputImage;
+        return templateImage;
     }
 
     private List<Vector2Int> FilterOpenPoint(Vector2Int point, List<Vector2Int> closedList) {

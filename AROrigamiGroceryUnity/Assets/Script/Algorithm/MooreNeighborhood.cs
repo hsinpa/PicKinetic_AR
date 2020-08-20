@@ -7,13 +7,16 @@ using UnityEngine;
 public class MooreNeighborhood
 {
 
-    private int[] contourImage;
+    private Color[] contourImage;
 
     private Point p; //current boundary pixel
     private Point c; //current pixel under consideration i.e.c is in M(p).
     private Point b; //backtrack of c(i.e.neighbor pixel of p that was previously tested)
 
-    private int[] _images;
+    private Color[] _images;
+    private Color emptyColor = Color.white;
+    private Color blockColor = Color.black;
+
     private int _width;
     private int _height;
     private float _threshold;
@@ -22,7 +25,7 @@ public class MooreNeighborhood
     private int _neighbourCount;
 
 
-    public Color[] Execute(int[] grayImages, int width, int height, float threshold = 0.1f)
+    public Color[] Execute(Color[] grayImages, int width, int height, float threshold = 0.9f)
     {
         int maxStep = 5000;
         int step = 0;
@@ -70,7 +73,7 @@ public class MooreNeighborhood
             step++;
         }
 
-        return ToColor(contourImage);
+        return contourImage;
     }
 
     private Point SearchForFirstContact(int startX, int startY) {
@@ -87,7 +90,7 @@ public class MooreNeighborhood
                 currentPoint.position.Set(x, y);
 
                 //Is Wall detected
-                if (_images[index] <= _threshold) {
+                if (_images[index].grayscale <= _threshold) {
                     currentPoint.value = 0;
                     return currentPoint;
                 }
@@ -123,9 +126,9 @@ public class MooreNeighborhood
                 isValidPosition = boundaryPixel.position.x >= 0 && boundaryPixel.position.y >= 0;
             }
 
-            int mapIndex = (int)((boundaryPixel.position.y * _width) + boundaryPixel.position.x);
+            int mapIndex = (int)((boundaryPixel.position.y * _width) + boundaryPixel.position.x); // 1
 
-            boundaryPixel.value = _images[mapIndex];
+            boundaryPixel.value = _images[mapIndex].grayscale < _threshold ? 0 : 1;
 
             boundaryPixel.neighborIndex = nextNIndex;
         }
@@ -135,15 +138,15 @@ public class MooreNeighborhood
     }
 
     private void DrawDotOnContour(int index) {
-        contourImage[index] = 0;
+        contourImage[index] = blockColor;
     }
 
-    private int[] ResetOutputImage(int length) {
-        int[] output = new int[length];
+    private Color[] ResetOutputImage(int length) {
+        Color[] output = new Color[length];
         for (int i =0; i < length; i++)
         {
             //Set As white
-            output[i] = 1;
+            output[i] = emptyColor;
         }
         return output;
     }
