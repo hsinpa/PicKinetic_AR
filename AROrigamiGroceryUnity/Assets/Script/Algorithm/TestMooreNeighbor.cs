@@ -5,21 +5,24 @@ using UnityEngine;
 public class TestMooreNeighbor : MonoBehaviour
 {
     private MooreNeighborhood MooreNeighborhood;
+    private MNFloodFill MNFloodFill;
 
     // Start is called before the first frame update
     void Start()
     {
         MooreNeighborhood = new MooreNeighborhood();
+        MNFloodFill = new MNFloodFill();
         int width = 10, heigth = 10;
 
         int[] TestGrayImage = PrepareFakeContour();
 
-        int[] TestContour = MooreNeighborhood.Execute(TestGrayImage, width, heigth);
+        Color[] TestContour = MooreNeighborhood.Execute(TestGrayImage, width, heigth);
+        TestContour = MNFloodFill.DrawMask(TestContour, width, heigth);
 
         LogContour(TestContour, width, heigth);
     }
 
-    private void LogContour(int[] p_contour, int width, int height) {
+    private void LogContour(Color[] p_contour, int width, int height) {
 
         string contour = "";
 
@@ -27,7 +30,7 @@ public class TestMooreNeighbor : MonoBehaviour
             for (int w = 0; w < width; w++) {
                 int index = w + (h * width);
 
-                contour += p_contour[index].ToString();
+                contour += p_contour[index].r.ToString();
 
                 if (w == width - 1) {
                     contour += "\n";

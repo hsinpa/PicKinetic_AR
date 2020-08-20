@@ -22,7 +22,7 @@ public class MooreNeighborhood
     private int _neighbourCount;
 
 
-    public int[] Execute(int[] grayImages, int width, int height, float threshold = 0.1f)
+    public Color[] Execute(int[] grayImages, int width, int height, float threshold = 0.1f)
     {
         int maxStep = 5000;
         int step = 0;
@@ -31,7 +31,7 @@ public class MooreNeighborhood
         _width = width;
         _height = height;
         _threshold = threshold;
-        _eightNeighbors = SetEightNeighbor();
+        _eightNeighbors = MaskUtility.EightNeighborList;
         _neighbourCount = _eightNeighbors.Count;
 
         Point startPoint = SearchForFirstContact(0, height);
@@ -70,7 +70,7 @@ public class MooreNeighborhood
             step++;
         }
 
-        return contourImage;
+        return ToColor(contourImage);
     }
 
     private Point SearchForFirstContact(int startX, int startY) {
@@ -134,14 +134,6 @@ public class MooreNeighborhood
         return boundaryPixel;
     }
 
-    private List<Vector2Int> SetEightNeighbor() {
-        return new List<Vector2Int> {
-            new Vector2Int(-1, 1), new Vector2Int(0, 1),new Vector2Int(1, 1),
-            new Vector2Int(1, 0), new Vector2Int(1, -1),
-            new Vector2Int(0, -1), new Vector2Int(-1, -1), new Vector2Int(-1, 0)
-        };
-    }
-
     private void DrawDotOnContour(int index) {
         contourImage[index] = 0;
     }
@@ -154,6 +146,23 @@ public class MooreNeighborhood
             output[i] = 1;
         }
         return output;
+    }
+
+    private Color[] ToColor(int[] binaryArray)
+    {
+        int l = binaryArray.Length;
+        Color[] colors = new Color[l];
+        Color color = new Color();
+        color.a = 1;
+
+        for (int i = 0; i < l; i++)
+        {
+            color.r = binaryArray[i];
+            color.g = binaryArray[i];
+            color.b = binaryArray[i];
+            colors[i] = color;
+        }
+        return colors;
     }
 
     private bool IsTerminatePoint(Point point, Point startPoint)
