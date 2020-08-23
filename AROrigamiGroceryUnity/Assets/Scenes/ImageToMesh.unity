@@ -153,11 +153,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 580f6bfdb6b28f340aded809157c5500, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rawColorTexture: {fileID: 2800000, guid: e3654d6f443a30342ac4594bbd64d04f, type: 3}
-  canvasTexture: {fileID: 2800000, guid: 1d6ac3a73a8cefe458826044598180fa, type: 3}
+  rawColorTexture: {fileID: 2800000, guid: c554ad60ca1123148af332fe004bda6f, type: 3}
   previewMaskTexture: {fileID: 0}
   meshFiler: {fileID: 130743006}
   meshRender: {fileID: 130743005}
+  EdgeMaterial: {fileID: 2100000, guid: 4b181255d35b99449a14cc6a6aa89e48, type: 2}
 --- !u!114 &130743003
 MonoBehaviour:
   m_ObjectHideFlags: 0

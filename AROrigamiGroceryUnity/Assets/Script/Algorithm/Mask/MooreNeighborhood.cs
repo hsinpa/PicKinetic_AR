@@ -25,7 +25,7 @@ public class MooreNeighborhood
     private int _neighbourCount;
 
 
-    public Color[] Execute(Color[] grayImages, int width, int height, float threshold = 0.9f)
+    public Color[] Execute(Color[] grayImages, int width, int height, float threshold = 0.25f)
     {
         int maxStep = 5000;
         int step = 0;
@@ -47,8 +47,8 @@ public class MooreNeighborhood
 
         //While c not equal to s do
         while (!IsTerminatePoint(c, startPoint) && step <= maxStep) {
-            //If c is black
-            if (c.value <= _threshold)
+            //If c is wall
+            if (c.value == 0)
             {
                 //insert c in B
                 DrawDotOnContour(c.GetIndex(_width));
@@ -90,7 +90,7 @@ public class MooreNeighborhood
                 currentPoint.position.Set(x, y);
 
                 //Is Wall detected
-                if (_images[index].grayscale <= _threshold) {
+                if (_images[index].r >= _threshold) {
                     currentPoint.value = 0;
                     return currentPoint;
                 }
@@ -128,7 +128,7 @@ public class MooreNeighborhood
 
             int mapIndex = (int)((boundaryPixel.position.y * _width) + boundaryPixel.position.x); // 1
 
-            boundaryPixel.value = _images[mapIndex].grayscale < _threshold ? 0 : 1;
+            boundaryPixel.value = _images[mapIndex].r >= _threshold ? 0 : 1;
 
             boundaryPixel.neighborIndex = nextNIndex;
         }
