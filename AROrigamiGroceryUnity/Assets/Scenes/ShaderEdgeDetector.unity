@@ -391,3 +391,9 @@ MonoBehaviour:
   EdgeMaterial: {fileID: 2100000, guid: 4b181255d35b99449a14cc6a6aa89e48, type: 2}
   inputImage: {fileID: 2800000, guid: 1ea4271e0d20b594ea4e85cb1a343cc1, type: 3}
   outputTex: {fileID: 0}
+  sourceRect:
+    serializedVersion: 2
+    x: 64
+    y: 64
+    width: 192
+    height: 192
