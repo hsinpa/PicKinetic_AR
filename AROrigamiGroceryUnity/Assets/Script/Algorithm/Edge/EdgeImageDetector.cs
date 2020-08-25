@@ -20,10 +20,10 @@ namespace AROrigami
         public EdgeImageDetector(Material EdgeMaterial)
         {
             this.EdgeMaterial = EdgeMaterial;
-            outputTexture = GetRenderTexture(textureSize);
+            outputTexture = TextureUtility.GetRenderTexture(textureSize);
 
-            tempTexA = GetRenderTexture(textureSize);
-            tempTexB = GetRenderTexture(textureSize);
+            tempTexA = TextureUtility.GetRenderTexture(textureSize);
+            tempTexB = TextureUtility.GetRenderTexture(textureSize);
             rectReadPicture = new Rect(0, 0, textureSize, textureSize);
 
             outputTex = new Texture2D(textureSize, textureSize, TextureFormat.ARGB32, true);
@@ -49,11 +49,6 @@ namespace AROrigami
             return outputTex;
         }
 
-        private RenderTexture GetRenderTexture(int size)
-        {
-            var rt = new RenderTexture(size, size, 16, RenderTextureFormat.ARGB32);
-            rt.Create();
-            return rt;
-        }
+
     }
 }
