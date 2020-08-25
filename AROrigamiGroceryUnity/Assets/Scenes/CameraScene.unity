@@ -1019,6 +1019,8 @@ MonoBehaviour:
   background: {fileID: 190187110}
   fit: {fileID: 190187109}
   preview: {fileID: 823230744}
+  rotateMat: {fileID: 2100000, guid: 2c979822271bf4c13b7198c4c9772745, type: 2}
+  cameraTexRot: 0
 --- !u!1 &1725160806
 GameObject:
   m_ObjectHideFlags: 0
