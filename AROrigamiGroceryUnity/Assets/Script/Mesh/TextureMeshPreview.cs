@@ -14,6 +14,9 @@ public class TextureMeshPreview : MonoBehaviour
     private Texture2D previewMaskTexture;
 
     [SerializeField]
+    private Texture2D highlightTexture;
+
+    [SerializeField]
     private MeshFilter meshFiler;
 
     [SerializeField]
@@ -35,24 +38,26 @@ public class TextureMeshPreview : MonoBehaviour
         previewMaskTexture = new Texture2D(resize, resize);
         imageMaskGeneator = new ImageMaskGeneator(resize);
         marchingCube = new MarchingCube();
-        meshGenerator = GetComponent<MeshGenerator>();
+        meshGenerator = new MeshGenerator();
         edgeImage = new EdgeImageDetector(EdgeMaterial);
 
         //var colors = ReadPixel();
 
         //AssignMesh(colors, maskTexture.width, maskTexture.height);
 
-        GenerateMesh(edgeImage.GetEdgeTex(rawColorTexture));
+        //GenerateMesh(edgeImage.GetEdgeTex(rawColorTexture));
     }
 
-    private async void GenerateMesh(Texture2D edgeTex)
-    {
-        var maskColors = await PrepareImageMask(edgeTex);
+    public async void CaptureEdgeBorderMesh(Texture2D rawTexture) {
+        var maskColors = await PrepareImageBorder(edgeImage.GetEdgeTex(rawTexture));
 
-        previewMaskTexture.SetPixels(maskColors);
-        previewMaskTexture.Apply();
+        AssignMesh(maskColors, resize, resize, highlightTexture);
+    }
 
-        AssignMesh(maskColors, resize, resize);
+    public async void CaptureContourMesh(Texture2D rawTexture) {
+        var maskColors = await PrepareImageMask(edgeImage.GetEdgeTex(rawTexture));
+
+        AssignMesh(maskColors, resize, resize, rawTexture);
     }
 
     private async Task<Color[]> PrepareImageMask(Texture2D rawImage)
@@ -62,11 +67,23 @@ public class TextureMeshPreview : MonoBehaviour
         return await imageMaskGeneator.AsyncCreateMask(scaledColor, resize, resize);
     }
 
-    private void AssignMesh(Color[] maskImage, int textureWidth, int textureHeight)
+    private async Task<Color[]> PrepareImageBorder(Texture2D rawImage)
     {
+        var scaledColor = rawImage.GetPixels(0, 0, resize, resize);
+
+        return await imageMaskGeneator.AsyncCreateBorder(scaledColor, resize, resize);
+    }
+
+    private void AssignMesh(Color[] maskImage, int textureWidth, int textureHeight, Texture2D matTex)
+    {
+        previewMaskTexture.SetPixels(maskImage);
+        previewMaskTexture.Apply();
+
         meshGenerator.GenerateMesh(maskImage, textureWidth, textureHeight, 1);
         Mesh mesh = marchingCube.Calculate(meshGenerator.squareGrid);
         meshFiler.mesh = mesh;
+
+        meshRender.material.SetTexture("_MainTex", matTex);
     }
 
     private Color[] ReadPixel()

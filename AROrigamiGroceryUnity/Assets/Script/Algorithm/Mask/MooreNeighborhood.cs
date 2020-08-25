@@ -25,7 +25,7 @@ public class MooreNeighborhood
     private int _neighbourCount;
 
 
-    public Color[] Execute(Color[] grayImages, int width, int height, float threshold = 0.25f)
+    public Color[] Execute(Color[] grayImages, int width, int height, float threshold = 0.2f)
     {
         int maxStep = 5000;
         int step = 0;
@@ -37,13 +37,12 @@ public class MooreNeighborhood
         _eightNeighbors = MaskUtility.EightNeighborList;
         _neighbourCount = _eightNeighbors.Count;
 
-        Point startPoint = SearchForFirstContact(0, height);
+        Point startPoint = SearchForFirstContact(0, height/2);
 
         p = startPoint;
         DrawDotOnContour(p.GetIndex(_width));
 
         c = GetMooreNeighborhood(p, p.backTracePoint);
-
 
         //While c not equal to s do
         while (!IsTerminatePoint(c, startPoint) && step <= maxStep) {
@@ -58,7 +57,6 @@ public class MooreNeighborhood
 
                 //backtrack (move the current pixel c to the pixel from which p was entered)
                 c = GetMooreNeighborhood(p, p.backTracePoint);
-
             }
             //advance the current pixel c to the next clockwise pixel in M(p)
             else
@@ -72,6 +70,8 @@ public class MooreNeighborhood
 
             step++;
         }
+
+        //Debug.Log("MooreNeighbor Step " + step);
 
         return contourImage;
     }

@@ -4,6 +4,7 @@
     {
         _MainTex("Texture", 2D) = "white" {}
         _KernelSize("Kernel Size (N)", Int) = 21
+		_Threshold("Line threshold", Float) = 0.1
 
 		_DeltaX ("Delta X", Float) = 0.01
 		_DeltaY ("Delta Y", Float) = 0.01
@@ -59,6 +60,7 @@
 				}
 
 				col /= kernelSum;
+
 				return float4(col, 1.0);
 			}
 			ENDCG
@@ -103,7 +105,8 @@
 
 			float _DeltaX;
 			float _DeltaY;
-		
+			float _Threshold;
+
 			float sobel (sampler2D tex, float2 uv) {
 				float2 delta = float2(_DeltaX, _DeltaY);
 			
@@ -134,7 +137,9 @@
 			}
 		
 			float4 frag (v2f_img IN) : COLOR {
-				float s = sobel(_MainTex, IN.uv);
+				float s = (sobel(_MainTex, IN.uv)  >= _Threshold) ? 1.0 : 0.0;
+				//float s = sobel(_MainTex, IN.uv);
+
 				return float4(s, s, s, 1);
 			}
 		ENDCG

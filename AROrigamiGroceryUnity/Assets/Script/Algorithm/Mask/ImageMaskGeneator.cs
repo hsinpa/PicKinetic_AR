@@ -26,9 +26,16 @@ public class ImageMaskGeneator
     {
         return await Task.Run(() =>
         {
-            //return MooreNeighborhood.Execute(scaledImage, width, height);
             Color[] TestContour = MooreNeighborhood.Execute(scaledImage, width, height);
             return MNFloodFill.Execute(TestContour, width, height);
+        });
+    }
+
+    public async Task<Color[]> AsyncCreateBorder(Color[] scaledImage, int width, int height)
+    {
+        return await Task.Run(() =>
+        {
+            return MooreNeighborhood.Execute(scaledImage, width, height);
         });
     }
 

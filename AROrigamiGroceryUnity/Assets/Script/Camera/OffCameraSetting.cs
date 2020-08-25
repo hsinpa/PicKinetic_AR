@@ -8,6 +8,9 @@ public class OffCameraSetting : MonoBehaviour
     public RawImage preview;
     public Material rotateMat;
 
+    [SerializeField]
+    private TextureMeshPreview textureMeshPreview;
+
     public Texture2D inputTex;
     private Texture2D cropTex;
     private Texture2D previewTex;
@@ -24,7 +27,11 @@ public class OffCameraSetting : MonoBehaviour
         TextureUtility = new TextureUtility();
         PrepareTexture();
 
-        preview.texture = RotateAndScaleImage(GrabTextureRadius(), 0);
+        var scaleTex = RotateAndScaleImage(GrabTextureRadius(), 0);
+        preview.texture = scaleTex;
+
+        textureMeshPreview.CaptureEdgeBorderMesh(scaleTex);
+        //textureMeshPreview.CaptureContourMesh(scaleTex);
     }
 
     private void PrepareTexture()
@@ -32,8 +39,6 @@ public class OffCameraSetting : MonoBehaviour
         previewRenderer = TextureUtility.GetRenderTexture(textureSize);
         previewTex = new Texture2D(textureSize, textureSize);
         rectReadPicture = new Rect(0, 0, textureSize, textureSize);
-
-
     }
 
     private Texture2D GrabTextureRadius()

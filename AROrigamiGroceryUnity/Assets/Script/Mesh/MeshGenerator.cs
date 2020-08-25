@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MeshGenerator : MonoBehaviour
+public class MeshGenerator
 {
-
     public SquareGrid squareGrid;
 
     public void GenerateMesh(Color[] map, int width, int height, float squareSize) {
@@ -13,7 +12,6 @@ public class MeshGenerator : MonoBehaviour
 
     public class SquareGrid {
         public Square[,] sqaures;
-
 
         private float _mapWidth;
         private float _mapHeight;
@@ -30,7 +28,6 @@ public class MeshGenerator : MonoBehaviour
             int totalLen = map.Length;
 
             ControlNode[,] controlNodes = new ControlNode[nodeCountX, nodeCountY];
-
 
             for (int x = 0; x < nodeCountX; x++) {
                 for (int y = 0; y < nodeCountY; y++)
