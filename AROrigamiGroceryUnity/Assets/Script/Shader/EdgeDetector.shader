@@ -137,12 +137,105 @@
 			}
 		
 			float4 frag (v2f_img IN) : COLOR {
-				float s = (sobel(_MainTex, IN.uv)  >= _Threshold) ? 1.0 : 0.0;
-				//float s = sobel(_MainTex, IN.uv);
+				//float s = (sobel(_MainTex, IN.uv)  >= _Threshold) ? 1.0 : 0.0;
+
+				float s = sobel(_MainTex, IN.uv);
 
 				return float4(s, s, s, 1);
 			}
 		ENDCG
+		}
+		//Sharp
+		Pass
+		{
+			CGPROGRAM
+			#pragma vertex vert_img
+			#pragma fragment frag
+
+			#include "UnityCG.cginc"
+
+			sampler2D _MainTex;
+			float2 _MainTex_TexelSize;
+			float _Threshold;
+
+			float Dilation (sampler2D tex, float2 uv) {
+			
+				float4 sum = float4(0, 0, 0, 0);
+
+				//Center
+				//float sideValue = -1.0/9.0;
+				//Bottom
+				sum += tex2D(tex, (uv + float2(-1.0, -1.0) * _MainTex_TexelSize)) *  0;
+				sum += tex2D(tex, (uv + float2( 1.0, -1.0) * _MainTex_TexelSize)) * -1;
+				sum += tex2D(tex, (uv + float2( 1.0,  -1.0) * _MainTex_TexelSize)) *  0;
+
+				//Center
+				sum += tex2D(tex, (uv + float2( -1.0,  0.0) * _MainTex_TexelSize)) * -1;
+				sum += tex2D(tex, (uv + float2( 0.0,  0.0) * _MainTex_TexelSize)) *  5;
+				sum += tex2D(tex, (uv + float2( 1.0,  0.0) * _MainTex_TexelSize)) * -1;
+				
+				//Top
+				sum += tex2D(tex, (uv + float2(-1.0, 1.0) * _MainTex_TexelSize)) *  0;
+				sum += tex2D(tex, (uv + float2( 0.0, 1.0) * _MainTex_TexelSize)) *  -1;
+				sum += tex2D(tex, (uv + float2( 1.0, 1.0) * _MainTex_TexelSize)) *  0;
+
+				return float4(sum.xyz, 1.0);
+			}
+		
+			float4 frag (v2f_img IN) : COLOR {
+				//float s = Dilation(_MainTex, IN.uv);
+				float s = (Dilation(_MainTex, IN.uv)  >= _Threshold) ? 1.0 : 0.0;
+
+				return float4(s, s, s, 1);
+			}
+		ENDCG
+		}
+
+
+				//Sharp
+		Pass
+		{
+			CGPROGRAM
+			#pragma vertex vert_img
+			#pragma fragment frag
+
+			#include "UnityCG.cginc"
+
+			sampler2D _MainTex;
+			float2 _MainTex_TexelSize;
+			float _Threshold;
+
+			float Dilation (sampler2D tex, float2 uv) {
+			
+				float4 sum = float4(0, 0, 0, 0);
+
+				//Center
+				//float sideValue = -1.0/9.0;
+				//Bottom
+				sum += tex2D(tex, (uv + float2(-1.0, -1.0) * _MainTex_TexelSize)) *  1;
+				sum += tex2D(tex, (uv + float2( 1.0, -1.0) * _MainTex_TexelSize)) * 1;
+				sum += tex2D(tex, (uv + float2( 1.0,  -1.0) * _MainTex_TexelSize)) * 1;
+
+				//Center
+				sum += tex2D(tex, (uv + float2( -1.0,  0.0) * _MainTex_TexelSize)) * 1;
+				sum += tex2D(tex, (uv + float2( 0.0,  0.0) * _MainTex_TexelSize)) *  1;
+				sum += tex2D(tex, (uv + float2( 1.0,  0.0) * _MainTex_TexelSize)) * 1;
+				
+				//Top
+				sum += tex2D(tex, (uv + float2(-1.0, 1.0) * _MainTex_TexelSize)) *  1;
+				sum += tex2D(tex, (uv + float2( 0.0, 1.0) * _MainTex_TexelSize)) *  1;
+				sum += tex2D(tex, (uv + float2( 1.0, 1.0) * _MainTex_TexelSize)) *  1;
+
+				return float4(sum.xyz / 9.0, 1.0);
+			}
+		
+			float4 frag (v2f_img IN) : COLOR {
+				float s = Dilation(_MainTex, IN.uv);
+
+				return float4(s, s, s, 1);
+			}
+		ENDCG
+
 		}
 
 

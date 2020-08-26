@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using AROrigami;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,6 +12,9 @@ public class OffCameraSetting : MonoBehaviour
     [SerializeField]
     private TextureMeshPreview textureMeshPreview;
 
+    [SerializeField]
+    private MeshObject p_meshObject;
+
     public Texture2D inputTex;
     private Texture2D cropTex;
     private Texture2D previewTex;
@@ -20,23 +24,26 @@ public class OffCameraSetting : MonoBehaviour
 
     private const float degreeToRadian = Mathf.PI / 180;
     private Rect rectReadPicture;
-    int textureSize = 256;
+    int textureSize = 512;
 
     private void Start()
     {
         TextureUtility = new TextureUtility();
         PrepareTexture();
 
-        //textureMeshPreview.CaptureContourMesh(scaleTex);
-    }
-
-    private void Update()
-    {
         var scaleTex = RotateAndScaleImage(GrabTextureRadius(), 0);
         preview.texture = scaleTex;
 
-        textureMeshPreview.CaptureEdgeBorderMesh(scaleTex);
+        textureMeshPreview.CaptureContourMesh(scaleTex, p_meshObject);
     }
+
+    //private void Update()
+    //{
+    //    var scaleTex = RotateAndScaleImage(GrabTextureRadius(), 0);
+    //    preview.texture = scaleTex;
+
+    //    textureMeshPreview.CaptureEdgeBorderMesh(scaleTex, p_meshObject);
+    //}
 
     private void PrepareTexture()
     {

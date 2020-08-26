@@ -83,12 +83,6 @@ public class MooreNeighborhood
         infoContainer.centerPoint.Set(centerPoint.x * divident, centerPoint.y * divident);
         infoContainer.img = contourImage;
 
-        Debug.Log("Area " + area);
-        Debug.Log("Center Point " + infoContainer.centerPoint);
-
-
-        //Debug.Log("MooreNeighbor Step " + step);
-
         return infoContainer;
     }
 
@@ -139,7 +133,8 @@ public class MooreNeighborhood
 
                 boundaryPixel.position = boundaryPixel.position + _eightNeighbors[nextNIndex];
 
-                isValidPosition = boundaryPixel.position.x >= 0 && boundaryPixel.position.y >= 0;
+                isValidPosition = boundaryPixel.position.x >= 0 && boundaryPixel.position.y >= 0 &&
+                                    boundaryPixel.position.x < _width && boundaryPixel.position.y < _height;
             }
 
             int mapIndex = (int)((boundaryPixel.position.y * _width) + boundaryPixel.position.x); // 1
@@ -148,7 +143,6 @@ public class MooreNeighborhood
 
             boundaryPixel.neighborIndex = nextNIndex;
         }
-
 
         return boundaryPixel;
     }

@@ -17,12 +17,6 @@ public class TextureMeshPreview : MonoBehaviour
     private Texture2D highlightTexture;
 
     [SerializeField]
-    private MeshFilter meshFiler;
-
-    [SerializeField]
-    private MeshRenderer meshRender;
-
-    [SerializeField]
     private Material EdgeMaterial;
 
     ImageMaskGeneator imageMaskGeneator;
@@ -30,6 +24,8 @@ public class TextureMeshPreview : MonoBehaviour
     MarchingCube marchingCube;
 
     EdgeImageDetector edgeImage;
+
+    public System.Action<Texture2D> OnEdgeTexUpdate;
 
     int resize = 64;
     int startPixelX;
@@ -46,15 +42,6 @@ public class TextureMeshPreview : MonoBehaviour
         meshGenerator = new MeshGenerator();
         edgeImage = new EdgeImageDetector(EdgeMaterial);
         _camera = Camera.main;
-
-        //var colors = ReadPixel();
-
-        //AssignMesh(colors, maskTexture.width, maskTexture.height);
-
-        //GenerateMesh(edgeImage.GetEdgeTex(rawColorTexture));
-
-        //var point = _camera.ScreenToWorldPoint(new Vector3(400f, 700f, _camera.nearClipPlane));
-        //Debug.Log("Cam Point " + point);
     }
 
     public void UpdateScreenInfo(int startPixelX, int startPixelY) {
@@ -62,20 +49,31 @@ public class TextureMeshPreview : MonoBehaviour
         this.startPixelY = startPixelY;
     }
 
-    public async void CaptureEdgeBorderMesh(Texture2D rawTexture) {
-        var maskColors = await PrepareImageBorder(edgeImage.GetEdgeTex(rawTexture));
+    public async void CaptureEdgeBorderMesh(Texture2D rawTexture, MeshObject meshObject) {
+
+        var edgeTex = edgeImage.GetEdgeTex(rawTexture);
+
+        if (OnEdgeTexUpdate != null)
+            OnEdgeTexUpdate(edgeTex);
+
+        var maskColors = await PrepareImageBorder(edgeTex);
 
         if (!CheckIfValid(maskColors)) return;
-        AssignMesh(maskColors.img, resize, resize, highlightTexture);
-        AssignPosition(maskColors);
+        AssignMesh(maskColors.img, resize, resize, highlightTexture, meshObject);
+        AssignPosition(maskColors, meshObject);
     }
 
-    public async void CaptureContourMesh(Texture2D rawTexture) {
-        var maskColors = await PrepareImageMask(edgeImage.GetEdgeTex(rawTexture));
+    public async void CaptureContourMesh(Texture2D rawTexture, MeshObject meshObject) {
+        var edgeTex = edgeImage.GetEdgeTex(rawTexture);
+
+        previewMaskTexture.SetPixels(edgeTex.GetPixels());
+        previewMaskTexture.Apply();
+
+        var maskColors = await PrepareImageMask(edgeTex);
         if (!CheckIfValid(maskColors)) return;
 
-        AssignMesh(maskColors.img, resize, resize, rawTexture);
-        AssignPosition(maskColors);
+        AssignMesh(maskColors.img, resize, resize, rawTexture, meshObject);
+        AssignPosition(maskColors, meshObject);
     }
 
     private async Task<MooreNeighborhood.MooreNeighborInfo> PrepareImageMask(Texture2D rawImage)
@@ -92,19 +90,18 @@ public class TextureMeshPreview : MonoBehaviour
         return await imageMaskGeneator.AsyncCreateBorder(scaledColor, resize, resize);
     }
 
-    private void AssignMesh(Color[] maskImage, int textureWidth, int textureHeight, Texture2D matTex)
+    private void AssignMesh(Color[] maskImage, int textureWidth, int textureHeight, Texture2D matTex, MeshObject meshObject)
     {
-        previewMaskTexture.SetPixels(maskImage);
-        previewMaskTexture.Apply();
+        //previewMaskTexture.SetPixels(maskImage);
+        //previewMaskTexture.Apply();
 
         meshGenerator.GenerateMesh(maskImage, textureWidth, textureHeight, 1);
         Mesh mesh = marchingCube.Calculate(meshGenerator.squareGrid);
-        meshFiler.mesh = mesh;
 
-        meshRender.material.SetTexture("_MainTex", matTex);
+        meshObject.SetMesh(mesh, matTex);
     }
 
-    private void AssignPosition(MooreNeighborhood.MooreNeighborInfo meshInfo) {
+    private void AssignPosition(MooreNeighborhood.MooreNeighborInfo meshInfo, MeshObject meshObject) {
 
         float x = (meshInfo.centerPoint.x * 4) + startPixelX;
         float y = (meshInfo.centerPoint.y * 4) + startPixelY;
@@ -113,7 +110,7 @@ public class TextureMeshPreview : MonoBehaviour
         var point = _camera.ScreenToWorldPoint(_meshPosition);
         point.z = 0;
 
-        meshRender.transform.position = point;
+        meshObject.transform.position = point;
     }
 
     private bool CheckIfValid(MooreNeighborhood.MooreNeighborInfo meshInfo) {

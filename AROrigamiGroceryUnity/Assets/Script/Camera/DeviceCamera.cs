@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using AROrigami;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,15 +12,28 @@ public class DeviceCamera : MonoBehaviour
 
     public RawImage background;
     public AspectRatioFitter fit;
-    public RawImage preview;
+
+    public RawImage scalePreview;
+    public RawImage linePreview;
+
     public Material rotateMat;
 
     private Texture2D cropTex;
     private Texture2D previewTex;
+
     private RenderTexture previewRenderer;
 
     [SerializeField]
     TextureMeshPreview texturePreivew;
+
+    [SerializeField]
+    MeshObject meshBorder;
+
+    [SerializeField]
+    MeshObject meshObject;
+
+    [SerializeField]
+    private Button shotBtn;
 
     private Vector3 backgroundScale = new Vector3();
 
@@ -27,10 +41,7 @@ public class DeviceCamera : MonoBehaviour
 
     private const float degreeToRadian = Mathf.PI / 180;
     private Rect rectReadPicture;
-    int textureSize = 256;
-
-    [SerializeField, Range(0, 3.14f)]
-    private float cameraTexRot;
+    int textureSize = 512;
 
     private Camera _camera;
 
@@ -40,6 +51,8 @@ public class DeviceCamera : MonoBehaviour
         defaultBackground = background.texture;
         TextureUtility = new TextureUtility();
         PrepareTexture();
+
+        shotBtn.onClick.AddListener(TakeAPhoto);
 
         WebCamDevice[] devices = WebCamTexture.devices;
 
@@ -68,6 +81,8 @@ public class DeviceCamera : MonoBehaviour
         background.texture = backCam;
 
         camAvailable = true;
+
+        texturePreivew.OnEdgeTexUpdate += OnEdgeImageUpdate;
     }
 
     private void PrepareTexture() {
@@ -97,9 +112,9 @@ public class DeviceCamera : MonoBehaviour
 
         var scaleTex = RotateAndScaleImage(GrabTextureRadius(), -backCam.videoRotationAngle);
 
-        preview.texture = scaleTex;
+        scalePreview.texture = scaleTex;
 
-        texturePreivew.CaptureEdgeBorderMesh(scaleTex);
+        texturePreivew.CaptureEdgeBorderMesh(scaleTex, meshBorder);
     }
 
     private Texture2D GrabTextureRadius() {
@@ -131,5 +146,20 @@ public class DeviceCamera : MonoBehaviour
         return previewTex;
     }
 
+    private void OnEdgeImageUpdate(Texture2D tex)
+    {
+        linePreview.texture = tex;
+    }
+
+    private void TakeAPhoto() {
+        if (scalePreview != null && scalePreview.texture != null) {
+            texturePreivew.CaptureContourMesh(scalePreview.texture as Texture2D, meshObject);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        texturePreivew.OnEdgeTexUpdate -= OnEdgeImageUpdate;
+    }
 
 }
