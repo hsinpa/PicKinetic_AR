@@ -18,6 +18,9 @@ public class DeviceCamera : MonoBehaviour
     private Texture2D previewTex;
     private RenderTexture previewRenderer;
 
+    [SerializeField]
+    TextureMeshPreview texturePreivew;
+
     private Vector3 backgroundScale = new Vector3();
 
     TextureUtility TextureUtility;
@@ -29,8 +32,11 @@ public class DeviceCamera : MonoBehaviour
     [SerializeField, Range(0, 3.14f)]
     private float cameraTexRot;
 
+    private Camera _camera;
+
     private void Start()
     {
+        _camera = Camera.main;
         defaultBackground = background.texture;
         TextureUtility = new TextureUtility();
         PrepareTexture();
@@ -69,6 +75,8 @@ public class DeviceCamera : MonoBehaviour
         previewTex = new Texture2D(textureSize, textureSize);
         rectReadPicture = new Rect(0, 0, textureSize, textureSize);
 
+        texturePreivew.UpdateScreenInfo((int)((Screen.width / 2f) - (textureSize / 2f)),
+                                    (int)((Screen.height / 2f) - (textureSize / 2f)));
     }
 
     private void Update()
@@ -87,7 +95,11 @@ public class DeviceCamera : MonoBehaviour
         int orient = -backCam.videoRotationAngle;
         background.rectTransform.localEulerAngles = new Vector3(0, 0, orient);
 
-        preview.texture = RotateAndScaleImage( GrabTextureRadius(), -backCam.videoRotationAngle);
+        var scaleTex = RotateAndScaleImage(GrabTextureRadius(), -backCam.videoRotationAngle);
+
+        preview.texture = scaleTex;
+
+        texturePreivew.CaptureEdgeBorderMesh(scaleTex);
     }
 
     private Texture2D GrabTextureRadius() {

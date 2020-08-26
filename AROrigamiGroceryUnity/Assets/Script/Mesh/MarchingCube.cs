@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using UnityEngine;
 using UnityEngine.Video;
 
@@ -18,8 +17,11 @@ public class MarchingCube
 
     }
 
+
     public Mesh Calculate(MeshGenerator.SquareGrid squareGrid)
     {
+        Reset();
+
         var square = squareGrid.sqaures;
         radiusW = squareGrid.mapWidth / 2f;
         radiusH = squareGrid.mapHeight / 2f;
@@ -125,6 +127,13 @@ public class MarchingCube
                 uv.Add(new Vector2( ((points[i].position.x / radiusW) + 1) * 0.5f, ((points[i].position.z / radiusH) + 1) * 0.5f));
             }
         }
+    }
+
+    private void Reset()
+    {
+        triangles.Clear();
+        vertices.Clear();
+        uv.Clear();
     }
 
     private void CreateTriangle(MeshGenerator.Node a, MeshGenerator.Node b, MeshGenerator.Node c)
