@@ -22,16 +22,17 @@ public class ImageMaskGeneator
         MNFloodFill = new MNFloodFill();
     }
 
-    public async Task<Color[]> AsyncCreateMask(Color[] scaledImage, int width, int height)
+    public async Task<MooreNeighborhood.MooreNeighborInfo> AsyncCreateMask(Color[] scaledImage, int width, int height)
     {
         return await Task.Run(() =>
         {
-            Color[] TestContour = MooreNeighborhood.Execute(scaledImage, width, height);
-            return MNFloodFill.Execute(TestContour, width, height);
+            var TestContour = MooreNeighborhood.Execute(scaledImage, width, height);
+            TestContour.img =  MNFloodFill.Execute(TestContour.img, width, height);
+            return TestContour;
         });
     }
 
-    public async Task<Color[]> AsyncCreateBorder(Color[] scaledImage, int width, int height)
+    public async Task<MooreNeighborhood.MooreNeighborInfo> AsyncCreateBorder(Color[] scaledImage, int width, int height)
     {
         return await Task.Run(() =>
         {

@@ -39,6 +39,9 @@ public class OffCameraSetting : MonoBehaviour
         previewRenderer = TextureUtility.GetRenderTexture(textureSize);
         previewTex = new Texture2D(textureSize, textureSize);
         rectReadPicture = new Rect(0, 0, textureSize, textureSize);
+
+        textureMeshPreview.UpdateScreenInfo((int) ((Screen.width / 2f) - (textureSize / 2f) ),
+                                            (int)((Screen.height / 2f) - (textureSize / 2f)));
     }
 
     private Texture2D GrabTextureRadius()

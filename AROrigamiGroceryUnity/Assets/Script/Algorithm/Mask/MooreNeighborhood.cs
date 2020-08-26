@@ -23,12 +23,15 @@ public class MooreNeighborhood
 
     private List<Vector2Int> _eightNeighbors;
     private int _neighbourCount;
+    private MooreNeighborInfo infoContainer = new MooreNeighborInfo();
 
-
-    public Color[] Execute(Color[] grayImages, int width, int height, float threshold = 0.2f)
+    public MooreNeighborInfo Execute(Color[] grayImages, int width, int height, float threshold = 0.2f)
     {
         int maxStep = 5000;
         int step = 0;
+
+        int area = 1;
+        Vector2 centerPoint;
         contourImage = ResetOutputImage(width * height);
         _images = grayImages;
         _width = width;
@@ -38,6 +41,7 @@ public class MooreNeighborhood
         _neighbourCount = _eightNeighbors.Count;
 
         Point startPoint = SearchForFirstContact(0, height/2);
+        centerPoint = startPoint.position;
 
         p = startPoint;
         DrawDotOnContour(p.GetIndex(_width));
@@ -57,6 +61,9 @@ public class MooreNeighborhood
 
                 //backtrack (move the current pixel c to the pixel from which p was entered)
                 c = GetMooreNeighborhood(p, p.backTracePoint);
+
+                area++;
+                centerPoint += p.position;
             }
             //advance the current pixel c to the next clockwise pixel in M(p)
             else
@@ -71,9 +78,18 @@ public class MooreNeighborhood
             step++;
         }
 
+        float divident = (1f / area);
+        infoContainer.area = area;
+        infoContainer.centerPoint.Set(centerPoint.x * divident, centerPoint.y * divident);
+        infoContainer.img = contourImage;
+
+        Debug.Log("Area " + area);
+        Debug.Log("Center Point " + infoContainer.centerPoint);
+
+
         //Debug.Log("MooreNeighbor Step " + step);
 
-        return contourImage;
+        return infoContainer;
     }
 
     private Point SearchForFirstContact(int startX, int startY) {
@@ -183,9 +199,11 @@ public class MooreNeighborhood
         public int GetIndex(int width) {
             return Mathf.RoundToInt((position.y * width) + position.x);
         }
-
     }
 
-
-
+    public struct MooreNeighborInfo {
+        public Color[] img;
+        public Vector2 centerPoint;
+        public float area;
+    }
 }
