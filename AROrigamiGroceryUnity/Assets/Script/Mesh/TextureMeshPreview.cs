@@ -96,9 +96,9 @@ public class TextureMeshPreview : MonoBehaviour
         //previewMaskTexture.Apply();
 
         meshGenerator.GenerateMesh(maskImage, textureWidth, textureHeight, 1);
-        Mesh mesh = marchingCube.Calculate(meshGenerator.squareGrid);
+        Mesh mesh = marchingCube.Calculate(meshGenerator.squareGrid, meshObject.mesh);
 
-        meshObject.SetMesh(mesh, matTex);
+        meshObject.SetMesh(mesh, matTex, matTex.width);
     }
 
     private void AssignPosition(MooreNeighborhood.MooreNeighborInfo meshInfo, MeshObject meshObject) {

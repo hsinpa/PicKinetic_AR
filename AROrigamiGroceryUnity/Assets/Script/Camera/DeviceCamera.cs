@@ -41,7 +41,7 @@ public class DeviceCamera : MonoBehaviour
 
     private const float degreeToRadian = Mathf.PI / 180;
     private Rect rectReadPicture;
-    int textureSize = 512;
+    int textureSize = 256;
 
     private Camera _camera;
 

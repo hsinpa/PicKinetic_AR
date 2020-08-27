@@ -24,26 +24,33 @@ public class OffCameraSetting : MonoBehaviour
 
     private const float degreeToRadian = Mathf.PI / 180;
     private Rect rectReadPicture;
-    int textureSize = 512;
+    int textureSize = 256;
+
+    float timer;
+    float timer_step = 0.1f;
 
     private void Start()
     {
         TextureUtility = new TextureUtility();
         PrepareTexture();
 
+        //var scaleTex = RotateAndScaleImage(GrabTextureRadius(), 0);
+        //preview.texture = scaleTex;
+
+        //textureMeshPreview.CaptureContourMesh(scaleTex, p_meshObject);
+    }
+
+    private void Update()
+    {
+        if (timer > Time.time) return;
+
         var scaleTex = RotateAndScaleImage(GrabTextureRadius(), 0);
         preview.texture = scaleTex;
 
-        textureMeshPreview.CaptureContourMesh(scaleTex, p_meshObject);
+        //textureMeshPreview.CaptureEdgeBorderMesh(scaleTex, p_meshObject);
+
+        timer = timer_step + Time.time;
     }
-
-    //private void Update()
-    //{
-    //    var scaleTex = RotateAndScaleImage(GrabTextureRadius(), 0);
-    //    preview.texture = scaleTex;
-
-    //    textureMeshPreview.CaptureEdgeBorderMesh(scaleTex, p_meshObject);
-    //}
 
     private void PrepareTexture()
     {
