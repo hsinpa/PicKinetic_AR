@@ -22,6 +22,7 @@ public class DeviceCamera : MonoBehaviour
     private Texture2D previewTex;
 
     private RenderTexture previewRenderer;
+    private RenderTexture tempRenderer;
 
     [SerializeField]
     TextureMeshPreview texturePreivew;
@@ -41,7 +42,7 @@ public class DeviceCamera : MonoBehaviour
 
     private const float degreeToRadian = Mathf.PI / 180;
     private Rect rectReadPicture;
-    int textureSize = 512;
+    int textureSize = 256;
 
     private Camera _camera;
 
@@ -87,6 +88,8 @@ public class DeviceCamera : MonoBehaviour
 
     private void PrepareTexture() {
         previewRenderer = TextureUtility.GetRenderTexture(textureSize);
+        tempRenderer = TextureUtility.GetRenderTexture(textureSize);
+
         previewTex = new Texture2D(textureSize, textureSize);
         rectReadPicture = new Rect(0, 0, textureSize, textureSize);
 
@@ -110,32 +113,28 @@ public class DeviceCamera : MonoBehaviour
         int orient = -backCam.videoRotationAngle;
         background.rectTransform.localEulerAngles = new Vector3(0, 0, orient);
 
-        var scaleTex = RotateAndScaleImage(GrabTextureRadius(), -backCam.videoRotationAngle);
+        var scaleTex = RotateAndScaleImage(backCam, GrabTextureRadius(), -backCam.videoRotationAngle);
 
         scalePreview.texture = scaleTex;
 
         texturePreivew.CaptureEdgeBorderMesh(scaleTex, meshBorder);
     }
 
-    private Texture2D GrabTextureRadius() {
+    private TextureUtility.TextureStructure GrabTextureRadius() {
 
-        var texInfo = TextureUtility.GrabTextureRadius(backCam.width, backCam.height, 0.6f);
-
-        if (cropTex == null)
-            cropTex = new Texture2D(texInfo.width, texInfo.height);
-
-        cropTex.SetPixels(backCam.GetPixels(texInfo.x, texInfo.y, texInfo.width, texInfo.height));
-        cropTex.Apply();
-
-        return cropTex;
+        return TextureUtility.GrabTextureRadius(backCam.width, backCam.height, 0.6f);
     }
 
-    private Texture2D RotateAndScaleImage(Texture p_texture, int degree) {
+    private Texture2D RotateAndScaleImage(Texture p_texture, TextureUtility.TextureStructure textureSetting, int degree) {
         float radian = degreeToRadian * degree;
 
-        rotateMat.SetFloat("_Rotation", radian);
+        rotateMat.SetFloat("_EnlargeX", textureSetting.xRatio);
+        rotateMat.SetFloat("_EnlargeY", textureSetting.yRatio);
 
-        Graphics.Blit(p_texture, previewRenderer, rotateMat, 0);
+        Graphics.Blit(p_texture, tempRenderer, rotateMat, 0);
+
+        rotateMat.SetFloat("_Rotation", radian);
+        Graphics.Blit(tempRenderer, previewRenderer, rotateMat, 1);
 
         RenderTexture.active = previewRenderer;
         // Read pixels

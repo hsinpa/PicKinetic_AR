@@ -18,6 +18,8 @@ public class OffCameraSetting : MonoBehaviour
     public Texture2D inputTex;
     private Texture2D cropTex;
     private Texture2D previewTex;
+    private RenderTexture tempRenderer;
+
     private RenderTexture previewRenderer;
 
     TextureUtility TextureUtility;
@@ -31,23 +33,24 @@ public class OffCameraSetting : MonoBehaviour
         TextureUtility = new TextureUtility();
         PrepareTexture();
 
-        var scaleTex = RotateAndScaleImage(GrabTextureRadius(), 0);
-        preview.texture = scaleTex;
+        //var scaleTex = RotateAndScaleImage(inputTex, GrabTextureRadius(), 0);
+        //preview.texture = scaleTex;
 
-        textureMeshPreview.CaptureContourMesh(scaleTex, p_meshObject);
+        //textureMeshPreview.CaptureContourMesh(scaleTex, p_meshObject);
     }
 
-    //private void Update()
-    //{
-    //    var scaleTex = RotateAndScaleImage(GrabTextureRadius(), 0);
-    //    preview.texture = scaleTex;
+    private void Update()
+    {
+        var scaleTex = RotateAndScaleImage(inputTex, GrabTextureRadius(), 0);
+        preview.texture = scaleTex;
 
-    //    textureMeshPreview.CaptureEdgeBorderMesh(scaleTex, p_meshObject);
-    //}
+        textureMeshPreview.CaptureEdgeBorderMesh(scaleTex, p_meshObject);
+    }
 
     private void PrepareTexture()
     {
         previewRenderer = TextureUtility.GetRenderTexture(textureSize);
+        tempRenderer = TextureUtility.GetRenderTexture(textureSize);
         previewTex = new Texture2D(textureSize, textureSize);
         rectReadPicture = new Rect(0, 0, textureSize, textureSize);
 
@@ -55,27 +58,26 @@ public class OffCameraSetting : MonoBehaviour
                                             (int)((Screen.height / 2f) - (textureSize / 2f)));
     }
 
-    private Texture2D GrabTextureRadius()
+    private TextureUtility.TextureStructure GrabTextureRadius()
     {
-
         var texInfo = TextureUtility.GrabTextureRadius(inputTex.width, inputTex.height, 0.6f);
 
-        if (cropTex == null)
-            cropTex = new Texture2D(texInfo.width, texInfo.height);
+        //Debug.Log("inputTex.width " + inputTex.width +", inputTex.height " + inputTex.height);
+        //Debug.Log("texInfo " + texInfo.width + ", texInfo " + texInfo.height);
 
-        cropTex.SetPixels(inputTex.GetPixels(texInfo.x, texInfo.y, texInfo.width, texInfo.height));
-        cropTex.Apply();
-
-        return cropTex;
+        return texInfo;
     }
 
-    private Texture2D RotateAndScaleImage(Texture p_texture, int degree)
+    private Texture2D RotateAndScaleImage(Texture texture, TextureUtility.TextureStructure textureSetting, int degree)
     {
         float radian = degreeToRadian * degree;
 
-        rotateMat.SetFloat("_Rotation", radian);
+        //rotateMat.SetFloat("_Rotation", radian);
+        rotateMat.SetFloat("_EnlargeX", textureSetting.xRatio);
+        rotateMat.SetFloat("_EnlargeY", textureSetting.yRatio);
 
-        Graphics.Blit(p_texture, previewRenderer, rotateMat, 0);
+        Graphics.Blit(texture, tempRenderer, rotateMat, 0);
+        Graphics.Blit(tempRenderer, previewRenderer, rotateMat, 1);
 
         RenderTexture.active = previewRenderer;
         // Read pixels
