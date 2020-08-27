@@ -18,7 +18,7 @@ public class MarchingCube
     }
 
 
-    public Mesh Calculate(MeshGenerator.SquareGrid squareGrid)
+    public Mesh Calculate(MeshGenerator.SquareGrid squareGrid, Mesh mesh)
     {
         Reset();
 
@@ -34,10 +34,9 @@ public class MarchingCube
             }
         }
 
-        Mesh mesh = new Mesh();
-        mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
-        mesh.uv = uv.ToArray();
+        mesh.SetVertices(vertices);
+        mesh.SetTriangles(triangles, 0);
+        mesh.SetUVs(0, uv);
         mesh.RecalculateNormals();
 
         return mesh;
