@@ -17,7 +17,10 @@ public class TextureUtility
         _textureStructure.height = size;
         _textureStructure.x = center.x - radius;
         _textureStructure.y = center.y - radius;
-            
+
+        _textureStructure.xRatio = (float)size / p_width;
+        _textureStructure.yRatio = (float)size / p_height;
+
         return _textureStructure;
     }
 
@@ -27,6 +30,9 @@ public class TextureUtility
         public int height;
         public int x;
         public int y;
+
+        public float xRatio;
+        public float yRatio;
     }
 
     public static RenderTexture GetRenderTexture(int size)

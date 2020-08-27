@@ -18,7 +18,6 @@ public class OffCameraSetting : MonoBehaviour
     public Texture2D inputTex;
     private Texture2D cropTex;
     private Texture2D previewTex;
-    private RenderTexture tempRenderer;
 
     private RenderTexture previewRenderer;
 
@@ -29,7 +28,7 @@ public class OffCameraSetting : MonoBehaviour
     int textureSize = 512;
 
     float timer;
-    float timer_step = 0.1f;
+    float timer_step = 0.5f;
 
     private void Start()
     {
@@ -40,7 +39,7 @@ public class OffCameraSetting : MonoBehaviour
 
     private void Update()
     {
-        if (timer > Time.time) return;
+        //if (timer > Time.time) return;
 
         var scaleTex = RotateAndScaleImage(inputTex, GrabTextureRadius(), 0);
         preview.texture = scaleTex;
@@ -53,7 +52,6 @@ public class OffCameraSetting : MonoBehaviour
     private void PrepareTexture()
     {
         previewRenderer = TextureUtility.GetRenderTexture(textureSize);
-        tempRenderer = TextureUtility.GetRenderTexture(textureSize);
         previewTex = new Texture2D(textureSize, textureSize);
         rectReadPicture = new Rect(0, 0, textureSize, textureSize);
 
@@ -79,8 +77,7 @@ public class OffCameraSetting : MonoBehaviour
         rotateMat.SetFloat("_EnlargeX", textureSetting.xRatio);
         rotateMat.SetFloat("_EnlargeY", textureSetting.yRatio);
 
-        Graphics.Blit(texture, tempRenderer, rotateMat, 0);
-        Graphics.Blit(tempRenderer, previewRenderer, rotateMat, 1);
+        Graphics.Blit(texture, previewRenderer, rotateMat, 0);
 
         RenderTexture.active = previewRenderer;
         // Read pixels

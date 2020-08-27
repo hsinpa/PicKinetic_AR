@@ -34,9 +34,24 @@ public class MarchingCube
             }
         }
 
-        mesh.SetVertices(vertices);
-        mesh.SetTriangles(triangles, 0);
-        mesh.SetUVs(0, uv);
+        try
+        {
+            mesh.Clear();
+
+            mesh.SetVertices(vertices);
+            mesh.SetTriangles(triangles, 0);
+            mesh.SetUVs(0, uv);
+        }
+        catch { 
+        
+        }
+        //mesh.vertices = (vertices).ToArray();
+        //mesh.triangles = (triangles).ToArray();
+        //mesh.uv = (uv).ToArray();
+
+        //mesh.SetVertices(vertices);
+        //mesh.SetTriangles(triangles, 0);
+        //mesh.SetUVs(0, uv);
         mesh.RecalculateNormals();
 
         return mesh;

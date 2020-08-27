@@ -5,12 +5,13 @@ using UnityEngine;
 namespace AROrigami {
     public class MeshObject : MonoBehaviour
     {
-        
-        [SerializeField]
-        private MeshRenderer meshRenderer;
 
         [SerializeField]
-        private MeshFilter meshFilter;
+        private MeshRenderer _meshRenderer;
+        public MeshRenderer meshRenderer => _meshRenderer;
+
+        [SerializeField]
+        private MeshFilter _meshFilter;
 
         [SerializeField, Range(1, 10)]
         private float rotateSensibility = 1;
@@ -44,10 +45,10 @@ namespace AROrigami {
 
             transform.rotation = _ori_quaterion;
 
-            meshFilter.mesh = mesh;
+            _meshFilter.mesh = mesh;
 
             m_PropertyBlock.SetTexture("_MainTex", dstTexture);
-            meshRenderer.SetPropertyBlock(m_PropertyBlock);
+            _meshRenderer.SetPropertyBlock(m_PropertyBlock);
         }
 
         public void Rotate(Vector3 direction) {

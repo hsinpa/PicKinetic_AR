@@ -22,7 +22,6 @@ public class DeviceCamera : MonoBehaviour
     private Texture2D previewTex;
 
     private RenderTexture previewRenderer;
-    private RenderTexture tempRenderer;
 
     [SerializeField]
     TextureMeshPreview texturePreivew;
@@ -42,9 +41,12 @@ public class DeviceCamera : MonoBehaviour
 
     private const float degreeToRadian = Mathf.PI / 180;
     private Rect rectReadPicture;
-    int textureSize = 256;
+    int textureSize = 512;
 
     private Camera _camera;
+
+    float timer;
+    float timer_step = 0.1f;
 
     private void Start()
     {
@@ -88,7 +90,6 @@ public class DeviceCamera : MonoBehaviour
 
     private void PrepareTexture() {
         previewRenderer = TextureUtility.GetRenderTexture(textureSize);
-        tempRenderer = TextureUtility.GetRenderTexture(textureSize);
 
         previewTex = new Texture2D(textureSize, textureSize);
         rectReadPicture = new Rect(0, 0, textureSize, textureSize);
@@ -100,6 +101,8 @@ public class DeviceCamera : MonoBehaviour
     private void Update()
     {
         if (!camAvailable) return;
+
+        if (timer > Time.time) return;
 
         float ratio = (float)backCam.width / (float)backCam.height;
 
@@ -118,6 +121,8 @@ public class DeviceCamera : MonoBehaviour
         scalePreview.texture = scaleTex;
 
         texturePreivew.CaptureEdgeBorderMesh(scaleTex, meshBorder);
+
+        timer = timer_step + Time.time;
     }
 
     private TextureUtility.TextureStructure GrabTextureRadius() {
@@ -130,11 +135,9 @@ public class DeviceCamera : MonoBehaviour
 
         rotateMat.SetFloat("_EnlargeX", textureSetting.xRatio);
         rotateMat.SetFloat("_EnlargeY", textureSetting.yRatio);
-
-        Graphics.Blit(p_texture, tempRenderer, rotateMat, 0);
-
         rotateMat.SetFloat("_Rotation", radian);
-        Graphics.Blit(tempRenderer, previewRenderer, rotateMat, 1);
+
+        Graphics.Blit(p_texture, previewRenderer, rotateMat, 0);
 
         RenderTexture.active = previewRenderer;
         // Read pixels
@@ -151,7 +154,15 @@ public class DeviceCamera : MonoBehaviour
     }
 
     private void TakeAPhoto() {
+
+        if (meshObject.meshRenderer.enabled) {
+            meshObject.meshRenderer.enabled = false;
+            return;
+        }
+
         if (scalePreview != null && scalePreview.texture != null) {
+            meshObject.meshRenderer.enabled = true;
+
             texturePreivew.CaptureContourMesh(scalePreview.texture as Texture2D, meshObject);
         }
     }
