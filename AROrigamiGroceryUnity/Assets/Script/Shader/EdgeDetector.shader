@@ -21,6 +21,7 @@
 			CGPROGRAM
 			#pragma vertex vert_img
 			#pragma fragment frag_horizontal
+            #pragma target 3.0
 
 			#include "UnityCG.cginc"
 
@@ -72,6 +73,7 @@
 			CGPROGRAM
 			#pragma vertex vert_img
 			#pragma fragment frag
+            #pragma target 3.0
 
 			#include "UnityCG.cginc"
 
@@ -96,6 +98,7 @@
 			CGPROGRAM
 			#pragma vertex vert_img
 			#pragma fragment frag
+            #pragma target 3.0
 
 			#include "UnityCG.cginc"
 
@@ -151,6 +154,7 @@
 			CGPROGRAM
 			#pragma vertex vert_img
 			#pragma fragment frag
+            #pragma target 3.0
 
 			#include "UnityCG.cginc"
 
@@ -198,6 +202,7 @@
 			CGPROGRAM
 			#pragma vertex vert_img
 			#pragma fragment frag
+            #pragma target 3.0
 
 			#include "UnityCG.cginc"
 
