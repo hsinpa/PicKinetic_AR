@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using AROrigami;
 
 namespace Hsinpa.Study {
     public class CubeMesh : MonoBehaviour
@@ -14,10 +15,17 @@ namespace Hsinpa.Study {
         private int[] triangle;
         private Vector2[] uv;
 
+        private Mesh2DTo3D mesh2DTo3D;
+
         private void Start()
         {
-            meshFilter.mesh = DrawQuad();
+            mesh2DTo3D = new Mesh2DTo3D();
+
+            var mesh = DrawQuad();
+            meshFilter.mesh = mesh2DTo3D.Convert(mesh);
         }
+
+
 
         private Mesh DrawQuad() {
             Mesh mesh = new Mesh();
