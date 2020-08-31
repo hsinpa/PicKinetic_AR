@@ -19,6 +19,8 @@ namespace AROrigami {
 
             targetMesh.uv = uv;
 
+            targetMesh.RecalculateNormals();
+
             return targetMesh;
         }
 
@@ -44,14 +46,36 @@ namespace AROrigami {
         {
             int originCount = triangle.Length;
             int newCount = originCount * 2;
-            int[] newTrigs = new int[newCount];
+            int[] newTrigs = new int[newCount + (originCount * 4)];
+            int verticeCount = 4;
 
             //Copy the front vert
             System.Array.Copy(triangle, newTrigs, originCount);
 
             for (int i = originCount; i < newCount; i++)
             {
-                newTrigs[i] = newTrigs[i - originCount] + originCount;
+                newTrigs[i] = newTrigs[i - originCount] + verticeCount;
+            }
+
+
+
+            Debug.Log(originCount);
+
+            for (int i = 0; i < verticeCount; i ++)
+            {
+                int previousID = i - 1;
+                if (i == 0) {
+                    previousID = verticeCount - 1;
+                }
+
+                int baseIndex = i * 6;
+                newTrigs[newCount + baseIndex] = previousID;
+                newTrigs[newCount + baseIndex + 1] = previousID + verticeCount;
+                newTrigs[newCount + baseIndex + 2] = i + verticeCount;
+
+                newTrigs[newCount + baseIndex + 3] = i + verticeCount;
+                newTrigs[newCount + baseIndex + 4] = i;
+                newTrigs[newCount + baseIndex + 5] = previousID ;
             }
 
             return newTrigs;

@@ -3,6 +3,7 @@
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        _SideTex ("Side Texture", 2D) = "white" {}
     }
     SubShader
     {
@@ -34,6 +35,8 @@
 
             uniform sampler2D _MainTex;
             float4 _MainTex_ST;
+
+            uniform sampler2D _SideTex;
 
             v2f vert (appdata v)
             {
