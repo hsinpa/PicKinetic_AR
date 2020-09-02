@@ -7,12 +7,18 @@
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags {
+            "Queue" = "Transparent"
+            "IgnoreProjector" = "True"
+            "RenderType" = "Transparent"
+        }
+
         LOD 100
 
         Pass
         {
             Cull Off
+            Blend SrcAlpha OneMinusSrcAlpha
 
             CGPROGRAM
             #pragma vertex vert
@@ -42,7 +48,8 @@
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = v.uv;
+                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+
                 return o;
             }
 

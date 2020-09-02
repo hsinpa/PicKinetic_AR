@@ -92,9 +92,6 @@ public class TextureMeshPreview : MonoBehaviour
 
     private void AssignMesh(Color[] maskImage, int textureWidth, int textureHeight, Texture2D matTex, MeshObject meshObject)
     {
-        //previewMaskTexture.SetPixels(maskImage);
-        //previewMaskTexture.Apply();
-
         meshGenerator.GenerateMesh(maskImage, textureWidth, textureHeight, 1);
         Mesh mesh = marchingCube.Calculate(meshGenerator.squareGrid, meshObject.mesh);
 

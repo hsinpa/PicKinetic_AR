@@ -44,7 +44,7 @@ public class OffCameraSetting : MonoBehaviour
         var scaleTex = RotateAndScaleImage(inputTex, GrabTextureRadius(), 0);
         preview.texture = scaleTex;
 
-        textureMeshPreview.CaptureEdgeBorderMesh(scaleTex, p_meshObject);
+        textureMeshPreview.CaptureContourMesh(scaleTex, p_meshObject);
 
         timer = timer_step + Time.time;
     }
