@@ -77,7 +77,8 @@ namespace AROrigami
                 DeformControlPoint cPointObj = ctrlPoints[i];
                 Vector3 changeInPos = _pointPos[i];
 
-                float weight = (cPointObj.Radius) - Vector3.Distance(vertice, _oriPointPos[i]);
+                //float weight = (cPointObj.Radius) - Vector3.Distance(vertice, _oriPointPos[i]);
+                float weight = (cPointObj.Radius) - Mathf.Abs(vertice.y - _oriPointPos[i].y);
                 float w_strength = Mathf.Clamp(weight, 0, weight) / cPointObj.Radius;
                 int step = (w_strength > 0) ? 1 : 0;
                 changeInDir += Vector3.Lerp(changeInPos * step, changeInPos * (w_strength), 1-cPointObj.Interpolation);

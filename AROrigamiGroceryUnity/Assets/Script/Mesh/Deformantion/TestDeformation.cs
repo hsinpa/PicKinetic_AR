@@ -21,12 +21,14 @@ namespace AROrigami
         private DeformControlPoint[] controllerPoints;
 
         private SpaceDeformation spaceDeformation;
+        private Animator meshAnimator;
 
         // Start is called before the first frame update
         void Start()
         {
             spaceDeformation = new SpaceDeformation();
             meshFilter.mesh = SpriteToMesh(targetSprite);
+            meshAnimator = meshFilter.GetComponent<Animator>();
             meshRenderer.material.SetTexture("_MainTex", targetSprite.texture);
 
             spaceDeformation.SetUpMesh(meshFilter.mesh);
@@ -36,6 +38,11 @@ namespace AROrigami
         private void Update()
         {
             spaceDeformation.OnUpdate();
+
+            if (Input.GetMouseButtonDown(0)) {
+                meshAnimator.gameObject.SetActive(false);
+                meshAnimator.gameObject.SetActive(true);
+            }
         }
 
         private void SetSpriteControlPoint()

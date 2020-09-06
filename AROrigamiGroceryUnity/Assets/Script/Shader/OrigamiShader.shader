@@ -31,12 +31,14 @@
             {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
+                fixed4 color : COLOR;
             };
 
             struct v2f
             {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
+                fixed4 color : COLOR;
             };
 
             uniform sampler2D _MainTex;
@@ -49,6 +51,7 @@
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+                o.color = v.color;
 
                 return o;
             }
@@ -57,6 +60,11 @@
             {
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv);
+
+                if (i.color.r >= 0.1) {
+                    col = tex2D(_SideTex, i.uv);                
+                }
+
                 return col;
             }
             ENDCG
