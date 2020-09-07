@@ -95,7 +95,8 @@ public class TextureMeshPreview : MonoBehaviour
         meshGenerator.GenerateMesh(maskImage, textureWidth, textureHeight, 1);
         Mesh mesh = marchingCube.Calculate(meshGenerator.squareGrid, meshObject.mesh);
 
-        meshObject.SetMesh(mesh, matTex, matTex.width);
+        if (mesh != null)
+            meshObject.SetMesh(mesh, matTex, matTex.width);
     }
 
     private void AssignPosition(MooreNeighborhood.MooreNeighborInfo meshInfo, MeshObject meshObject) {
@@ -107,7 +108,8 @@ public class TextureMeshPreview : MonoBehaviour
         var point = _camera.ScreenToWorldPoint(_meshPosition);
         point.z = 0;
 
-        meshObject.transform.position = point;
+        if (meshObject != null)
+            meshObject.transform.position = point;
     }
 
     private bool CheckIfValid(MooreNeighborhood.MooreNeighborInfo meshInfo) {

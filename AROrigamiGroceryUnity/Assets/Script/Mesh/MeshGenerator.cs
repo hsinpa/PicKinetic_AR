@@ -12,6 +12,7 @@ public class MeshGenerator
 
     public class SquareGrid {
         public Square[,] sqaures;
+        public Vector3 borderVertices;
 
         private float _mapWidth;
         private float _mapHeight;
@@ -40,6 +41,7 @@ public class MeshGenerator
                 }
             }
 
+            borderVertices = new Vector3();
             sqaures = new Square[nodeCountX -1, nodeCountY -1];
             for (int x = 0; x < nodeCountX - 1; x++)
             {

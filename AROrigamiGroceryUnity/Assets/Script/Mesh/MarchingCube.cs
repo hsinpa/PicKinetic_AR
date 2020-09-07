@@ -52,7 +52,9 @@ public class MarchingCube
         //mesh.SetVertices(vertices);
         //mesh.SetTriangles(triangles, 0);
         //mesh.SetUVs(0, uv);
-        mesh.RecalculateNormals();
+
+        if (mesh != null)
+            mesh.RecalculateNormals();
 
         return mesh;
     }

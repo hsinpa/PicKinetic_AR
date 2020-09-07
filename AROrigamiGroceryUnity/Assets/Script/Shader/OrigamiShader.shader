@@ -61,7 +61,7 @@
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv);
 
-                if (i.color.r >= 0.1) {
+                if (i.color.r < 0.9) {
                     col = tex2D(_SideTex, i.uv);                
                 }
 
