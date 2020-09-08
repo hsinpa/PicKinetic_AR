@@ -11,6 +11,9 @@ public class MarchingCube
     List<Vector3> vertices = new List<Vector3>();
     List<Vector2> uv = new List<Vector2>();
 
+    List<Vector3> borders = new List<Vector3>();
+
+
     float radiusW, radiusH;
 
     public MarchingCube() {
@@ -53,6 +56,8 @@ public class MarchingCube
         //mesh.SetTriangles(triangles, 0);
         //mesh.SetUVs(0, uv);
 
+        mesh.GetNormals(borders);
+
         if (mesh != null)
             mesh.RecalculateNormals();
 
@@ -64,31 +69,55 @@ public class MarchingCube
             // 1 points
             case 1:
                 MeshFromPoints(square.centerBottom, square.bottomLeft, square.centerLeft);
+                borders.Add(square.centerBottom.position);
+                borders.Add(square.centerLeft.position);
                 break;
             case 2:
                 MeshFromPoints(square.centerRight, square.bottomRight, square.centerBottom);
+                borders.Add(square.centerRight.position);
+                borders.Add(square.centerBottom.position);
+
                 break;
             case 4:
                 MeshFromPoints(square.centerTop, square.topRight, square.centerRight);
+                borders.Add(square.centerTop.position);
+                borders.Add(square.centerRight.position);
+
                 break;
             case 8:
                 MeshFromPoints(square.topLeft, square.centerTop, square.centerLeft);
+                borders.Add(square.centerTop.position);
+                borders.Add(square.centerLeft.position);
+                Debug.Log(square.centerLeft.position);
+
                 break;
             // 2 points
             case 3:
                 MeshFromPoints(square.centerRight, square.bottomRight, square.bottomLeft, square.centerLeft);
+                borders.Add(square.centerLeft.position);
+                borders.Add(square.centerRight.position);
+
                 break;
             case 6:
                 MeshFromPoints(square.centerTop, square.topRight, square.bottomRight, square.centerBottom);
+                borders.Add(square.centerBottom.position);
+                borders.Add(square.centerTop.position);
+
                 break;
             case 9:
                 MeshFromPoints(square.topLeft, square.centerTop, square.centerBottom, square.bottomLeft);
+                borders.Add(square.centerTop.position);
+                borders.Add(square.centerBottom.position);
                 break;
             case 12:
                 MeshFromPoints(square.topLeft, square.topRight, square.centerRight, square.centerLeft);
+                borders.Add(square.centerRight.position);
+                borders.Add(square.centerLeft.position);
+
                 break;
             case 5:
                 MeshFromPoints(square.centerTop, square.topRight, square.centerRight, square.centerBottom, square.bottomLeft, square.centerLeft);
+
                 break;
             case 10:
                 MeshFromPoints(square.topLeft, square.centerTop, square.centerRight, square.bottomRight, square.centerBottom, square.centerLeft);
@@ -97,15 +126,26 @@ public class MarchingCube
             // 3 points
             case 7:
                 MeshFromPoints(square.centerTop, square.topRight, square.bottomRight, square.bottomLeft, square.centerLeft);
+                borders.Add(square.centerLeft.position);
+                borders.Add(square.centerTop.position);
+
                 break;
             case 11:
                 MeshFromPoints(square.topLeft, square.centerTop, square.centerRight, square.bottomRight, square.bottomLeft);
+                borders.Add(square.centerTop.position);
+                borders.Add(square.centerRight.position);
+
                 break;
             case 13:
                 MeshFromPoints(square.topLeft, square.topRight, square.centerRight, square.centerBottom, square.bottomLeft);
+                borders.Add(square.centerRight.position);
+                borders.Add(square.centerBottom.position);
+
                 break;
             case 14:
                 MeshFromPoints(square.topLeft, square.topRight, square.bottomRight, square.centerBottom, square.centerLeft);
+                borders.Add(square.centerBottom.position);
+                borders.Add(square.centerLeft.position);
                 break;
 
             // 4 points
@@ -150,6 +190,7 @@ public class MarchingCube
         triangles.Clear();
         vertices.Clear();
         uv.Clear();
+        borders.Clear();
     }
 
     private void CreateTriangle(MeshGenerator.Node a, MeshGenerator.Node b, MeshGenerator.Node c)

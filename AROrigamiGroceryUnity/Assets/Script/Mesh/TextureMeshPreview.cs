@@ -27,6 +27,8 @@ public class TextureMeshPreview : MonoBehaviour
 
     public System.Action<Texture2D> OnEdgeTexUpdate;
 
+    private Vector3[] TestBorderArray;
+
     int resize = 64;
     int startPixelX;
     int startPixelY;
@@ -95,6 +97,9 @@ public class TextureMeshPreview : MonoBehaviour
         meshGenerator.GenerateMesh(maskImage, textureWidth, textureHeight, 1);
         Mesh mesh = marchingCube.Calculate(meshGenerator.squareGrid, meshObject.mesh);
 
+        Debug.Log(mesh.normals.Length);
+        TestBorderArray = mesh.normals;
+
         if (mesh != null)
             meshObject.SetMesh(mesh, matTex, matTex.width);
     }
@@ -121,4 +126,16 @@ public class TextureMeshPreview : MonoBehaviour
         return rawColorTexture.GetPixels(0, 0, rawColorTexture.width, rawColorTexture.height);
     }
 
+
+    private void OnDrawGizmosSelected()
+    {
+        if (TestBorderArray != null) {
+            int count = TestBorderArray.Length;
+            for (int i = 0; i < count; i++) {
+
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawSphere(TestBorderArray[i], 0.01f);
+            }
+        }
+    }
 }
