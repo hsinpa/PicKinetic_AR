@@ -11,17 +11,16 @@ public class MarchingCube
     List<Vector3> vertices = new List<Vector3>();
     List<Vector2> uv = new List<Vector2>();
 
-    List<Vector3> borders = new List<Vector3>();
+    HashSet<Vector3> borders = new HashSet<Vector3>();
 
-
+    MarchingCubeResult marchingCubeResult = new MarchingCubeResult();
     float radiusW, radiusH;
 
     public MarchingCube() {
-
     }
 
 
-    public Mesh Calculate(MeshGenerator.SquareGrid squareGrid, Mesh mesh)
+    public MarchingCubeResult Calculate(MeshGenerator.SquareGrid squareGrid, Mesh mesh)
     {
         Reset();
 
@@ -56,12 +55,13 @@ public class MarchingCube
         //mesh.SetTriangles(triangles, 0);
         //mesh.SetUVs(0, uv);
 
-        mesh.GetNormals(borders);
-
         if (mesh != null)
             mesh.RecalculateNormals();
 
-        return mesh;
+        marchingCubeResult.borderVertices = borders;
+        marchingCubeResult.mesh = mesh;
+
+        return marchingCubeResult;
     }
 
     private void TriangulateSquare(MeshGenerator.Square square) {
@@ -69,83 +69,84 @@ public class MarchingCube
             // 1 points
             case 1:
                 MeshFromPoints(square.centerBottom, square.bottomLeft, square.centerLeft);
-                borders.Add(square.centerBottom.position);
-                borders.Add(square.centerLeft.position);
+                AddBorder(square.centerLeft.position);
+                AddBorder(square.centerBottom.position);
                 break;
             case 2:
                 MeshFromPoints(square.centerRight, square.bottomRight, square.centerBottom);
-                borders.Add(square.centerRight.position);
-                borders.Add(square.centerBottom.position);
+                AddBorder(square.centerRight.position);
+                AddBorder(square.centerBottom.position);
 
                 break;
             case 4:
                 MeshFromPoints(square.centerTop, square.topRight, square.centerRight);
-                borders.Add(square.centerTop.position);
-                borders.Add(square.centerRight.position);
+                AddBorder(square.centerTop.position);
+                AddBorder(square.centerRight.position);
 
                 break;
             case 8:
                 MeshFromPoints(square.topLeft, square.centerTop, square.centerLeft);
-                borders.Add(square.centerTop.position);
-                borders.Add(square.centerLeft.position);
-                Debug.Log(square.centerLeft.position);
+                AddBorder(square.centerLeft.position);
+                AddBorder(square.centerTop.position);
 
                 break;
             // 2 points
             case 3:
                 MeshFromPoints(square.centerRight, square.bottomRight, square.bottomLeft, square.centerLeft);
-                borders.Add(square.centerLeft.position);
-                borders.Add(square.centerRight.position);
+                AddBorder(square.centerLeft.position);
+                AddBorder(square.centerRight.position);
 
                 break;
             case 6:
                 MeshFromPoints(square.centerTop, square.topRight, square.bottomRight, square.centerBottom);
-                borders.Add(square.centerBottom.position);
-                borders.Add(square.centerTop.position);
+                AddBorder(square.centerBottom.position);
+                AddBorder(square.centerTop.position);
 
                 break;
             case 9:
                 MeshFromPoints(square.topLeft, square.centerTop, square.centerBottom, square.bottomLeft);
-                borders.Add(square.centerTop.position);
-                borders.Add(square.centerBottom.position);
+                AddBorder(square.centerTop.position);
+                AddBorder(square.centerBottom.position);
                 break;
             case 12:
                 MeshFromPoints(square.topLeft, square.topRight, square.centerRight, square.centerLeft);
-                borders.Add(square.centerRight.position);
-                borders.Add(square.centerLeft.position);
+                AddBorder(square.centerRight.position);
+                AddBorder(square.centerLeft.position);
 
                 break;
             case 5:
                 MeshFromPoints(square.centerTop, square.topRight, square.centerRight, square.centerBottom, square.bottomLeft, square.centerLeft);
-
+                Debug.Log("Type 5");
                 break;
             case 10:
                 MeshFromPoints(square.topLeft, square.centerTop, square.centerRight, square.bottomRight, square.centerBottom, square.centerLeft);
+                Debug.Log("Type 10");
+
                 break;
 
             // 3 points
             case 7:
                 MeshFromPoints(square.centerTop, square.topRight, square.bottomRight, square.bottomLeft, square.centerLeft);
-                borders.Add(square.centerLeft.position);
-                borders.Add(square.centerTop.position);
+                AddBorder(square.centerLeft.position);
+                AddBorder(square.centerTop.position);
 
                 break;
             case 11:
                 MeshFromPoints(square.topLeft, square.centerTop, square.centerRight, square.bottomRight, square.bottomLeft);
-                borders.Add(square.centerTop.position);
-                borders.Add(square.centerRight.position);
+                AddBorder(square.centerTop.position);
+                AddBorder(square.centerRight.position);
 
                 break;
             case 13:
                 MeshFromPoints(square.topLeft, square.topRight, square.centerRight, square.centerBottom, square.bottomLeft);
-                borders.Add(square.centerRight.position);
-                borders.Add(square.centerBottom.position);
+                AddBorder(square.centerRight.position);
+                AddBorder(square.centerBottom.position);
 
                 break;
             case 14:
                 MeshFromPoints(square.topLeft, square.topRight, square.bottomRight, square.centerBottom, square.centerLeft);
-                borders.Add(square.centerBottom.position);
-                borders.Add(square.centerLeft.position);
+                AddBorder(square.centerBottom.position);
+                AddBorder(square.centerLeft.position);
                 break;
 
             // 4 points
@@ -154,6 +155,11 @@ public class MarchingCube
                 break;
 
         }
+    }
+
+    private void AddBorder(Vector3 vector) {
+        if (!borders.Contains(vector))
+            borders.Add(vector);
     }
 
     private void MeshFromPoints(params MeshGenerator.Node[] points) {
@@ -170,7 +176,6 @@ public class MarchingCube
 
         if (points.Length >= 6)
             CreateTriangle(points[0], points[4], points[5]);
-
     }
 
     private void AssignVertices(MeshGenerator.Node[] points) { 
@@ -199,6 +204,11 @@ public class MarchingCube
         triangles.Add(b.vertexIndex);
         triangles.Add(c.vertexIndex);
 
+    }
+
+    public struct MarchingCubeResult {
+        public Mesh mesh;
+        public HashSet<Vector3> borderVertices;
     }
 
 }
