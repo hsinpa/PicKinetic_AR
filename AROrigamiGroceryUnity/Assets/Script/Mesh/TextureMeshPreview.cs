@@ -22,12 +22,13 @@ public class TextureMeshPreview : MonoBehaviour
     ImageMaskGeneator imageMaskGeneator;
     MeshGenerator meshGenerator;
     MarchingCube marchingCube;
+    private Mesh2DTo3D mesh2DTo3D;
 
     EdgeImageDetector edgeImage;
     MarchingCubeBorder marchingCubeBorder;
     public System.Action<Texture2D> OnEdgeTexUpdate;
 
-    private List<Vector3> TestBorderArray;
+    private Vector3[] TestBorderArray;
 
     int resize = 64;
     int startPixelX;
@@ -43,6 +44,7 @@ public class TextureMeshPreview : MonoBehaviour
         marchingCube = new MarchingCube();
         meshGenerator = new MeshGenerator();
         marchingCubeBorder = new MarchingCubeBorder();
+        mesh2DTo3D = new Mesh2DTo3D();
         edgeImage = new EdgeImageDetector(EdgeMaterial);
         _camera = Camera.main;
     }
@@ -62,7 +64,12 @@ public class TextureMeshPreview : MonoBehaviour
         var maskColors = await PrepareImageBorder(edgeTex);
 
         if (!CheckIfValid(maskColors)) return;
-        await AssignMesh(maskColors.img, resize, resize, highlightTexture, meshObject);
+
+        var meshResult = AssignMesh(maskColors.img, resize, resize, rawTexture, meshObject);
+
+        if (meshResult.mesh != null)
+            meshObject.SetMesh(meshResult.mesh, rawTexture, rawTexture.width);
+
         AssignPosition(maskColors, meshObject);
     }
 
@@ -75,7 +82,17 @@ public class TextureMeshPreview : MonoBehaviour
         var maskColors = await PrepareImageMask(edgeTex);
         if (!CheckIfValid(maskColors)) return;
 
-        await AssignMesh(maskColors.img, resize, resize, rawTexture, meshObject);
+        var meshResult = AssignMesh(maskColors.img, resize, resize, rawTexture, meshObject);
+
+        Debug.Log(meshResult.mesh.vertexCount);
+
+        var mesh = await MeshTo3D(meshResult, meshObject);
+
+        Debug.Log(mesh.vertexCount);
+
+        if (mesh != null)
+            meshObject.SetMesh(mesh, rawTexture, rawTexture.width);
+
         AssignPosition(maskColors, meshObject);
     }
 
@@ -93,15 +110,16 @@ public class TextureMeshPreview : MonoBehaviour
         return await imageMaskGeneator.AsyncCreateBorder(scaledColor, resize, resize);
     }
 
-    private async Task AssignMesh(Color[] maskImage, int textureWidth, int textureHeight, Texture2D matTex, MeshObject meshObject)
+    private MarchingCube.MarchingCubeResult AssignMesh(Color[] maskImage, int textureWidth, int textureHeight, Texture2D matTex, MeshObject meshObject)
     {
         meshGenerator.GenerateMesh(maskImage, textureWidth, textureHeight, 1);
-        var meshResult = marchingCube.Calculate(meshGenerator.squareGrid, meshObject.mesh);
+        return marchingCube.Calculate(meshGenerator.squareGrid, meshObject.mesh);
+    }
 
-        TestBorderArray = await marchingCubeBorder.AsynSort(meshResult.borderVertices);
-
-        if (meshResult.mesh != null)
-            meshObject.SetMesh(meshResult.mesh, matTex, matTex.width);
+    private async Task<Mesh> MeshTo3D(MarchingCube.MarchingCubeResult meshResult, MeshObject meshObject) {
+        Vector3[] borderVertices = await marchingCubeBorder.AsynSort(meshResult.borderVertices);
+        TestBorderArray = borderVertices;
+        return mesh2DTo3D.Convert(meshResult.mesh, borderVertices);
     }
 
     private void AssignPosition(MooreNeighborhood.MooreNeighborInfo meshInfo, MeshObject meshObject) {
@@ -130,7 +148,7 @@ public class TextureMeshPreview : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         if (TestBorderArray != null) {
-            int count = TestBorderArray.Count;
+            int count = TestBorderArray.Length;
             for (int i = 0; i < count; i++) {
                 float pert = (float)i / count;
                 Gizmos.color = new Color(pert, pert, pert);

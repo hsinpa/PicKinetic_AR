@@ -25,8 +25,6 @@ namespace Hsinpa.Study {
             meshFilter.mesh = mesh2DTo3D.Convert(mesh, mesh.vertices);
         }
 
-
-
         private Mesh DrawQuad() {
             Mesh mesh = new Mesh();
             Vector3[] vertices = new Vector3[4];

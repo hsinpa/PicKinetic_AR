@@ -980,6 +980,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 130743004}
     m_Modifications:
+    - target: {fileID: 2299862529841633304, guid: c5a055a17c57b5944977700124a71c7c,
+        type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2299862529841633304, guid: c5a055a17c57b5944977700124a71c7c,
+        type: 3}
+      propertyPath: m_LightProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2299862529841633304, guid: c5a055a17c57b5944977700124a71c7c,
+        type: 3}
+      propertyPath: m_ReflectionProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3172466947099852267, guid: c5a055a17c57b5944977700124a71c7c,
         type: 3}
       propertyPath: copyUVTexture

@@ -37,21 +37,25 @@ namespace AROrigami {
             if (m_PropertyBlock == null)
                 m_PropertyBlock = new MaterialPropertyBlock();
 
-            if (dstTexture == null)
+            if (dstTexture == null) {
                 dstTexture = new Texture2D(size, size);
+            }
 
             //Graphics.CopyTexture(uvTexture, dstTexture);
             if (copyUVTexture) {
 #if UNITY_IOS
             dstTexture.SetPixels(uvTexture.GetPixels());
 #else
-            Graphics.CopyTexture(uvTexture, 0, 0, (int)0, (int)0, size, size, dstTexture, 0, 0, 0, 0);
+                dstTexture.SetPixels(uvTexture.GetPixels());
+                dstTexture.Apply();
+                //Graphics.CopyTexture(uvTexture, 0, 0, (int)0, (int)0, size, size, dstTexture, 0, 0, 0, 0);
 #endif
             } else
             {
                 dstTexture = uvTexture;
             }
 
+            Debug.Log("HEllo " + dstTexture.width);
             transform.rotation = _ori_quaterion;
 
             _meshFilter.mesh = mesh;

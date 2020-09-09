@@ -17,7 +17,7 @@
 
         Pass
         {
-            Cull Off
+            Cull Off 
             Blend SrcAlpha OneMinusSrcAlpha
 
             CGPROGRAM
@@ -61,9 +61,9 @@
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv);
 
-                if (i.color.r < 0.9) {
+               if (i.color.r > 0.1) {
                     col = tex2D(_SideTex, i.uv);                
-                }
+               }
 
                 return col;
             }

@@ -23,6 +23,8 @@ namespace AROrigami {
 
             targetMesh.colors = vertInfo.colors;
 
+            targetMesh.bounds = new Bounds(Vector3.zero, Vector3.one * 10000);
+
             targetMesh.RecalculateNormals();
 
             return targetMesh;
@@ -43,7 +45,7 @@ namespace AROrigami {
             //Copy the front vert
             System.Array.Copy(vertices, newVertices, faceVertCount);
 
-            Vector3 dirDiff = new Vector3(0, 0, -0.1f);
+            Vector3 dirDiff = new Vector3(0, -1, 0);
             for (int i = faceVertCount; i < doubleFaceVertCount; i++)
             {
                 newVertices[i] = vertices[i - faceVertCount] + dirDiff;
@@ -64,7 +66,8 @@ namespace AROrigami {
             vertInfo.borderVertexCount = borderCount;
             vertInfo.borderStartCount = doubleFaceVertCount;
 
-            Debug.Log("Vert Count " + newVertices.Length);
+            Debug.Log("faceVertCount " + faceVertCount);
+            Debug.Log("doubleFaceVertCount " + doubleFaceVertCount);
 
             return vertInfo;
         }

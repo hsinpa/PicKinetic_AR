@@ -67,10 +67,10 @@ public class MarchingCubeBorder
         return sorted;
     }
 
-    public async Task<List<Vector3>> AsynSort(HashSet<Vector3> borderVertices) {
+    public async Task<Vector3[]> AsynSort(HashSet<Vector3> borderVertices) {
         return await Task.Run(() =>
         {
-            return Sort(borderVertices);
+            return Sort(borderVertices).ToArray();
         });
     }
 
