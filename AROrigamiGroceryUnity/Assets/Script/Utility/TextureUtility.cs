@@ -37,7 +37,7 @@ public class TextureUtility
 
     public static RenderTexture GetRenderTexture(int size)
     {
-        var rt = new RenderTexture(size, size, 16, RenderTextureFormat.ARGB32);
+        var rt = new RenderTexture(size, size, 0, RenderTextureFormat.ARGB32);
         rt.Create();
         return rt;
     }

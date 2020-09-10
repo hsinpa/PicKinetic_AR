@@ -18,7 +18,7 @@ namespace AROrigami {
 
         public bool copyUVTexture = false;
 
-        private Texture2D dstTexture;
+        private RenderTexture dstTexture;
 
         private MaterialPropertyBlock m_PropertyBlock;
 
@@ -33,12 +33,12 @@ namespace AROrigami {
             _ori_quaterion = transform.rotation;
         }
 
-        public void SetMesh(Mesh mesh, Texture2D uvTexture, int size) {
+        public void SetMesh(Mesh mesh, RenderTexture uvTexture, int size) {
             if (m_PropertyBlock == null)
                 m_PropertyBlock = new MaterialPropertyBlock();
 
             if (dstTexture == null) {
-                dstTexture = new Texture2D(size, size);
+                dstTexture = TextureUtility.GetRenderTexture(size);
             }
 
             //Graphics.CopyTexture(uvTexture, dstTexture);
@@ -46,8 +46,7 @@ namespace AROrigami {
 #if UNITY_IOS
             dstTexture.SetPixels(uvTexture.GetPixels());
 #else
-                dstTexture.SetPixels(uvTexture.GetPixels());
-                dstTexture.Apply();
+                Graphics.Blit(uvTexture, dstTexture);
                 //Graphics.CopyTexture(uvTexture, 0, 0, (int)0, (int)0, size, size, dstTexture, 0, 0, 0, 0);
 #endif
             } else

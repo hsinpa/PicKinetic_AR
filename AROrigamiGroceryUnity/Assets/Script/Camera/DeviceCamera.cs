@@ -21,7 +21,8 @@ public class DeviceCamera : MonoBehaviour
     private Texture2D cropTex;
     private Texture2D previewTex;
 
-    private RenderTexture previewRenderer;
+    private RenderTexture modelTexRenderer;
+    private RenderTexture imageProcessRenderer;
 
     [SerializeField]
     TextureMeshPreview texturePreivew;
@@ -89,7 +90,8 @@ public class DeviceCamera : MonoBehaviour
     }
 
     private void PrepareTexture() {
-        previewRenderer = TextureUtility.GetRenderTexture(textureSize);
+        modelTexRenderer = TextureUtility.GetRenderTexture(textureSize);
+        imageProcessRenderer = TextureUtility.GetRenderTexture((int) (textureSize * 0.5f));
 
         previewTex = new Texture2D(textureSize, textureSize);
         rectReadPicture = new Rect(0, 0, textureSize, textureSize);
@@ -116,11 +118,12 @@ public class DeviceCamera : MonoBehaviour
         int orient = -backCam.videoRotationAngle;
         background.rectTransform.localEulerAngles = new Vector3(0, 0, orient);
 
-        var scaleTex = RotateAndScaleImage(backCam, GrabTextureRadius(), -backCam.videoRotationAngle);
+        modelTexRenderer = RotateAndScaleImage(backCam, modelTexRenderer, GrabTextureRadius(), -backCam.videoRotationAngle);
+        imageProcessRenderer = RotateAndScaleImage(backCam, imageProcessRenderer, GrabTextureRadius(), -backCam.videoRotationAngle);
 
-        scalePreview.texture = scaleTex;
+        scalePreview.texture = modelTexRenderer;
 
-        texturePreivew.CaptureEdgeBorderMesh(scaleTex, meshBorder);
+        texturePreivew.CaptureEdgeBorderMesh(imageProcessRenderer.width, meshBorder);
 
         timer = timer_step + Time.time;
     }
@@ -130,22 +133,22 @@ public class DeviceCamera : MonoBehaviour
         return TextureUtility.GrabTextureRadius(backCam.width, backCam.height, 0.6f);
     }
 
-    private Texture2D RotateAndScaleImage(Texture p_texture, TextureUtility.TextureStructure textureSetting, int degree) {
+    private RenderTexture RotateAndScaleImage(Texture p_texture, RenderTexture renderer, TextureUtility.TextureStructure textureSetting, int degree) {
         float radian = degreeToRadian * degree;
 
         rotateMat.SetFloat("_EnlargeX", textureSetting.xRatio);
         rotateMat.SetFloat("_EnlargeY", textureSetting.yRatio);
         rotateMat.SetFloat("_Rotation", radian);
 
-        Graphics.Blit(p_texture, previewRenderer, rotateMat, 0);
+        Graphics.Blit(p_texture, renderer, rotateMat, 0);
 
-        RenderTexture.active = previewRenderer;
-        // Read pixels
-        previewTex.ReadPixels(rectReadPicture, 0, 0);
-        previewTex.Apply();
-        RenderTexture.active = null;
+        //RenderTexture.active = previewRenderer;
+        //// Read pixels
+        //previewTex.ReadPixels(rectReadPicture, 0, 0);
+        //previewTex.Apply();
+        //RenderTexture.active = null;
 
-        return previewTex;
+        return renderer;
     }
 
     private void OnEdgeImageUpdate(Texture2D tex)
@@ -163,7 +166,7 @@ public class DeviceCamera : MonoBehaviour
         if (scalePreview != null && scalePreview.texture != null) {
             meshObject.meshRenderer.enabled = true;
 
-            texturePreivew.CaptureContourMesh(scalePreview.texture as Texture2D, meshObject);
+            texturePreivew.CaptureContourMesh(imageProcessRenderer, modelTexRenderer, meshObject);
         }
     }
 

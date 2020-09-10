@@ -29,7 +29,7 @@ namespace AROrigami
             outputTex = new Texture2D(textureSize, textureSize, TextureFormat.ARGB32, true);
         }
 
-        public Texture2D GetEdgeTex(Texture2D input)
+        public RenderTexture GetEdgeTex(RenderTexture input)
         {
             //Blur
             Graphics.Blit(input, tempTexA, EdgeMaterial, 0);
@@ -46,14 +46,28 @@ namespace AROrigami
             //Dilatiion
             Graphics.Blit(tempTexB, outputTexture, EdgeMaterial, 4);
 
-            RenderTexture.active = outputTexture;
-            // Read pixels
-            outputTex.ReadPixels(rectReadPicture, 0, 0);
-            outputTex.Apply();
-            RenderTexture.active = null;
+            //RenderTexture.active = outputTexture;
+            //// Read pixels
+            //outputTex.ReadPixels(rectReadPicture, 0, 0);
+            //outputTex.Apply();
+            //RenderTexture.active = null;
 
-            return outputTex;
+            return outputTexture;
         }
+
+        //IEnumerator GetEdgeTexAsync(Texture2D input)
+        //{
+        //    while (true)
+        //    {
+        //        yield return new WaitForSeconds(1);
+        //        yield return new WaitForEndOfFrame();
+
+        //        var rt = RenderTexture.GetTemporary(Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32);
+        //        ScreenCapture.CaptureScreenshotIntoRenderTexture(rt);
+        //        AsyncGPUReadback.Request(rt, 0, TextureFormat.ARGB32, OnCompleteReadback);
+        //        RenderTexture.ReleaseTemporary(rt);
+        //    }
+        //}
 
 
     }

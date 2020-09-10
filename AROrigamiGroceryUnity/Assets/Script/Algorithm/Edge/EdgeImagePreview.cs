@@ -21,25 +21,24 @@ namespace AROrigami {
         private MeshRenderer meshRenderer;
         private EdgeImageDetector edgeImage;
 
+        private RenderTexture inputRenderTexture;
+
         // Start is called before the first frame update
         void Start()
         {
+            inputRenderTexture = TextureUtility.GetRenderTexture(size: inputImage.width);
+
+            Graphics.Blit(inputImage, inputRenderTexture);
+
             meshRenderer = GetComponent<MeshRenderer>();
 
             edgeImage = new EdgeImageDetector(EdgeMaterial);
 
-            meshRenderer.material.SetTexture("_MainTex", outputTex);
         }
 
         private void Update()
         {
-            outputTex = edgeImage.GetEdgeTex(inputImage);
-
-            //TextureStructure t_structure = GrabTextureRadius(inputImage, 0.7f);
-            //outputTex = new Texture2D(t_structure.width, t_structure.height);
-            //outputTex.SetPixels(t_structure.colors);
-            outputTex.Apply();
-            meshRenderer.material.SetTexture("_MainTex", outputTex);
+            meshRenderer.material.SetTexture("_MainTex", edgeImage.GetEdgeTex(inputRenderTexture));
         }
 
         private TextureStructure GrabTextureRadius(Texture2D p_texture, float ratio) {

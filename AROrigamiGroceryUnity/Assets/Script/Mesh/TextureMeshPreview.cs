@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 public class TextureMeshPreview : MonoBehaviour
@@ -11,10 +12,11 @@ public class TextureMeshPreview : MonoBehaviour
     private Texture2D rawColorTexture;
 
     [SerializeField]
-    private Texture2D previewMaskTexture;
+    private Texture2D edgeOutputTex;
 
     [SerializeField]
     private Texture2D highlightTexture;
+    private RenderTexture highlightRenderer;
 
     [SerializeField]
     private Material EdgeMaterial;
@@ -39,7 +41,8 @@ public class TextureMeshPreview : MonoBehaviour
 
     public void Start()
     {
-        previewMaskTexture = new Texture2D(resize, resize);
+        highlightRenderer = TextureUtility.GetRenderTexture(resize);
+        edgeOutputTex = new Texture2D(resize, resize, TextureFormat.ARGB32, false);
         imageMaskGeneator = new ImageMaskGeneator(resize);
         marchingCube = new MarchingCube();
         meshGenerator = new MeshGenerator();
@@ -47,6 +50,8 @@ public class TextureMeshPreview : MonoBehaviour
         mesh2DTo3D = new Mesh2DTo3D();
         edgeImage = new EdgeImageDetector(EdgeMaterial);
         _camera = Camera.main;
+
+        Graphics.Blit(highlightTexture, highlightRenderer);
     }
 
     public void UpdateScreenInfo(int startPixelX, int startPixelY) {
@@ -54,40 +59,42 @@ public class TextureMeshPreview : MonoBehaviour
         this.startPixelY = startPixelY;
     }
 
-    public async void CaptureEdgeBorderMesh(Texture2D rawTexture, MeshObject meshObject) {
+    public IEnumerator ExecEdgeProcessing(RenderTexture processTex)
+    {
+        var edgeTex = edgeImage.GetEdgeTex(processTex);
 
-        var edgeTex = edgeImage.GetEdgeTex(rawTexture);
+        yield return new WaitForEndOfFrame();
+
+        AsyncGPUReadback.Request(edgeTex, 0, TextureFormat.ARGB32, OnTexCompleteReadback);
+    }
+
+    public async void CaptureEdgeBorderMesh(int skinSize, MeshObject meshObject) {
 
         if (OnEdgeTexUpdate != null)
-            OnEdgeTexUpdate(edgeTex);
+            OnEdgeTexUpdate(edgeOutputTex);
 
-        var maskColors = await PrepareImageBorder(edgeTex);
+        var maskColors = await PrepareImageBorder(edgeOutputTex);
 
         if (!CheckIfValid(maskColors)) return;
 
-        var meshResult = AssignMesh(maskColors.img, resize, resize, rawTexture, meshObject);
+        var meshResult = AssignMesh(maskColors.img, resize, resize, meshObject);
 
         if (meshResult.mesh != null)
-            meshObject.SetMesh(meshResult.mesh, highlightTexture, rawTexture.width);
+            meshObject.SetMesh(meshResult.mesh, highlightRenderer, skinSize);
 
         AssignPosition(maskColors, meshObject);
     }
 
-    public async void CaptureContourMesh(Texture2D rawTexture, MeshObject meshObject) {
-        var edgeTex = edgeImage.GetEdgeTex(rawTexture);
-
-        previewMaskTexture.SetPixels(edgeTex.GetPixels());
-        previewMaskTexture.Apply();
-
-        var maskColors = await PrepareImageMask(edgeTex);
+    public async void CaptureContourMesh(RenderTexture processTexture, RenderTexture skinTexture, MeshObject meshObject) {
+        var maskColors = await PrepareImageMask(edgeOutputTex);
         if (!CheckIfValid(maskColors)) return;
 
-        var meshResult = AssignMesh(maskColors.img, resize, resize, rawTexture, meshObject);
+        var meshResult = AssignMesh(maskColors.img, resize, resize, meshObject);
 
         var mesh = await MeshTo3D(meshResult, meshObject);
 
         if (mesh != null)
-            meshObject.SetMesh(mesh, rawTexture, rawTexture.width);
+            meshObject.SetMesh(mesh, skinTexture, skinTexture.width);
 
         AssignPosition(maskColors, meshObject);
     }
@@ -106,7 +113,7 @@ public class TextureMeshPreview : MonoBehaviour
         return await imageMaskGeneator.AsyncCreateBorder(scaledColor, resize, resize);
     }
 
-    private MarchingCube.MarchingCubeResult AssignMesh(Color[] maskImage, int textureWidth, int textureHeight, Texture2D matTex, MeshObject meshObject)
+    private MarchingCube.MarchingCubeResult AssignMesh(Color[] maskImage, int textureWidth, int textureHeight, MeshObject meshObject)
     {
         meshGenerator.GenerateMesh(maskImage, textureWidth, textureHeight, 1);
         return marchingCube.Calculate(meshGenerator.squareGrid, meshObject.mesh);
@@ -135,11 +142,17 @@ public class TextureMeshPreview : MonoBehaviour
         return (meshInfo.area > 40);
     }
 
-    private Color[] ReadPixel()
+    void OnTexCompleteReadback(AsyncGPUReadbackRequest request)
     {
-        return rawColorTexture.GetPixels(0, 0, rawColorTexture.width, rawColorTexture.height);
-    }
+        if (request.hasError)
+        {
+            Debug.Log("GPU readback error detected.");
+            return;
+        }
 
+        edgeOutputTex.LoadRawTextureData(request.GetData<uint>());
+        edgeOutputTex.Apply();
+    }
 
     private void OnDrawGizmosSelected()
     {
