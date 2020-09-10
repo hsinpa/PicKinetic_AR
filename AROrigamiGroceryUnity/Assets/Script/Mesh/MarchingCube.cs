@@ -55,8 +55,8 @@ public class MarchingCube
         //mesh.SetTriangles(triangles, 0);
         //mesh.SetUVs(0, uv);
 
-        if (mesh != null)
-            mesh.RecalculateNormals();
+        //if (mesh != null)
+        //    mesh.RecalculateNormals();
 
         marchingCubeResult.borderVertices = borders;
         marchingCubeResult.mesh = mesh;
@@ -116,12 +116,9 @@ public class MarchingCube
                 break;
             case 5:
                 MeshFromPoints(square.centerTop, square.topRight, square.centerRight, square.centerBottom, square.bottomLeft, square.centerLeft);
-                Debug.Log("Type 5");
                 break;
             case 10:
                 MeshFromPoints(square.topLeft, square.centerTop, square.centerRight, square.bottomRight, square.centerBottom, square.centerLeft);
-                Debug.Log("Type 10");
-
                 break;
 
             // 3 points
@@ -141,7 +138,7 @@ public class MarchingCube
                 MeshFromPoints(square.topLeft, square.topRight, square.centerRight, square.centerBottom, square.bottomLeft);
                 AddBorder(square.centerRight.position);
                 AddBorder(square.centerBottom.position);
-
+                
                 break;
             case 14:
                 MeshFromPoints(square.topLeft, square.topRight, square.bottomRight, square.centerBottom, square.centerLeft);
@@ -157,7 +154,8 @@ public class MarchingCube
         }
     }
 
-    private void AddBorder(Vector3 vector) {
+    private void AddBorder(Vector3 vector)
+    {
         if (!borders.Contains(vector))
             borders.Add(vector);
     }

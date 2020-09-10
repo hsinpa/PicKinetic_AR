@@ -4,6 +4,9 @@
     {
         _MainTex ("Texture", 2D) = "white" {}
         _SideTex ("Side Texture", 2D) = "white" {}
+
+        [Toggle(SHOW_SIDE_TEX)]
+        _ShowSideTex("Show Side Texture", Int) = 0
     }
     SubShader
     {
@@ -45,13 +48,20 @@
             float4 _MainTex_ST;
 
             uniform sampler2D _SideTex;
+            uniform int _ShowSideTex;
 
             v2f vert (appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                o.color = v.color;
+
+                if (_ShowSideTex == 0) {
+                    o.color = 0;
+                }
+                else {
+                    o.color = v.color;
+                }
 
                 return o;
             }

@@ -55,12 +55,12 @@ namespace AROrigami {
                 dstTexture = uvTexture;
             }
 
-            Debug.Log("HEllo " + dstTexture.width);
             transform.rotation = _ori_quaterion;
 
             _meshFilter.mesh = mesh;
 
             m_PropertyBlock.SetTexture("_MainTex", dstTexture);
+            m_PropertyBlock.SetInt("_ShowSideTex", (copyUVTexture) ? 1 : 0);
             _meshRenderer.SetPropertyBlock(m_PropertyBlock);
         }
 

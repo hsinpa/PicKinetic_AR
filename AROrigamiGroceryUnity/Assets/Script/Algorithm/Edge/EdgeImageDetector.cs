@@ -40,9 +40,10 @@ namespace AROrigami
             //Sobel edge
             Graphics.Blit(tempTexB, tempTexA, EdgeMaterial, 2);
 
-            //Dilatiion
+            //Sharp
             Graphics.Blit(tempTexA, tempTexB, EdgeMaterial, 3);
-
+            
+            //Dilatiion
             Graphics.Blit(tempTexB, outputTexture, EdgeMaterial, 4);
 
             RenderTexture.active = outputTexture;

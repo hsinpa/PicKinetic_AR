@@ -68,7 +68,7 @@ public class TextureMeshPreview : MonoBehaviour
         var meshResult = AssignMesh(maskColors.img, resize, resize, rawTexture, meshObject);
 
         if (meshResult.mesh != null)
-            meshObject.SetMesh(meshResult.mesh, rawTexture, rawTexture.width);
+            meshObject.SetMesh(meshResult.mesh, highlightTexture, rawTexture.width);
 
         AssignPosition(maskColors, meshObject);
     }
@@ -84,11 +84,7 @@ public class TextureMeshPreview : MonoBehaviour
 
         var meshResult = AssignMesh(maskColors.img, resize, resize, rawTexture, meshObject);
 
-        Debug.Log(meshResult.mesh.vertexCount);
-
         var mesh = await MeshTo3D(meshResult, meshObject);
-
-        Debug.Log(mesh.vertexCount);
 
         if (mesh != null)
             meshObject.SetMesh(mesh, rawTexture, rawTexture.width);

@@ -162,7 +162,7 @@
 			float2 _MainTex_TexelSize;
 			float _Threshold;
 
-			float Dilation (sampler2D tex, float2 uv) {
+			float Sharp (sampler2D tex, float2 uv) {
 			
 				float4 sum = float4(0, 0, 0, 0);
 
@@ -188,7 +188,7 @@
 		
 			float4 frag (v2f_img IN) : COLOR {
 				//float s = Dilation(_MainTex, IN.uv);
-				float s = (Dilation(_MainTex, IN.uv)  >= _Threshold) ? 1.0 : 0.0;
+				float s = (Sharp(_MainTex, IN.uv)  >= _Threshold) ? 1.0 : 0.0;
 
 				return float4(s, s, s, 1);
 			}
@@ -196,7 +196,7 @@
 		}
 
 
-				//Sharp
+		//Dilation
 		Pass
 		{
 			CGPROGRAM

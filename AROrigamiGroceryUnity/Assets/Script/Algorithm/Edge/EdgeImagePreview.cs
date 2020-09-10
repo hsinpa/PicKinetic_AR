@@ -18,16 +18,28 @@ namespace AROrigami {
         [SerializeField]
         private Rect sourceRect;
 
+        private MeshRenderer meshRenderer;
+        private EdgeImageDetector edgeImage;
+
         // Start is called before the first frame update
         void Start()
         {
-            EdgeImageDetector edgeImage = new EdgeImageDetector(EdgeMaterial);
-            //outputTex = edgeImage.GetEdgeTex(inputImage);
+            meshRenderer = GetComponent<MeshRenderer>();
 
-            TextureStructure t_structure = GrabTextureRadius(inputImage, 0.7f);
-            outputTex = new Texture2D(t_structure.width, t_structure.height);
-            outputTex.SetPixels(t_structure.colors);
+            edgeImage = new EdgeImageDetector(EdgeMaterial);
+
+            meshRenderer.material.SetTexture("_MainTex", outputTex);
+        }
+
+        private void Update()
+        {
+            outputTex = edgeImage.GetEdgeTex(inputImage);
+
+            //TextureStructure t_structure = GrabTextureRadius(inputImage, 0.7f);
+            //outputTex = new Texture2D(t_structure.width, t_structure.height);
+            //outputTex.SetPixels(t_structure.colors);
             outputTex.Apply();
+            meshRenderer.material.SetTexture("_MainTex", outputTex);
         }
 
         private TextureStructure GrabTextureRadius(Texture2D p_texture, float ratio) {
