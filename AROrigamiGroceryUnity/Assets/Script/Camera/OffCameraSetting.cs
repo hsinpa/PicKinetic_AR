@@ -32,7 +32,7 @@ public class OffCameraSetting : MonoBehaviour
     int textureSize = 512;
 
     float timer;
-    float timer_step = 0.1f;
+    float timer_step = 0.05f;
 
     private void Start()
     {
@@ -47,14 +47,17 @@ public class OffCameraSetting : MonoBehaviour
 
     private void Update()
     {
-        if (timer > Time.time) return;
-
         RotateAndScaleImage(inputTex, modelTexRenderer, GrabTextureRadius(), 0);
         RotateAndScaleImage(inputTex, imageProcessRenderer, GrabTextureRadius(), 0);
 
+
         preview.texture = imageProcessRenderer;
 
+        if (timer > Time.time) return;
+
         StartCoroutine(textureMeshPreview.ExecEdgeProcessing(imageProcessRenderer));
+        textureMeshPreview.ProcessTextureColor();
+
         textureMeshPreview.CaptureEdgeBorderMesh(imageProcessRenderer.width, p_meshObject);
 
         timer = timer_step + Time.time;

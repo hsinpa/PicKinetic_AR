@@ -316,9 +316,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rawColorTexture: {fileID: 2800000, guid: c554ad60ca1123148af332fe004bda6f, type: 3}
-  previewMaskTexture: {fileID: 0}
+  edgeOutputTex: {fileID: 0}
   highlightTexture: {fileID: 2800000, guid: ce0566797ea48bd4d8d8a56e4c5c1bc3, type: 3}
   EdgeMaterial: {fileID: 2100000, guid: 4b181255d35b99449a14cc6a6aa89e48, type: 2}
+  textureComputeShader: {fileID: 7200000, guid: 78be3ce54954e4244a44e9e8954a0e48,
+    type: 3}
 --- !u!4 &130743004
 Transform:
   m_ObjectHideFlags: 0

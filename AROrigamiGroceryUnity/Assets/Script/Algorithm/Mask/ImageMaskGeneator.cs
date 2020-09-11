@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 public class ImageMaskGeneator
 {
@@ -22,7 +23,7 @@ public class ImageMaskGeneator
         MNFloodFill = new MNFloodFill();
     }
 
-    public async Task<MooreNeighborhood.MooreNeighborInfo> AsyncCreateMask(Color[] scaledImage, int width, int height)
+    public async UniTask<MooreNeighborhood.MooreNeighborInfo> AsyncCreateMask(Color[] scaledImage, int width, int height)
     {
         return await Task.Run(() =>
         {
@@ -32,7 +33,7 @@ public class ImageMaskGeneator
         });
     }
 
-    public async Task<MooreNeighborhood.MooreNeighborInfo> AsyncCreateBorder(Color[] scaledImage, int width, int height)
+    public async UniTask<MooreNeighborhood.MooreNeighborInfo> AsyncCreateBorder(Color[] scaledImage, int width, int height)
     {
         return await Task.Run(() =>
         {

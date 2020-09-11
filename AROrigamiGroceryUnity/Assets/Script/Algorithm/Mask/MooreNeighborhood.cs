@@ -89,7 +89,6 @@ public class MooreNeighborhood
     private Point SearchForFirstContact(int startX, int startY) {
 
         Point currentPoint = new Point();
-
         currentPoint.position = new Vector2Int(0, 0);
         currentPoint.backTracePoint = new Vector2Int(0, 0);
 

@@ -1,0 +1,16 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel GetColors
+
+Texture2D<float4> MainTex;
+
+uniform int TexWidth;
+
+RWStructuredBuffer<float4> ColorBuffer;
+
+[numthreads(16, 16, 1)]
+void GetColors (uint2 id : SV_DispatchThreadID)
+{
+    int index = (TexWidth * id.y) + id.x;
+
+    ColorBuffer[index] = float4(MainTex[id.xy].x, MainTex[id.xy].y, MainTex[id.xy].z, 1);
+}

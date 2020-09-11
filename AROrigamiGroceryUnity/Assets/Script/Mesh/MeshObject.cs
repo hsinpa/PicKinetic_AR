@@ -43,12 +43,8 @@ namespace AROrigami {
 
             //Graphics.CopyTexture(uvTexture, dstTexture);
             if (copyUVTexture) {
-#if UNITY_IOS
-            dstTexture.SetPixels(uvTexture.GetPixels());
-#else
                 Graphics.Blit(uvTexture, dstTexture);
                 //Graphics.CopyTexture(uvTexture, 0, 0, (int)0, (int)0, size, size, dstTexture, 0, 0, 0, 0);
-#endif
             } else
             {
                 dstTexture = uvTexture;
