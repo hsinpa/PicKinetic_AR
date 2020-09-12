@@ -5,13 +5,13 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 
-public class OffCameraSetting : MonoBehaviour
+public class OffCameraPreview : MonoBehaviour
 {
     public RawImage preview;
     public Material rotateMat;
 
     [SerializeField]
-    private TextureMeshPreview textureMeshPreview;
+    private TextureMeshManager textureMeshPreview;
 
     [SerializeField]
     private MeshObject p_meshObject;
@@ -26,8 +26,6 @@ public class OffCameraSetting : MonoBehaviour
     TextureUtility TextureUtility;
 
     private const float degreeToRadian = Mathf.PI / 180;
-    private Rect rectReadPicture;
-
 
     int textureSize = 512;
 
@@ -38,6 +36,7 @@ public class OffCameraSetting : MonoBehaviour
     {
         TextureUtility = new TextureUtility();
         PrepareTexture();
+        preview.texture = imageProcessRenderer;
 
         //var scaleTex = RotateAndScaleImage(inputTex, GrabTextureRadius(), 0);
         //preview.texture = scaleTex;
@@ -49,14 +48,11 @@ public class OffCameraSetting : MonoBehaviour
     {
         RotateAndScaleImage(inputTex, modelTexRenderer, GrabTextureRadius(), 0);
         RotateAndScaleImage(inputTex, imageProcessRenderer, GrabTextureRadius(), 0);
-
-
-        preview.texture = imageProcessRenderer;
+        StartCoroutine(textureMeshPreview.ExecEdgeProcessing(imageProcessRenderer));
 
         if (timer > Time.time) return;
 
-        StartCoroutine(textureMeshPreview.ExecEdgeProcessing(imageProcessRenderer));
-        textureMeshPreview.ProcessTextureColor();
+        textureMeshPreview.ProcessCSTextureColor();
 
         textureMeshPreview.CaptureEdgeBorderMesh(imageProcessRenderer.width, p_meshObject);
 
@@ -68,7 +64,6 @@ public class OffCameraSetting : MonoBehaviour
     {
         modelTexRenderer = TextureUtility.GetRenderTexture(textureSize);
         imageProcessRenderer = TextureUtility.GetRenderTexture((int)(textureSize * 0.5f));
-        rectReadPicture = new Rect(0, 0, textureSize, textureSize);
 
         textureMeshPreview.UpdateScreenInfo((int) ((Screen.width / 2f) - (textureSize / 2f) ),
                                             (int)((Screen.height / 2f) - (textureSize / 2f)));

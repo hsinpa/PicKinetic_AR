@@ -5,8 +5,6 @@ using UnityEngine.Video;
 
 public class MarchingCube
 {
-
-    Dictionary<int, MeshGenerator.Node[]> marchingCubeLookupTable = new Dictionary<int, MeshGenerator.Node[]>();
     List<int> triangles = new List<int>();
     List<Vector3> vertices = new List<Vector3>();
     List<Vector2> uv = new List<Vector2>();
@@ -20,7 +18,7 @@ public class MarchingCube
     }
 
 
-    public MarchingCubeResult Calculate(MeshGenerator.SquareGrid squareGrid, Mesh mesh)
+    public MarchingCubeResult Calculate(MeshGenerator.SquareGrid squareGrid)
     {
         Reset();
 
@@ -38,11 +36,15 @@ public class MarchingCube
 
         try
         {
-            mesh.Clear();
+            //mesh.Clear();
 
-            mesh.SetVertices(vertices);
-            mesh.SetTriangles(triangles, 0);
-            mesh.SetUVs(0, uv);
+            //mesh.SetVertices(vertices);
+            //mesh.SetTriangles(triangles, 0);
+            //mesh.SetUVs(0, uv);
+            marchingCubeResult.borderVertices = borders;
+            marchingCubeResult.vertices = vertices.ToArray();
+            marchingCubeResult.uv = uv.ToArray();
+            marchingCubeResult.triangles = triangles.ToArray();
         }
         catch { 
         
@@ -57,9 +59,6 @@ public class MarchingCube
 
         //if (mesh != null)
         //    mesh.RecalculateNormals();
-
-        marchingCubeResult.borderVertices = borders;
-        marchingCubeResult.mesh = mesh;
 
         return marchingCubeResult;
     }
@@ -205,7 +204,9 @@ public class MarchingCube
     }
 
     public struct MarchingCubeResult {
-        public Mesh mesh;
+        public int[] triangles;
+        public Vector3[] vertices;
+        public Vector2[] uv;
         public HashSet<Vector3> borderVertices;
     }
 

@@ -22,7 +22,7 @@ namespace Hsinpa.Study {
             mesh2DTo3D = new Mesh2DTo3D();
 
             var mesh = DrawQuad();
-            meshFilter.mesh = mesh2DTo3D.Convert(mesh, mesh.vertices);
+            //meshFilter.mesh = mesh2DTo3D.Convert(mesh, mesh.vertices);
         }
 
         private Mesh DrawQuad() {

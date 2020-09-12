@@ -8,8 +8,9 @@ using Cysharp.Threading.Tasks;
 namespace AROrigami
 {
 
-    public class TextureMeshPreview : MonoBehaviour
+    public class TextureMeshManager : MonoBehaviour
     {
+        #region Inspector 
         [SerializeField]
         private Texture2D rawColorTexture;
 
@@ -25,7 +26,9 @@ namespace AROrigami
 
         [SerializeField]
         ComputeShader textureComputeShader;
+        #endregion
 
+        #region Private Parameters
         ImageMaskGeneator imageMaskGeneator;
         MeshGenerator meshGenerator;
         MarchingCube marchingCube;
@@ -48,10 +51,12 @@ namespace AROrigami
         private ComputeBuffer _colorBuffer;
         private int floatSize = sizeof(float);
         int GetColorKernelHandle;
-
+        bool IsComputeShaderFree = true;
 
         Camera _camera;
         Vector3 _meshPosition = new Vector2();
+        #endregion
+
 
         public void Start()
         {
@@ -67,6 +72,7 @@ namespace AROrigami
 
             process_tex_colors = new Color[resize * resize];
             process_tex_colors_cpu = new Color[resize * resize];
+            PrepareComputeShader();
 
             Graphics.Blit(highlightTexture, highlightRenderer);
         }
@@ -78,14 +84,27 @@ namespace AROrigami
 
         public IEnumerator ExecEdgeProcessing(RenderTexture processTex)
         {
-            var edgeTex = edgeImage.GetEdgeTex(processTex);
+            if (IsComputeShaderFree)
+            {
+                IsComputeShaderFree = false;
 
-            yield return new WaitForEndOfFrame();
+                var edgeTex = edgeImage.GetEdgeTex(processTex);
 
-            AsyncGPUReadback.Request(edgeTex, 0, TextureFormat.ARGB32, OnTexCompleteReadback);
+                yield return new WaitForEndOfFrame();
+
+                AsyncGPUReadback.Request(edgeTex, 0, TextureFormat.ARGB32, OnTexCompleteReadback);
+            }
         }
 
-        public void ProcessTextureColor() {
+        #region ComputeShader API
+        public void ProcessCSTextureColor()
+        {
+            textureComputeShader.Dispatch(GetColorKernelHandle, resize / 16, resize / 16, 1);
+
+            _colorBuffer.GetData(process_tex_colors_cpu);
+        }
+
+        private void PrepareComputeShader() {
             _colorBuffer = ComputeShaderUtility.SetComputeBuffer(process_tex_colors, resize * resize, floatSize * 4, ComputeBufferType.Default);
 
             GetColorKernelHandle = textureComputeShader.FindKernel("GetColors");
@@ -95,67 +114,76 @@ namespace AROrigami
             textureComputeShader.SetTexture(GetColorKernelHandle, "MainTex", edgeOutputTex);
 
             textureComputeShader.SetBuffer(GetColorKernelHandle, "ColorBuffer", _colorBuffer);
-
-            textureComputeShader.Dispatch(GetColorKernelHandle, resize / 16, resize / 16, 1);
-
-            _colorBuffer.GetData(process_tex_colors_cpu);
         }
 
-        public async void CaptureEdgeBorderMesh(int skinSize, MeshObject meshObject) {
+        private void OnTexCompleteReadback(AsyncGPUReadbackRequest request)
+        {
+            if (request.hasError)
+            {
+                Debug.Log("GPU readback error detected.");
+                return;
+            }
+
+            if (edgeOutputTex == null) return;
+
+            edgeOutputTex.LoadRawTextureData(request.GetData<uint>());
+            edgeOutputTex.Apply();
+
+            IsComputeShaderFree = true;
+        }
+        #endregion
+
+        #region Mask API 
+        public async void CaptureEdgeBorderMesh(int skinSize, MeshObject meshObject)
+        {
 
             if (OnEdgeTexUpdate != null)
                 OnEdgeTexUpdate(edgeOutputTex);
 
-            var maskColors = await PrepareImageBorder(process_tex_colors_cpu);
+            var maskColors = await imageMaskGeneator.AsyncCreateBorder(process_tex_colors_cpu, resize, resize);
 
             if (!CheckIfValid(maskColors)) return;
 
-            var meshResult = AssignMesh(maskColors.img, resize, resize, meshObject);
+            var meshResult = await AssignMesh(maskColors.img, resize, resize);
+            var meshData = mesh2DTo3D.CreateMeshData(meshResult.vertices, meshResult.triangles, meshResult.uv, null);
 
-            if (meshResult.mesh != null)
-                meshObject.SetMesh(meshResult.mesh, highlightRenderer, skinSize);
+            meshObject.SetMesh(mesh2DTo3D.CreateMesh(meshObject.mesh, meshData), highlightRenderer, skinSize);
 
             AssignPosition(maskColors, meshObject);
         }
 
-        public async void CaptureContourMesh(RenderTexture processTexture, RenderTexture skinTexture, MeshObject meshObject) {
-            var maskColors = await PrepareImageMask(process_tex_colors_cpu);
+        public async void CaptureContourMesh(RenderTexture processTexture, RenderTexture skinTexture, MeshObject meshObject)
+        {
+            var maskColors = await imageMaskGeneator.AsyncCreateMask(process_tex_colors_cpu, resize, resize);
+
             if (!CheckIfValid(maskColors)) return;
 
-            var meshResult = AssignMesh(maskColors.img, resize, resize, meshObject);
+            var meshResult = await AssignMesh(maskColors.img, resize, resize);
 
-            var mesh = await MeshTo3D(meshResult, meshObject);
+            var mesh = await MeshTo3D(meshResult, meshObject.mesh);
 
             if (mesh != null)
                 meshObject.SetMesh(mesh, skinTexture, skinTexture.width);
 
             AssignPosition(maskColors, meshObject);
         }
+        #endregion
 
-        private async UniTask<MooreNeighborhood.MooreNeighborInfo> PrepareImageMask(Color[] colors)
+        private async UniTask<MarchingCube.MarchingCubeResult> AssignMesh(Color[] maskImage, int textureWidth, int textureHeight)
         {
-            //var scaledColor = rawImage.GetPixels(0, 0, resize, resize);
-
-            return await imageMaskGeneator.AsyncCreateMask(colors, resize, resize);
+            return await UniTask.Run(() =>
+            {
+                meshGenerator.GenerateMesh(maskImage, textureWidth, textureHeight, 1);
+                return marchingCube.Calculate(meshGenerator.squareGrid);
+            });
         }
 
-        private async UniTask<MooreNeighborhood.MooreNeighborInfo> PrepareImageBorder(Color[] colors)
-        {
-            //var scaledColor = rawImage.GetPixels(0, 0, resize, resize);
-
-            return await imageMaskGeneator.AsyncCreateBorder(colors, resize, resize);
-        }
-
-        private MarchingCube.MarchingCubeResult AssignMesh(Color[] maskImage, int textureWidth, int textureHeight, MeshObject meshObject)
-        {
-            meshGenerator.GenerateMesh(maskImage, textureWidth, textureHeight, 1);
-            return marchingCube.Calculate(meshGenerator.squareGrid, meshObject.mesh);
-        }
-
-        private async Task<Mesh> MeshTo3D(MarchingCube.MarchingCubeResult meshResult, MeshObject meshObject) {
+        private async UniTask<Mesh> MeshTo3D(MarchingCube.MarchingCubeResult meshResult, Mesh mesh) {
             Vector3[] borderVertices = await marchingCubeBorder.AsynSort(meshResult.borderVertices);
-            TestBorderArray = borderVertices;
-            return mesh2DTo3D.Convert(meshResult.mesh, borderVertices);
+            //TestBorderArray = borderVertices;
+            Mesh2DTo3D.MeshData meshData = await mesh2DTo3D.Convert(meshResult, borderVertices);
+
+            return mesh2DTo3D.CreateMesh(mesh, meshData);
         }
 
         private void AssignPosition(MooreNeighborhood.MooreNeighborInfo meshInfo, MeshObject meshObject) {
@@ -175,36 +203,24 @@ namespace AROrigami
             return (meshInfo.area > 40);
         }
 
-        void OnTexCompleteReadback(AsyncGPUReadbackRequest request)
-        {
-            if (request.hasError)
-            {
-                Debug.Log("GPU readback error detected.");
-                return;
-            }
-
-            edgeOutputTex.LoadRawTextureData(request.GetData<uint>());
-            edgeOutputTex.Apply();
-        }
-
-        private void OnDrawGizmosSelected()
-        {
-            if (TestBorderArray != null) {
-                int count = TestBorderArray.Length;
-                for (int i = 0; i < count; i++) {
-                    float pert = (float)i / count;
-                    Gizmos.color = new Color(pert, pert, pert);
-                    Gizmos.DrawSphere(TestBorderArray[i] * 0.12f, 0.04f);
-                }
-            }
-        }
+        //private void OnDrawGizmosSelected()
+        //{
+        //    if (TestBorderArray != null) {
+        //        int count = TestBorderArray.Length;
+        //        for (int i = 0; i < count; i++) {
+        //            float pert = (float)i / count;
+        //            Gizmos.color = new Color(pert, pert, pert);
+        //            Gizmos.DrawSphere(TestBorderArray[i] * 0.12f, 0.04f);
+        //        }
+        //    }
+        //}
 
         private void OnApplicationQuit()
         {
             ResetData();
         }
 
-        void ResetData()
+        private void ResetData()
         {
             _colorBuffer.Dispose();
         }

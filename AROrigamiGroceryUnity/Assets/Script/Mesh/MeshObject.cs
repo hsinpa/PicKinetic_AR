@@ -34,6 +34,8 @@ namespace AROrigami {
         }
 
         public void SetMesh(Mesh mesh, RenderTexture uvTexture, int size) {
+            if (gameObject == null) return;
+
             if (m_PropertyBlock == null)
                 m_PropertyBlock = new MaterialPropertyBlock();
 

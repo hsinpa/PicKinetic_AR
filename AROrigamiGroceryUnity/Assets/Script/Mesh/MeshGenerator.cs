@@ -6,13 +6,17 @@ public class MeshGenerator
 {
     public SquareGrid squareGrid;
 
+    public MeshGenerator() {
+        squareGrid = new SquareGrid();
+    }
+
     public void GenerateMesh(Color[] map, int width, int height, float squareSize) {
-        squareGrid = new SquareGrid(map, width, height, squareSize);
+        squareGrid.Calculate(map, width, height, squareSize);
     }
 
     public class SquareGrid {
         public Square[,] sqaures;
-        public Vector3 borderVertices;
+        private ControlNode[,] controlNodes;
 
         private float _mapWidth;
         private float _mapHeight;
@@ -20,7 +24,8 @@ public class MeshGenerator
         public float mapWidth => _mapWidth;
         public float mapHeight => _mapHeight;
 
-        public SquareGrid(Color[] map, int width, int height,  float squareSize) {
+
+        public void Calculate(Color[] map, int width, int height, float squareSize) {
             int nodeCountX = width;
             int nodeCountY = height;
             _mapWidth = nodeCountX * squareSize;
@@ -28,21 +33,24 @@ public class MeshGenerator
 
             int totalLen = map.Length;
 
-            ControlNode[,] controlNodes = new ControlNode[nodeCountX, nodeCountY];
+            if (controlNodes == null)
+                controlNodes = new ControlNode[nodeCountX, nodeCountY];
 
-            for (int x = 0; x < nodeCountX; x++) {
+            for (int x = 0; x < nodeCountX; x++)
+            {
                 for (int y = 0; y < nodeCountY; y++)
                 {
                     int mapIndex = (nodeCountY * y) + x;
-                    
+
                     Vector3 pos = new Vector3(-(mapWidth / 2f) + x * squareSize + (squareSize / 2f), 0, -(mapHeight / 2f) + y * squareSize + (squareSize / 2));
-                    
+
                     controlNodes[x, y] = new ControlNode(pos, map[mapIndex].r <= 0.1f, squareSize);
                 }
             }
 
-            borderVertices = new Vector3();
-            sqaures = new Square[nodeCountX -1, nodeCountY -1];
+            if (sqaures == null)
+                sqaures = new Square[nodeCountX - 1, nodeCountY - 1];
+
             for (int x = 0; x < nodeCountX - 1; x++)
             {
                 for (int y = 0; y < nodeCountY - 1; y++)
@@ -59,10 +67,10 @@ public class MeshGenerator
         }
     }
 
-    public class Square {
+    public struct Square {
         public ControlNode topLeft, topRight, bottomRight, bottomLeft;
         public Node centerTop, centerRight, centerLeft, centerBottom;
-        public int configuration;
+        public int configuration => GetConfigurationCode(topLeft.activeInt, topRight.activeInt, bottomRight.activeInt, bottomLeft.activeInt);
 
         public Square(ControlNode topLeft, ControlNode topRight, ControlNode bottomRight, ControlNode bottomLeft)
         {
@@ -75,8 +83,6 @@ public class MeshGenerator
             this.centerRight = bottomRight.above;
             this.centerBottom = bottomLeft.right;
             this.centerLeft = bottomLeft.above;
-
-            configuration = GetConfigurationCode(topLeft.activeInt, topRight.activeInt, bottomRight.activeInt, bottomLeft.activeInt);
         }
 
         private int GetConfigurationCode(int topLeft, int topRight, int bottomRight, int bottomLeft) {
@@ -103,6 +109,5 @@ public class MeshGenerator
             above = new Node(position + Vector3.forward * (squareSize / 2f));
             right = new Node(position + Vector3.right * (squareSize / 2f));
         }
-
-    }    
+    }
 }

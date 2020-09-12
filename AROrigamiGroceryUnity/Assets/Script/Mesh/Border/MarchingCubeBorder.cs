@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 public class MarchingCubeBorder
 {
@@ -14,7 +15,7 @@ public class MarchingCubeBorder
         int sortedCount = 0;
         int opendCount = opended.Count;
         int step = 0;
-        int maxStep = 10000;
+        int maxStep = 2000;
         float limitDist = 1.1f;
 
         if (opendCount <= 0)
@@ -35,10 +36,6 @@ public class MarchingCubeBorder
             {
                 float topDist = Vector3.Distance(opended[i], sorted[sortedCount - 1]);
                 float botDist = Vector3.Distance(opended[i], sorted[0]);
-
-                if (step > 9900) {
-                    Debug.Log("topDist " + topDist + ", botDist " + botDist);
-                }
 
                 if (topDist <= limitDist)
                 {
@@ -62,13 +59,11 @@ public class MarchingCubeBorder
             isDone = step >= maxStep || opendCount <= 0;
         }
 
-        Debug.Log("sortedCount " + sortedCount + ", opendCount "+ opendCount + " step " + step);
-
         return sorted;
     }
 
-    public async Task<Vector3[]> AsynSort(HashSet<Vector3> borderVertices) {
-        return await Task.Run(() =>
+    public async UniTask<Vector3[]> AsynSort(HashSet<Vector3> borderVertices) {
+        return await UniTask.Run(() =>
         {
             return Sort(borderVertices).ToArray();
         });

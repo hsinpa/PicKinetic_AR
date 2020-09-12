@@ -25,7 +25,7 @@ public class DeviceCamera : MonoBehaviour
     private RenderTexture imageProcessRenderer;
 
     [SerializeField]
-    TextureMeshPreview texturePreivew;
+    TextureMeshManager texturePreivew;
 
     [SerializeField]
     MeshObject meshBorder;

@@ -3,27 +3,49 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 namespace AROrigami {
     public class Mesh2DTo3D
     {
-        public Mesh Convert(Mesh targetMesh, Vector3[] borderVert) {
+        private MeshData _meshData = new MeshData();
 
-            var vertInfo = VerticesTo3D(targetMesh.vertices, borderVert);
-            var triangles = TriangleTo3D(targetMesh.triangles, targetMesh.vertices.Length, vertInfo.borderStartCount, vertInfo.borderVertexCount);
-            var uv = UVTo3D(targetMesh.uv, vertInfo.borderVertexCount);
+        public MeshData CreateMeshData(Vector3[] vertices, int[] triangles, Vector2[] uv, Color[] colors)
+        {
+            _meshData.vertices = vertices;
+
+            _meshData.triangles = triangles;
+
+            _meshData.uv = uv;
+
+            _meshData.colors = colors;
+
+            return _meshData;
+        }
+
+        public async UniTask<MeshData> Convert(MarchingCube.MarchingCubeResult marchingCubeResult, Vector3[] borderVertices) {
+            return await UniTask.Run(() =>
+            {
+                var vertInfo = VerticesTo3D(marchingCubeResult.vertices, borderVertices);
+                var triangles = TriangleTo3D(marchingCubeResult.triangles, marchingCubeResult.vertices.Length, vertInfo.borderStartCount, vertInfo.borderVertexCount);
+                var uv = UVTo3D(marchingCubeResult.uv, vertInfo.borderVertexCount);
+
+                return CreateMeshData(vertInfo.vectors, triangles, uv, vertInfo.colors);
+            });
+        }
+
+        public Mesh CreateMesh(Mesh targetMesh, MeshData meshData) {
+            if (targetMesh == null) return targetMesh;
 
             targetMesh.Clear();
 
-            targetMesh.vertices = vertInfo.vectors;
+            targetMesh.vertices = meshData.vertices;
 
-            targetMesh.triangles = triangles;
+            targetMesh.triangles = meshData.triangles;
 
-            targetMesh.uv = uv;
+            targetMesh.uv = meshData.uv;
 
-            targetMesh.colors = vertInfo.colors;
-
-            targetMesh.bounds = new Bounds(Vector3.zero, Vector3.one * 10000);
+            targetMesh.colors = meshData.colors;
 
             targetMesh.RecalculateNormals();
 
@@ -151,6 +173,13 @@ namespace AROrigami {
             public Color[] colors;
             public int borderVertexCount;
             public int borderStartCount;
+        }
+
+        public struct MeshData {
+            public Vector3[] vertices;
+            public int[] triangles;
+            public Vector2[] uv;
+            public Color[] colors;
         }
 
     }
