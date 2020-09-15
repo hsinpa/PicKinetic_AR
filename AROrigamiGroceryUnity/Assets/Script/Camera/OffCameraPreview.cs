@@ -56,6 +56,8 @@ public class OffCameraPreview : MonoBehaviour
 
         textureMeshPreview.CaptureEdgeBorderMesh(imageProcessRenderer.width, p_meshObject);
 
+        //textureMeshPreview.CaptureContourMesh(imageProcessRenderer, modelTexRenderer, p_meshObject);
+
         timer = timer_step + Time.time;
     }
 

@@ -162,8 +162,8 @@ namespace AROrigami
 
             var mesh = await MeshTo3D(meshResult, meshObject.mesh);
 
-            if (mesh != null)
-                meshObject.SetMesh(mesh, skinTexture, skinTexture.width);
+            if (mesh.Item1 != null)
+                meshObject.SetMesh(mesh.Item1, skinTexture, skinTexture.width);
 
             AssignPosition(maskColors, meshObject);
         }
@@ -178,12 +178,12 @@ namespace AROrigami
             });
         }
 
-        private async UniTask<Mesh> MeshTo3D(MarchingCube.MarchingCubeResult meshResult, Mesh mesh) {
+        private async UniTask<(Mesh, Mesh2DTo3D.MeshData)> MeshTo3D(MarchingCube.MarchingCubeResult meshResult, Mesh mesh) {
             Vector3[] borderVertices = await marchingCubeBorder.AsynSort(meshResult.borderVertices);
             //TestBorderArray = borderVertices;
             Mesh2DTo3D.MeshData meshData = await mesh2DTo3D.Convert(meshResult, borderVertices);
 
-            return mesh2DTo3D.CreateMesh(mesh, meshData);
+            return (mesh2DTo3D.CreateMesh(mesh, meshData), meshData);
         }
 
         private void AssignPosition(MooreNeighborhood.MooreNeighborInfo meshInfo, MeshObject meshObject) {

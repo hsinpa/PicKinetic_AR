@@ -20,20 +20,36 @@ namespace Hsinpa.Study {
         private void Start()
         {
             mesh2DTo3D = new Mesh2DTo3D();
-
-            var mesh = DrawQuad();
-            //meshFilter.mesh = mesh2DTo3D.Convert(mesh, mesh.vertices);
+            Form3DMesh();
+            //meshFilter.mesh = mesh2DTo3D.Convert(meshData, meshData.borderVertices);
         }
 
-        private Mesh DrawQuad() {
+        private async void Form3DMesh()
+        {
             Mesh mesh = new Mesh();
+            var meshData = DrawQuad();
+
+            var d = await mesh2DTo3D.Convert(meshData, meshData.borderVertices);
+
+            mesh.vertices = d.vertices;
+            mesh.triangles = d.triangles;
+            mesh.uv = d.uv;
+            mesh.colors = d.colors;
+
+            mesh.RecalculateNormals();
+
+            meshFilter.mesh = mesh;
+        }
+
+        private MarchingCube.MarchingCubeResult DrawQuad() {
+            MarchingCube.MarchingCubeResult marchingCubeResult = new MarchingCube.MarchingCubeResult();
             Vector3[] vertices = new Vector3[4];
             int[] triangle = new int[6];
             Vector2[] uv = new Vector2[4];
 
             vertices[0] = new Vector3(-0.5f, 0, 0); // A
-            vertices[1] = new Vector3(-0.5f, 1, 0); // B
-            vertices[2] = new Vector3(0.5f, 1, 0); // C
+            vertices[1] = new Vector3(-0.5f, 0, 1); // B
+            vertices[2] = new Vector3(0.5f, 0, 1); // C
             vertices[3] = new Vector3(0.5f, 0, 0); // D
 
             //vertices[3] = new Vector3(0.5f, 0, 0); // A
@@ -49,16 +65,16 @@ namespace Hsinpa.Study {
 
             for (int i = 0; i < 4; i++)
             {
-                uv[i] = new Vector2(vertices[i].x + 0.5f, vertices[i].y);
+                uv[i] = new Vector2(vertices[i].x + 0.5f, vertices[i].z);
             }
 
-            mesh.vertices = vertices;
-            mesh.triangles = triangle;
-            mesh.uv = uv;
+            marchingCubeResult.vertices = vertices;
+            marchingCubeResult.triangles = triangle;
+            marchingCubeResult.uv = uv;
+            marchingCubeResult.borderVertices = vertices;
+            
 
-            mesh.RecalculateNormals();
-
-            return mesh;
+            return marchingCubeResult;
         }
 
         

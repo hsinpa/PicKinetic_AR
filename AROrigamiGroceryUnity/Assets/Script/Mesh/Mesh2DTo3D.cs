@@ -54,6 +54,8 @@ namespace AROrigami {
 
         private VertInfo VerticesTo3D(Vector3[] vertices, Vector3[] borderVertices) {
             VertInfo vertInfo = new VertInfo();
+            Vector3 topVertice = Vector3.zero, bottomVertice = topVertice;
+
             int faceVertCount = vertices.Length;
             int borderCount = borderVertices.Length;
 
@@ -67,7 +69,7 @@ namespace AROrigami {
             //Copy the front vert
             System.Array.Copy(vertices, newVertices, faceVertCount);
 
-            Vector3 dirDiff = new Vector3(0, -1, 0);
+            Vector3 dirDiff = new Vector3(0, -2, 0);
             for (int i = faceVertCount; i < doubleFaceVertCount; i++)
             {
                 newVertices[i] = vertices[i - faceVertCount] + dirDiff;
@@ -81,15 +83,22 @@ namespace AROrigami {
 
                 colors[doubleFaceVertCount + (i * 2)] = texTypeTwo;
                 colors[doubleFaceVertCount + (i * 2) + 1] = texTypeTwo;
+
+                //Set Top Vertice
+                if (borderVertices[i].y >= topVertice.y)
+                    topVertice = borderVertices[i];
+
+                //Set Bottom Vertice
+                if (borderVertices[i].y <= bottomVertice.y)
+                    bottomVertice = borderVertices[i];
             }
 
             vertInfo.colors = colors;
             vertInfo.vectors = newVertices;
             vertInfo.borderVertexCount = borderCount;
             vertInfo.borderStartCount = doubleFaceVertCount;
-
-            Debug.Log("faceVertCount " + faceVertCount);
-            Debug.Log("doubleFaceVertCount " + doubleFaceVertCount);
+            vertInfo.topVertice = topVertice;
+            vertInfo.bottomVertice = bottomVertice;
 
             return vertInfo;
         }
@@ -170,6 +179,7 @@ namespace AROrigami {
 
         private struct VertInfo {
             public Vector3[] vectors;
+            public Vector3 topVertice, bottomVertice;
             public Color[] colors;
             public int borderVertexCount;
             public int borderStartCount;

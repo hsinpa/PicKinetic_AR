@@ -8,7 +8,7 @@ using Cysharp.Threading.Tasks;
 public class MarchingCubeBorder
 {
 
-    private List<Vector3> Sort(HashSet<Vector3> hashVertices) {
+    private List<Vector3> Sort(Vector3[] hashVertices) {
         List<Vector3> sorted = new List<Vector3>();
         List<Vector3> opended = hashVertices.ToList();
 
@@ -62,7 +62,7 @@ public class MarchingCubeBorder
         return sorted;
     }
 
-    public async UniTask<Vector3[]> AsynSort(HashSet<Vector3> borderVertices) {
+    public async UniTask<Vector3[]> AsynSort(Vector3[] borderVertices) {
         return await UniTask.Run(() =>
         {
             return Sort(borderVertices).ToArray();

@@ -92,6 +92,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 892443915ab9e2343b9376ccbad70b48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  controlPointPrefab: {fileID: 7299609825280179261, guid: a166c718336d1264197605909038338f,
+    type: 3}
   _meshRenderer: {fileID: 2299862529841633304}
   _meshFilter: {fileID: 86071067758467403}
   rotateSensibility: 1

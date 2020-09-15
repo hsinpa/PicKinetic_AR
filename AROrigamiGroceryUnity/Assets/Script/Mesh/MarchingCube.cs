@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Video;
+using System.Linq;
 
 public class MarchingCube
 {
@@ -41,7 +41,7 @@ public class MarchingCube
             //mesh.SetVertices(vertices);
             //mesh.SetTriangles(triangles, 0);
             //mesh.SetUVs(0, uv);
-            marchingCubeResult.borderVertices = borders;
+            marchingCubeResult.borderVertices = borders.ToArray();
             marchingCubeResult.vertices = vertices.ToArray();
             marchingCubeResult.uv = uv.ToArray();
             marchingCubeResult.triangles = triangles.ToArray();
@@ -207,7 +207,7 @@ public class MarchingCube
         public int[] triangles;
         public Vector3[] vertices;
         public Vector2[] uv;
-        public HashSet<Vector3> borderVertices;
+        public Vector3[] borderVertices;
     }
 
 }
