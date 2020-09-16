@@ -37,11 +37,15 @@ namespace AROrigami {
         private Mesh _mesh;
         public Mesh mesh => _mesh;
 
-        private ControlPoints ctrlPoints;
 
+        #region Control Point Variable
+        private ControlPoints ctrlPoints;
         private const int controlPointCount = 3;
+
+        private Vector4[] originalPoints = new Vector4[controlPointCount];
         private Vector4[] shaderCtrlPoints = new Vector4[controlPointCount];
         private GameObject[] worldControlPoint = new GameObject[controlPointCount];
+        #endregion
 
         private void Awake()
         {
@@ -66,16 +70,21 @@ namespace AROrigami {
             c_point1.transform.localPosition = ctrlPoints.top_control_point;
             c_point1.transform.name = "top_control_point";
             worldControlPoint[0] = c_point1;
+            originalPoints[0] = ctrlPoints.top_control_point;
 
             GameObject c_point2 = UtilityMethod.CreateObjectToParent(controlPointsHolder, controlPointPrefab);
             c_point2.transform.localPosition = ctrlPoints.bottom_control_point;
             c_point2.transform.name = "bottom_control_point";
             worldControlPoint[1] = c_point2;
+            originalPoints[1] = ctrlPoints.bottom_control_point;
 
             GameObject c_point3 = UtilityMethod.CreateObjectToParent(controlPointsHolder, controlPointPrefab);
             c_point3.transform.localPosition = ctrlPoints.center_control_point;
             c_point3.transform.name = "center_control_point";
             worldControlPoint[2] = c_point3;
+            originalPoints[2] = ctrlPoints.center_control_point;
+
+            UpdateShader("_OriControlPoints", originalPoints);
         }
 
         public void SetMesh(Mesh mesh, RenderTexture uvTexture, int size) {
@@ -101,8 +110,6 @@ namespace AROrigami {
                 m_PropertyBlock.SetInt("_ShowSideTex", (copyUVTexture) ? 1 : 0);
                 _meshRenderer.SetPropertyBlock(m_PropertyBlock);
             }
-
-
             transform.rotation = _ori_quaterion;
 
             _meshFilter.mesh = mesh;
@@ -116,7 +123,7 @@ namespace AROrigami {
         private void Update()
         {
             UpdateControlPoint();
-            UpdateShader(shaderCtrlPoints);
+            UpdateShader("_ControlPoints", shaderCtrlPoints);
         }
 
         private void UpdateControlPoint() {
@@ -129,11 +136,11 @@ namespace AROrigami {
             }
         }
 
-        private void UpdateShader(Vector4[] ctrlPoints) {
+        private void UpdateShader(string variableName, Vector4[] ctrlPoints) {
             if (m_PropertyBlock == null)
                 m_PropertyBlock = new MaterialPropertyBlock();
 
-            m_PropertyBlock.SetVectorArray("_ControlPoints", ctrlPoints);
+            m_PropertyBlock.SetVectorArray(variableName, ctrlPoints);
 
             _meshRenderer.SetPropertyBlock(m_PropertyBlock);
         }
