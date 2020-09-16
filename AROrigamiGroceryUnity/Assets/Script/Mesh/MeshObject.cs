@@ -39,6 +39,10 @@ namespace AROrigami {
 
         private ControlPoints ctrlPoints;
 
+        private const int controlPointCount = 3;
+        private Vector4[] shaderCtrlPoints = new Vector4[controlPointCount];
+        private GameObject[] worldControlPoint = new GameObject[controlPointCount];
+
         private void Awake()
         {
             _mesh = new Mesh();
@@ -61,21 +65,21 @@ namespace AROrigami {
             GameObject c_point1 = UtilityMethod.CreateObjectToParent(controlPointsHolder, controlPointPrefab);
             c_point1.transform.localPosition = ctrlPoints.top_control_point;
             c_point1.transform.name = "top_control_point";
+            worldControlPoint[0] = c_point1;
 
             GameObject c_point2 = UtilityMethod.CreateObjectToParent(controlPointsHolder, controlPointPrefab);
             c_point2.transform.localPosition = ctrlPoints.bottom_control_point;
             c_point2.transform.name = "bottom_control_point";
+            worldControlPoint[1] = c_point2;
 
             GameObject c_point3 = UtilityMethod.CreateObjectToParent(controlPointsHolder, controlPointPrefab);
             c_point3.transform.localPosition = ctrlPoints.center_control_point;
             c_point3.transform.name = "center_control_point";
+            worldControlPoint[2] = c_point3;
         }
 
         public void SetMesh(Mesh mesh, RenderTexture uvTexture, int size) {
             if (_meshRenderer == null) return;
-
-            if (m_PropertyBlock == null)
-                m_PropertyBlock = new MaterialPropertyBlock();
 
             if (dstTexture == null) {
                 dstTexture = TextureUtility.GetRenderTexture(size);
@@ -109,11 +113,35 @@ namespace AROrigami {
             transform.rotation = Quaternion.Euler( currentAngle + (direction * rotateSensibility) );   
         }
 
+        private void Update()
+        {
+            UpdateControlPoint();
+            UpdateShader(shaderCtrlPoints);
+        }
+
+        private void UpdateControlPoint() {
+            if (worldControlPoint == null) return;
+
+            for (int i = 0; i < controlPointCount; i++) {
+                if (worldControlPoint[i] == null) continue;
+
+                shaderCtrlPoints[i] = worldControlPoint[i].transform.localPosition;
+            }
+        }
+
+        private void UpdateShader(Vector4[] ctrlPoints) {
+            if (m_PropertyBlock == null)
+                m_PropertyBlock = new MaterialPropertyBlock();
+
+            m_PropertyBlock.SetVectorArray("_ControlPoints", ctrlPoints);
+
+            _meshRenderer.SetPropertyBlock(m_PropertyBlock);
+        }
+
         private void OnDestroy()
         {
             _meshRenderer = null;
         }
-
 
         public struct ControlPoints {
             public Vector3 top_control_point;

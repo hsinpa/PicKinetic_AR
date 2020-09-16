@@ -24,6 +24,8 @@
             Blend SrcAlpha OneMinusSrcAlpha
 
             CGPROGRAM
+// Upgrade NOTE: excluded shader from DX11 because it uses wrong array syntax (type[size] name)
+#pragma exclude_renderers d3d11
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 3.0
@@ -50,10 +52,16 @@
             uniform sampler2D _SideTex;
             uniform int _ShowSideTex;
 
+            uniform float4 _ControlPoints[3];
+
+            float4 GetCtrlPointEffectVertex(float4 vertex) {
+                return float4(vertex.x, vertex.y, _ControlPoints[0].z, vertex.w);
+            }
+
             v2f vert (appdata v)
             {
                 v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
+                o.vertex = UnityObjectToClipPos(GetCtrlPointEffectVertex(v.vertex));
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 
                 if (_ShowSideTex == 0) {
