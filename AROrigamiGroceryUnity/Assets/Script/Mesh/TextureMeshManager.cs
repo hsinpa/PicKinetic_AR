@@ -149,10 +149,11 @@ namespace AROrigami
 
             meshObject.SetMesh(mesh2DTo3D.CreateMesh(meshObject.mesh, meshData), highlightRenderer, skinSize);
 
+
             AssignPosition(maskColors, meshObject);
         }
 
-        public async void CaptureContourMesh(RenderTexture processTexture, RenderTexture skinTexture, MeshObject meshObject)
+        public async void CaptureContourMesh(RenderTexture skinTexture, MeshObject meshObject)
         {
             var maskColors = await imageMaskGeneator.AsyncCreateMask(process_tex_colors_cpu, resize, resize);
 
@@ -162,8 +163,10 @@ namespace AROrigami
 
             var mesh = await MeshTo3D(meshResult, meshObject.mesh);
 
-            if (mesh.Item1 != null)
+            if (mesh.Item1 != null) {
                 meshObject.SetMesh(mesh.Item1, skinTexture, skinTexture.width);
+                meshObject.SetControlPoint(mesh.Item2.topVertice, mesh.Item2.bottomVertice);
+            }
 
             AssignPosition(maskColors, meshObject);
         }

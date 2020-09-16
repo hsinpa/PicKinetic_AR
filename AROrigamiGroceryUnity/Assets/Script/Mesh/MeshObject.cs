@@ -32,7 +32,7 @@ namespace AROrigami {
 
         private MaterialPropertyBlock m_PropertyBlock;
 
-        private Quaternion _ori_quaterion;
+        private Quaternion _ori_quaterion; 
 
         private Mesh _mesh;
         public Mesh mesh => _mesh;
@@ -50,7 +50,7 @@ namespace AROrigami {
 
             ctrlPoints.top_control_point = topVertice;
             ctrlPoints.bottom_control_point = bottomVertice;
-            ctrlPoints.center_control_point = new Vector3(0, (topVertice.y + bottomVertice.y) * 0.5f ,0);
+            ctrlPoints.center_control_point = new Vector3(0,0, (topVertice.z + bottomVertice.z) * 0.5f);
 
             return ctrlPoints;
         }
@@ -71,7 +71,6 @@ namespace AROrigami {
             c_point3.transform.name = "center_control_point";
         }
 
-
         public void SetMesh(Mesh mesh, RenderTexture uvTexture, int size) {
             if (_meshRenderer == null) return;
 
@@ -82,22 +81,27 @@ namespace AROrigami {
                 dstTexture = TextureUtility.GetRenderTexture(size);
             }
 
-            //Graphics.CopyTexture(uvTexture, dstTexture);
-            if (copyUVTexture) {
-                Graphics.Blit(uvTexture, dstTexture);
-                //Graphics.CopyTexture(uvTexture, 0, 0, (int)0, (int)0, size, size, dstTexture, 0, 0, 0, 0);
-            } else
-            {
-                dstTexture = uvTexture;
+            if (uvTexture != null) {
+
+                if (copyUVTexture)
+                {
+                    Graphics.Blit(uvTexture, dstTexture);
+                    //Graphics.CopyTexture(uvTexture, 0, 0, (int)0, (int)0, size, size, dstTexture, 0, 0, 0, 0);
+                }
+                else
+                {
+                    dstTexture = uvTexture;
+                }
+
+                m_PropertyBlock.SetTexture("_MainTex", dstTexture);
+                m_PropertyBlock.SetInt("_ShowSideTex", (copyUVTexture) ? 1 : 0);
+                _meshRenderer.SetPropertyBlock(m_PropertyBlock);
             }
+
 
             transform.rotation = _ori_quaterion;
 
             _meshFilter.mesh = mesh;
-
-            m_PropertyBlock.SetTexture("_MainTex", dstTexture);
-            m_PropertyBlock.SetInt("_ShowSideTex", (copyUVTexture) ? 1 : 0);
-            _meshRenderer.SetPropertyBlock(m_PropertyBlock);
         }
 
         public void Rotate(Vector3 direction) {

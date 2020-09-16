@@ -10,7 +10,7 @@ namespace AROrigami {
     {
         private MeshData _meshData = new MeshData();
 
-        public MeshData CreateMeshData(Vector3[] vertices, int[] triangles, Vector2[] uv, Color[] colors)
+        public MeshData CreateMeshData(Vector3[] vertices, int[] triangles, Vector2[] uv, Color[] colors, Vector3 topVertice = default(Vector3), Vector3 bottomeVertice = default(Vector3))
         {
             _meshData.vertices = vertices;
 
@@ -19,6 +19,10 @@ namespace AROrigami {
             _meshData.uv = uv;
 
             _meshData.colors = colors;
+
+            _meshData.topVertice = topVertice;
+
+            _meshData.bottomVertice = bottomeVertice;
 
             return _meshData;
         }
@@ -30,7 +34,7 @@ namespace AROrigami {
                 var triangles = TriangleTo3D(marchingCubeResult.triangles, marchingCubeResult.vertices.Length, vertInfo.borderStartCount, vertInfo.borderVertexCount);
                 var uv = UVTo3D(marchingCubeResult.uv, vertInfo.borderVertexCount);
 
-                return CreateMeshData(vertInfo.vectors, triangles, uv, vertInfo.colors);
+                return CreateMeshData(vertInfo.vectors, triangles, uv, vertInfo.colors, vertInfo.topVertice, vertInfo.bottomVertice);
             });
         }
 
@@ -69,7 +73,7 @@ namespace AROrigami {
             //Copy the front vert
             System.Array.Copy(vertices, newVertices, faceVertCount);
 
-            Vector3 dirDiff = new Vector3(0, -2, 0);
+            Vector3 dirDiff = new Vector3(0, -1.5f, 0);
             for (int i = faceVertCount; i < doubleFaceVertCount; i++)
             {
                 newVertices[i] = vertices[i - faceVertCount] + dirDiff;
@@ -85,13 +89,17 @@ namespace AROrigami {
                 colors[doubleFaceVertCount + (i * 2) + 1] = texTypeTwo;
 
                 //Set Top Vertice
-                if (borderVertices[i].y >= topVertice.y)
+                if (borderVertices[i].z >= topVertice.z)
                     topVertice = borderVertices[i];
 
                 //Set Bottom Vertice
-                if (borderVertices[i].y <= bottomVertice.y)
+                if (borderVertices[i].z <= bottomVertice.z)
                     bottomVertice = borderVertices[i];
             }
+
+            Debug.Log("Bottom " + bottomVertice);
+            Debug.Log("Top " + topVertice);
+
 
             vertInfo.colors = colors;
             vertInfo.vectors = newVertices;
@@ -190,6 +198,9 @@ namespace AROrigami {
             public int[] triangles;
             public Vector2[] uv;
             public Color[] colors;
+
+            public Vector3 topVertice;
+            public Vector3 bottomVertice;
         }
 
     }

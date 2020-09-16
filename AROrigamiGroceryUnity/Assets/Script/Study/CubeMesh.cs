@@ -7,9 +7,11 @@ namespace Hsinpa.Study {
     public class CubeMesh : MonoBehaviour
     {
 
-        [SerializeField]
-        private MeshFilter meshFilter;
+        //[SerializeField]
+        //private MeshFilter meshFilter;
 
+        [SerializeField]
+        MeshObject meshObject;
 
         private Vector3[] vertices;
         private int[] triangle;
@@ -35,10 +37,13 @@ namespace Hsinpa.Study {
             mesh.triangles = d.triangles;
             mesh.uv = d.uv;
             mesh.colors = d.colors;
+            
 
             mesh.RecalculateNormals();
 
-            meshFilter.mesh = mesh;
+            meshObject.SetMesh(mesh, null, size: 512);
+            meshObject.SetControlPoint(d.topVertice, d.bottomVertice);
+            meshObject.GenerateControlPoints();
         }
 
         private MarchingCube.MarchingCubeResult DrawQuad() {

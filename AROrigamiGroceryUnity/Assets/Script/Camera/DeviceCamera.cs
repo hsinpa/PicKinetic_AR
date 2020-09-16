@@ -166,7 +166,7 @@ public class DeviceCamera : MonoBehaviour
         if (scalePreview != null && scalePreview.texture != null) {
             meshObject.meshRenderer.enabled = true;
 
-            texturePreivew.CaptureContourMesh(imageProcessRenderer, modelTexRenderer, meshObject);
+            texturePreivew.CaptureContourMesh(modelTexRenderer, meshObject);
         }
     }
 
