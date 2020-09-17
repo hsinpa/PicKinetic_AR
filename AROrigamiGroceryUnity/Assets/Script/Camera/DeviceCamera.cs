@@ -40,7 +40,6 @@ public class DeviceCamera : MonoBehaviour
 
     TextureUtility TextureUtility;
 
-    private const float degreeToRadian = Mathf.PI / 180;
     private Rect rectReadPicture;
     int textureSize = 512;
 
@@ -85,6 +84,7 @@ public class DeviceCamera : MonoBehaviour
         background.texture = backCam;
 
         camAvailable = true;
+        scalePreview.texture = modelTexRenderer;
 
         texturePreivew.OnEdgeTexUpdate += OnEdgeImageUpdate;
     }
@@ -104,6 +104,12 @@ public class DeviceCamera : MonoBehaviour
     {
         if (!camAvailable) return;
 
+        //Resize, and rotate to right direction
+        TextureUtility.RotateAndScaleImage(backCam, modelTexRenderer, rotateMat, GrabTextureRadius(), -backCam.videoRotationAngle);
+        TextureUtility.RotateAndScaleImage(backCam, imageProcessRenderer, rotateMat, GrabTextureRadius(), -backCam.videoRotationAngle);
+
+        StartCoroutine(texturePreivew.ExecEdgeProcessing(imageProcessRenderer));
+
         if (timer > Time.time) return;
 
         float ratio = (float)backCam.width / (float)backCam.height;
@@ -118,10 +124,7 @@ public class DeviceCamera : MonoBehaviour
         int orient = -backCam.videoRotationAngle;
         background.rectTransform.localEulerAngles = new Vector3(0, 0, orient);
 
-        modelTexRenderer = RotateAndScaleImage(backCam, modelTexRenderer, GrabTextureRadius(), -backCam.videoRotationAngle);
-        imageProcessRenderer = RotateAndScaleImage(backCam, imageProcessRenderer, GrabTextureRadius(), -backCam.videoRotationAngle);
-
-        scalePreview.texture = modelTexRenderer;
+        texturePreivew.ProcessCSTextureColor();
 
         texturePreivew.CaptureEdgeBorderMesh(imageProcessRenderer.width, meshBorder);
 
@@ -129,26 +132,7 @@ public class DeviceCamera : MonoBehaviour
     }
 
     private TextureUtility.TextureStructure GrabTextureRadius() {
-
-        return TextureUtility.GrabTextureRadius(backCam.width, backCam.height, 0.6f);
-    }
-
-    private RenderTexture RotateAndScaleImage(Texture p_texture, RenderTexture renderer, TextureUtility.TextureStructure textureSetting, int degree) {
-        float radian = degreeToRadian * degree;
-
-        rotateMat.SetFloat("_EnlargeX", textureSetting.xRatio);
-        rotateMat.SetFloat("_EnlargeY", textureSetting.yRatio);
-        rotateMat.SetFloat("_Rotation", radian);
-
-        Graphics.Blit(p_texture, renderer, rotateMat, 0);
-
-        //RenderTexture.active = previewRenderer;
-        //// Read pixels
-        //previewTex.ReadPixels(rectReadPicture, 0, 0);
-        //previewTex.Apply();
-        //RenderTexture.active = null;
-
-        return renderer;
+        return TextureUtility.GrabTextureRadius(backCam.width, backCam.height, 0.4f);
     }
 
     private void OnEdgeImageUpdate(Texture2D tex)
@@ -157,7 +141,6 @@ public class DeviceCamera : MonoBehaviour
     }
 
     private void TakeAPhoto() {
-
         if (meshObject.meshRenderer.enabled) {
             meshObject.meshRenderer.enabled = false;
             return;

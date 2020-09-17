@@ -1037,7 +1037,7 @@ PrefabInstance:
     - target: {fileID: 3172466947099852267, guid: c5a055a17c57b5944977700124a71c7c,
         type: 3}
       propertyPath: copyUVTexture
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4312182339678629056, guid: c5a055a17c57b5944977700124a71c7c,
         type: 3}

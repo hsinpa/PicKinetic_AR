@@ -97,10 +97,6 @@ namespace AROrigami {
                     bottomVertice = borderVertices[i];
             }
 
-            Debug.Log("Bottom " + bottomVertice);
-            Debug.Log("Top " + topVertice);
-
-
             vertInfo.colors = colors;
             vertInfo.vectors = newVertices;
             vertInfo.borderVertexCount = borderCount;

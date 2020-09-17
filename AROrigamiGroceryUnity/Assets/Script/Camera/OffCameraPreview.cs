@@ -48,8 +48,9 @@ public class OffCameraPreview : MonoBehaviour
 
     private void Update()
     {
-        RotateAndScaleImage(inputTex, modelTexRenderer, GrabTextureRadius(), 0);
-        RotateAndScaleImage(inputTex, imageProcessRenderer, GrabTextureRadius(), 0);
+        TextureUtility.RotateAndScaleImage(inputTex, modelTexRenderer, rotateMat, GrabTextureRadius(), 0);
+        TextureUtility.RotateAndScaleImage(inputTex, imageProcessRenderer, rotateMat, GrabTextureRadius(), 0);
+
         StartCoroutine(textureMeshPreview.ExecEdgeProcessing(imageProcessRenderer));
 
         if (timer > Time.time) return;
@@ -87,24 +88,5 @@ public class OffCameraPreview : MonoBehaviour
         //Debug.Log("texInfo " + texInfo.width + ", texInfo " + texInfo.height);
 
         return texInfo;
-    }
-
-    private RenderTexture RotateAndScaleImage(Texture texture, RenderTexture renderer, TextureUtility.TextureStructure textureSetting, int degree)
-    {
-        float radian = degreeToRadian * degree;
-
-        //rotateMat.SetFloat("_Rotation", radian);
-        rotateMat.SetFloat("_EnlargeX", textureSetting.xRatio);
-        rotateMat.SetFloat("_EnlargeY", textureSetting.yRatio);
-
-        Graphics.Blit(texture, renderer, rotateMat, 0);
-
-        //RenderTexture.active = previewRenderer;
-        //// Read pixels
-        //previewTex.ReadPixels(rectReadPicture, 0, 0);
-        //previewTex.Apply();
-        //RenderTexture.active = null;
-
-        return renderer;
     }
 }

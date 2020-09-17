@@ -6,6 +6,8 @@ public class TextureUtility
 {
     TextureStructure _textureStructure = new TextureStructure();
 
+    private const float degreeToRadian = Mathf.PI / 180;
+
     public TextureStructure GrabTextureRadius(int p_width, int p_height, float ratio)
     {
         int criteria = (p_width > p_height) ? p_height : p_width;
@@ -40,6 +42,21 @@ public class TextureUtility
         var rt = new RenderTexture(size, size, 0, RenderTextureFormat.ARGB32);
         rt.Create();
         return rt;
+    }
+
+
+
+    public static RenderTexture RotateAndScaleImage(Texture p_texture, RenderTexture renderer, Material rotateMat, TextureUtility.TextureStructure textureSetting, int degree)
+    {
+        float radian = degreeToRadian * degree;
+
+        rotateMat.SetFloat("_EnlargeX", textureSetting.xRatio);
+        rotateMat.SetFloat("_EnlargeY", textureSetting.yRatio);
+        rotateMat.SetFloat("_Rotation", radian);
+
+        Graphics.Blit(p_texture, renderer, rotateMat, 0);
+
+        return renderer;
     }
 
 
