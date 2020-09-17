@@ -5,9 +5,7 @@
         _MainTex ("Texture", 2D) = "white" {}
         _SideTex ("Side Texture", 2D) = "white" {}
 
-        _CtrlPointRadius ("CtrlPoint Radius", Range(0, 2)) = 1
-
-        _CtrlInterpolation ("Ctrl Interpolation", Range(0, 1)) = 0
+        _CtrlPointRadius ("CtrlPoint Radius", Range(0, 50)) = 1
 
         [Toggle(SHOW_SIDE_TEX)]
         _ShowSideTex("Show Side Texture", Int) = 0
@@ -57,38 +55,24 @@
             uniform float4 _ControlPoints[3];
             uniform float4 _OriControlPoints[3];
             float _CtrlPointRadius;
-            float _CtrlInterpolation;
-
-            int FindClosestCtrlPoint(float4 vertex) {
-                float shortestDist = 10000.0;
-                int m_index = 0;
-
-                for (int i = 0; i < 3; i++) {
-                    float dist = distance(vertex, _OriControlPoints[i]);
-
-                    if (dist < shortestDist) {
-                        m_index = i;
-                        shortestDist = dist;
-                    }
-                }
-
-                return m_index;
-            }
 
             float4 GetCtrlPointEffectVertex(float4 vertex) {
 
-                int closestIndex = FindClosestCtrlPoint(vertex);
+                float4 changeVector = float4(0,0,0,0);
+                for (int i = 0; i < 3; i++) {
 
-                float weight = (_CtrlPointRadius) - abs(vertex.z - _OriControlPoints[closestIndex].z);
+                    float weight = (_CtrlPointRadius) - abs(vertex.z - _OriControlPoints[i].z);
 
-                float w_strength = clamp(weight, 0.0, _CtrlPointRadius) / (_CtrlPointRadius + 0.0000001);
+                    float w_strength = clamp(weight, 0.0, _CtrlPointRadius) / (_CtrlPointRadius + 0.0000001);
 
-                int stepValue = step(0.0, w_strength);
+                    int stepValue = step(0.0, w_strength);
 
-                float4 dist = (_ControlPoints[closestIndex] - _OriControlPoints[closestIndex]);
+                    float4 dist = (_ControlPoints[i] - _OriControlPoints[i]);
 
-                return vertex + (dist * w_strength);
-               //return vertex + lerp(dist * clamp(weight, 0.0, 1), dist, 1 - _CtrlInterpolation);
+                    changeVector += dist * w_strength;
+                }
+
+                return vertex + (changeVector);
             }
 
             v2f vert (appdata v)

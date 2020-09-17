@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using System.Threading.Tasks;
 
 namespace Utilities
 {
@@ -118,6 +119,12 @@ namespace Utilities
 		    return (T) System.Enum.Parse(typeof(T), value, true);
 		}
 
+		public static async Task DoDelayWork(float p_delay, System.Action p_action)
+		{
+			await Task.Delay(System.TimeSpan.FromSeconds(p_delay));
 
+			if (p_action != null)
+				p_action();
+		}
 	}
 }

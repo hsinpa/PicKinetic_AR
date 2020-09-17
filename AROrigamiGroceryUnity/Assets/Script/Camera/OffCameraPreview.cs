@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
+using Utilities;
 
 public class OffCameraPreview : MonoBehaviour
 {
@@ -42,6 +43,7 @@ public class OffCameraPreview : MonoBehaviour
         //preview.texture = scaleTex;
 
         //textureMeshPreview.CaptureContourMesh(scaleTex, p_meshObject);
+        _ = UtilityMethod.DoDelayWork(1, Preview3DObject);
     }
 
     private void Update()
@@ -52,15 +54,21 @@ public class OffCameraPreview : MonoBehaviour
 
         if (timer > Time.time) return;
 
-        textureMeshPreview.ProcessCSTextureColor();
+        //textureMeshPreview.ProcessCSTextureColor();
 
         //textureMeshPreview.CaptureEdgeBorderMesh(imageProcessRenderer.width, p_meshObject);
 
-        textureMeshPreview.CaptureContourMesh(modelTexRenderer, p_meshObject);
+        //textureMeshPreview.CaptureContourMesh(modelTexRenderer, p_meshObject);
 
         timer = timer_step + Time.time;
     }
 
+
+    private void Preview3DObject() {
+        textureMeshPreview.ProcessCSTextureColor();
+
+        textureMeshPreview.CaptureContourMesh(modelTexRenderer, p_meshObject);
+    }
 
     private void PrepareTexture()
     {

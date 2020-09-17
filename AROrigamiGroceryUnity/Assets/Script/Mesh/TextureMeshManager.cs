@@ -166,6 +166,7 @@ namespace AROrigami
             if (mesh.Item1 != null) {
                 meshObject.SetMesh(mesh.Item1, skinTexture, skinTexture.width);
                 meshObject.SetControlPoint(mesh.Item2.topVertice, mesh.Item2.bottomVertice);
+                meshObject.GenerateControlPoints();
             }
 
             AssignPosition(maskColors, meshObject);
