@@ -60,7 +60,7 @@
             float _CtrlInterpolation;
 
             int FindClosestCtrlPoint(float4 vertex) {
-                float shortestDist = 10000;
+                float shortestDist = 10000.0;
                 int m_index = 0;
 
                 for (int i = 0; i < 3; i++) {
@@ -79,19 +79,22 @@
 
                 int closestIndex = FindClosestCtrlPoint(vertex);
 
-                float weight = (_CtrlPointRadius) - abs(vertex.z - _ControlPoints[closestIndex].z);
+                float weight = (_CtrlPointRadius) - abs(vertex.z - _OriControlPoints[closestIndex].z);
 
-                float w_strength = clamp(weight, 0, weight) / _CtrlPointRadius;
+                float w_strength = clamp(weight, 0.0, _CtrlPointRadius) / (_CtrlPointRadius + 0.0000001);
 
-                int stepValue = (w_strength > 0) ? 1 : 0;
+                int stepValue = step(0.0, w_strength);
 
-                return vertex + lerp(_ControlPoints[closestIndex] * stepValue, _ControlPoints[closestIndex] * (w_strength), 1 - _CtrlInterpolation);
+                float4 dist = (_ControlPoints[closestIndex] - _OriControlPoints[closestIndex]);
+
+                return vertex + (dist * w_strength);
+               //return vertex + lerp(dist * clamp(weight, 0.0, 1), dist, 1 - _CtrlInterpolation);
             }
 
             v2f vert (appdata v)
             {
                 v2f o;
-                o.vertex = UnityObjectToClipPos( v.vertex );
+                o.vertex = UnityObjectToClipPos(GetCtrlPointEffectVertex( v.vertex) );
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 
                 if (_ShowSideTex == 0) {
