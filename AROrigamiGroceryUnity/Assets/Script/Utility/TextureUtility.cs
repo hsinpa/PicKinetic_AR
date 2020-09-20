@@ -39,11 +39,16 @@ public class TextureUtility
 
     public static RenderTexture GetRenderTexture(int size)
     {
-        var rt = new RenderTexture(size, size, 0, RenderTextureFormat.ARGB32);
+        return GetRenderTexture(size, size, depth:0);
+    }
+
+    public static RenderTexture GetRenderTexture(int width, int height, int depth)
+    {
+        var rt = new RenderTexture(width, height, depth, RenderTextureFormat.ARGB32);
+        
         rt.Create();
         return rt;
     }
-
 
 
     public static RenderTexture RotateAndScaleImage(Texture p_texture, RenderTexture renderer, Material rotateMat, TextureUtility.TextureStructure textureSetting, int degree)
