@@ -20,6 +20,9 @@ public class DeviceCamera : MonoBehaviour
     private RenderTexture imageProcessRenderer;
     private RenderTexture arBackgroundRenderer;
 
+    [SerializeField, Range(0, 0.05f)]
+    private float _SizeStrength = 1;
+
     [SerializeField]
     private ARCameraManager _arCameraManager;
 
@@ -41,6 +44,7 @@ public class DeviceCamera : MonoBehaviour
     [SerializeField]
     private Button shotBtn;
 
+    private Camera _camera;
     TextureUtility TextureUtility;
 
     int textureSize = 512;
@@ -91,6 +95,7 @@ public class DeviceCamera : MonoBehaviour
     }
 
     private void Init() {
+        _camera = Camera.main;
         AccessToFrontCamera();
 
         TextureUtility = new TextureUtility();
@@ -102,6 +107,7 @@ public class DeviceCamera : MonoBehaviour
         scalePreview.texture = modelTexRenderer;
 
         texturePreivew.OnEdgeTexUpdate += OnEdgeImageUpdate;
+        texturePreivew.OnMeshCalculationDone += OnMeshDone;
     }
 
     //Fallback function, if ar foundation is not support
@@ -189,6 +195,21 @@ public class DeviceCamera : MonoBehaviour
         linePreview.texture = tex;
     }
 
+    private void OnMeshDone(TextureMeshManager.MeshCalResult meshResult) {
+        Ray ray = _camera.ScreenPointToRay(meshResult.screenPoint) ;
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, 100.0f))
+        {
+            Debug.Log(string.Format("You selected the {0}, Position {1}", hit.transform.name, hit.point)); // ensure you picked right object
+
+            meshResult.meshObject.transform.position = hit.point + new Vector3(0, 0.01f, 0);
+
+            float sizeMagnitue = (_camera.transform.position - meshResult.meshObject.transform.position).magnitude * _SizeStrength;
+            meshResult.meshObject.transform.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
+        }
+    }
+
     private void TakeAPhoto() {
         if (meshObject.meshRenderer.enabled) {
             meshObject.meshRenderer.enabled = false;
@@ -205,5 +226,6 @@ public class DeviceCamera : MonoBehaviour
     private void OnDestroy()
     {
         texturePreivew.OnEdgeTexUpdate -= OnEdgeImageUpdate;
+        texturePreivew.OnMeshCalculationDone -= OnMeshDone;
     }
 }

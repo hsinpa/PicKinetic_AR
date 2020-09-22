@@ -11,6 +11,9 @@ public class OffCameraPreview : MonoBehaviour
     public RawImage preview;
     public Material rotateMat;
 
+    [SerializeField, Range(0, 1)]
+    private float _SizeStrength = 1;
+
     [SerializeField]
     private TextureMeshManager textureMeshPreview;
 
@@ -25,6 +28,7 @@ public class OffCameraPreview : MonoBehaviour
     private RenderTexture imageProcessRenderer;
 
     TextureUtility TextureUtility;
+    private Camera _camera;
 
     private const float degreeToRadian = Mathf.PI / 180;
 
@@ -35,15 +39,18 @@ public class OffCameraPreview : MonoBehaviour
 
     private void Start()
     {
+        _camera = Camera.main;
         TextureUtility = new TextureUtility();
         PrepareTexture();
         preview.texture = imageProcessRenderer;
+
+        textureMeshPreview.OnMeshCalculationDone += OnMeshDone;
 
         //var scaleTex = RotateAndScaleImage(inputTex, GrabTextureRadius(), 0);
         //preview.texture = scaleTex;
 
         //textureMeshPreview.CaptureContourMesh(scaleTex, p_meshObject);
-        _ = UtilityMethod.DoDelayWork(1, Preview3DObject);
+        //_ = UtilityMethod.DoDelayWork(1, Preview3DObject);
     }
 
     private void Update()
@@ -55,13 +62,30 @@ public class OffCameraPreview : MonoBehaviour
 
         if (timer > Time.time) return;
 
-        //textureMeshPreview.ProcessCSTextureColor();
+        textureMeshPreview.ProcessCSTextureColor();
 
-        //textureMeshPreview.CaptureEdgeBorderMesh(imageProcessRenderer.width, p_meshObject);
+        textureMeshPreview.CaptureEdgeBorderMesh(imageProcessRenderer.width, p_meshObject);
 
         //textureMeshPreview.CaptureContourMesh(modelTexRenderer, p_meshObject);
 
         timer = timer_step + Time.time;
+    }
+
+    private void OnMeshDone(TextureMeshManager.MeshCalResult meshResult)
+    {
+        Ray ray = _camera.ScreenPointToRay(meshResult.screenPoint);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, 100.0f))
+        {
+            //Debug.Log(string.Format("You selected the {0}, Position {1}", hit.transform.name, hit.point)); // ensure you picked right object
+
+            meshResult.meshObject.transform.position = hit.point + new Vector3(0,0.01f,0);
+
+            float sizeMagnitue = (_camera.transform.position - meshResult.meshObject.transform.position).magnitude * _SizeStrength;
+            meshResult.meshObject.transform.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
+
+        }
     }
 
 

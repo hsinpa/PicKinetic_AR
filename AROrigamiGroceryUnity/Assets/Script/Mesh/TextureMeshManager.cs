@@ -32,11 +32,13 @@ namespace AROrigami
         ImageMaskGeneator imageMaskGeneator;
         MeshGenerator meshGenerator;
         MarchingCube marchingCube;
+        MeshCalResult meshCalResult;
         private Mesh2DTo3D mesh2DTo3D;
 
         EdgeImageDetector edgeImage;
         MarchingCubeBorder marchingCubeBorder;
         public System.Action<Texture2D> OnEdgeTexUpdate;
+        public System.Action<MeshCalResult> OnMeshCalculationDone;
 
         private Vector3[] TestBorderArray;
 
@@ -54,12 +56,13 @@ namespace AROrigami
         bool IsComputeShaderFree = true;
 
         Camera _camera;
-        Vector3 _meshPosition = new Vector2();
+        Vector2 _meshPosition = new Vector2();
         #endregion
 
 
         public void Start()
         {
+            meshCalResult = new MeshCalResult();
             highlightRenderer = TextureUtility.GetRenderTexture(resize);
             edgeOutputTex = new Texture2D(resize, resize, TextureFormat.ARGB32, false);
             imageMaskGeneator = new ImageMaskGeneator(resize);
@@ -144,13 +147,14 @@ namespace AROrigami
 
             if (!CheckIfValid(maskColors)) return;
 
-            var meshResult = await AssignMesh(maskColors.img, resize, resize);
-            var meshData = mesh2DTo3D.CreateMeshData(meshResult.vertices, meshResult.triangles, meshResult.uv, null);
+            var marchCubeResult = await AssignMesh(maskColors.img, resize, resize);
+            var meshData = mesh2DTo3D.CreateMeshData(marchCubeResult.vertices, marchCubeResult.triangles, marchCubeResult.uv, null);
 
             meshObject.SetMesh(mesh2DTo3D.CreateMesh(meshObject.mesh, meshData), highlightRenderer, skinSize);
 
-
-            AssignPosition(maskColors, meshObject);
+            if (OnMeshCalculationDone != null && meshObject != null)
+                OnMeshCalculationDone(GetMeshCalResult(maskColors, meshObject));
+             
         }
 
         public async void CaptureContourMesh(RenderTexture skinTexture, MeshObject meshObject)
@@ -159,9 +163,9 @@ namespace AROrigami
 
             if (!CheckIfValid(maskColors)) return;
 
-            var meshResult = await AssignMesh(maskColors.img, resize, resize);
+            var marchCubeResult = await AssignMesh(maskColors.img, resize, resize);
 
-            var mesh = await MeshTo3D(meshResult, meshObject.mesh);
+            var mesh = await MeshTo3D(marchCubeResult, meshObject.mesh);
 
             if (mesh.Item1 != null) {
                 meshObject.SetMesh(mesh.Item1, skinTexture, skinTexture.width);
@@ -169,7 +173,8 @@ namespace AROrigami
                 meshObject.GenerateControlPoints();
             }
 
-            AssignPosition(maskColors, meshObject);
+            if (OnMeshCalculationDone != null && meshObject != null)
+                OnMeshCalculationDone(GetMeshCalResult(maskColors, meshObject));
         }
         #endregion
 
@@ -190,17 +195,22 @@ namespace AROrigami
             return (mesh2DTo3D.CreateMesh(mesh, meshData), meshData);
         }
 
-        private void AssignPosition(MooreNeighborhood.MooreNeighborInfo meshInfo, MeshObject meshObject) {
+        private MeshCalResult GetMeshCalResult(MooreNeighborhood.MooreNeighborInfo meshInfo, MeshObject meshObject) {
 
+            meshCalResult.meshObject = meshObject;
             float x = (meshInfo.centerPoint.x * 4) + startPixelX;
             float y = (meshInfo.centerPoint.y * 4) + startPixelY;
 
-            _meshPosition.Set(x, y, _camera.nearClipPlane);
-            var point = _camera.ScreenToWorldPoint(_meshPosition);
-            point.z = 0;
+            _meshPosition.Set(x, y);
 
-            if (meshObject != null)
-                meshObject.transform.position = point;
+            meshCalResult.screenPoint = _meshPosition;
+            meshCalResult.meshObject = meshObject;
+
+            return meshCalResult;
+            //point.z = 0;
+
+            //if (meshObject != null)
+            //    meshObject.transform.position = point;
         }
 
         private bool CheckIfValid(MooreNeighborhood.MooreNeighborInfo meshInfo) {
@@ -218,6 +228,11 @@ namespace AROrigami
         //        }
         //    }
         //}
+
+        public struct MeshCalResult {
+            public MeshObject meshObject;
+            public Vector3 screenPoint;
+        }
 
         private void OnApplicationQuit()
         {
