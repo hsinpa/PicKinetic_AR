@@ -197,8 +197,9 @@ namespace AROrigami
         private MeshCalResult GetMeshCalResult(MooreNeighborhood.MooreNeighborInfo meshInfo, MeshObject meshObject, TextureUtility.TextureStructure textureStructure) {
 
             meshCalResult.meshObject = meshObject;
-            float x = (meshInfo.centerPoint.x * 4) + startPixelX;
-            float y = (meshInfo.centerPoint.y * 4) + startPixelY;
+            float x = (meshInfo.centerPoint.x / resize);
+            //float y = (meshInfo.centerPoint.y * 4) + startPixelY;
+            float y = (meshInfo.centerPoint.y / resize);
 
             _meshPosition.Set(x, y);
 

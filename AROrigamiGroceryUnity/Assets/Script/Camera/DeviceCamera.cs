@@ -24,7 +24,7 @@ public class DeviceCamera : MonoBehaviour
     private float _SizeStrength = 1;
 
     [SerializeField]
-    private ARCameraManager _arCameraManager;
+    private ARRaycastManager _arRaycastManager;
 
     [SerializeField]
     private ARCameraBackground _arCameraBG;
@@ -47,6 +47,7 @@ public class DeviceCamera : MonoBehaviour
     private Camera _camera;
     TextureUtility TextureUtility;
     TextureUtility.TextureStructure _textureStructure;
+    List<ARRaycastHit> aRRaycastHits = new List<ARRaycastHit>();
 
     int textureSize = 512;
 
@@ -75,6 +76,7 @@ public class DeviceCamera : MonoBehaviour
 
     private IEnumerator Start()
     {
+        _camera = Camera.main;
         Init();
 
         if ((ARSession.state == ARSessionState.None) ||
@@ -96,7 +98,6 @@ public class DeviceCamera : MonoBehaviour
     }
 
     private void Init() {
-        _camera = Camera.main;
         AccessToFrontCamera();
 
         TextureUtility = new TextureUtility();
@@ -198,17 +199,22 @@ public class DeviceCamera : MonoBehaviour
     }
 
     private void OnMeshDone(TextureMeshManager.MeshCalResult meshResult) {
-        Ray ray = _camera.ScreenPointToRay(meshResult.screenPoint) ;
-        RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, 100.0f))
+        var screenCenter = _camera.ViewportToScreenPoint(meshResult.screenPoint);
+        bool hasHitSomething = _arRaycastManager.Raycast(screenCenter, aRRaycastHits, UnityEngine.XR.ARSubsystems.TrackableType.Planes);
+
+        if (hasHitSomething)
         {
-            Debug.Log(string.Format("You selected the {0}, Position {1}", hit.transform.name, hit.point)); // ensure you picked right object
+            //Debug.Log(string.Format("You selected the {0}, Position {1}", hit.transform.name, hit.point)); // ensure you picked right object
 
-            meshResult.meshObject.transform.position = hit.point + new Vector3(0, 0.01f, 0);
+            meshResult.meshObject.transform.position = aRRaycastHits[0].pose.position + new Vector3(0, 0.01f, 0);
 
             float sizeMagnitue = (_camera.transform.position - meshResult.meshObject.transform.position).magnitude * _SizeStrength;
             meshResult.meshObject.transform.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
+
+            var cameraForward = _camera.transform.forward;
+            var cameraBearing = new Vector3(cameraForward.x, 0, cameraForward.z).normalized;
+            meshResult.meshObject.transform.rotation = Quaternion.LookRotation(cameraBearing);
         }
     }
 
@@ -227,6 +233,7 @@ public class DeviceCamera : MonoBehaviour
 
     private void OnDestroy()
     {
+
         texturePreivew.OnEdgeTexUpdate -= OnEdgeImageUpdate;
         texturePreivew.OnMeshCalculationDone -= OnMeshDone;
     }

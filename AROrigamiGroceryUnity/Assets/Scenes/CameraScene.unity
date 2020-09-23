@@ -355,7 +355,7 @@ MonoBehaviour:
   linePreview: {fileID: 2007126181}
   rotateMat: {fileID: 2100000, guid: 2c979822271bf4c13b7198c4c9772745, type: 2}
   _SizeStrength: 0.007
-  _arCameraManager: {fileID: 130228055}
+  _arRaycastManager: {fileID: 714661513}
   _arCameraBG: {fileID: 130228054}
   _arSession: {fileID: 1751368926}
   texturePreivew: {fileID: 130743002}
@@ -649,6 +649,7 @@ GameObject:
   - component: {fileID: 714661512}
   - component: {fileID: 714661511}
   - component: {fileID: 714661510}
+  - component: {fileID: 714661513}
   m_Layer: 0
   m_Name: AR Sesion Origin
   m_TagString: Untagged
@@ -699,6 +700,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &714661513
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 714661509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa17d122634046b4a8e23048891fafc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RaycastPrefab: {fileID: 0}
 --- !u!1001 &741253624
 PrefabInstance:
   m_ObjectHideFlags: 0
