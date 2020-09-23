@@ -354,7 +354,7 @@ MonoBehaviour:
   scalePreview: {fileID: 823230744}
   linePreview: {fileID: 2007126181}
   rotateMat: {fileID: 2100000, guid: 2c979822271bf4c13b7198c4c9772745, type: 2}
-  _SizeStrength: 0.007
+  _SizeStrength: 0.01
   _arRaycastManager: {fileID: 714661513}
   _arCameraBG: {fileID: 130228054}
   _arSession: {fileID: 1751368926}
