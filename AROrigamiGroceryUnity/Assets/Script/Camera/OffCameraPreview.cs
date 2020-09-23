@@ -40,10 +40,10 @@ public class OffCameraPreview : MonoBehaviour
 
     private void Start()
     {
-        _textureStructure = GrabTextureRadius();
-
         _camera = Camera.main;
         TextureUtility = new TextureUtility();
+        _textureStructure = GrabTextureRadius();
+
         PrepareTexture();
         preview.texture = imageProcessRenderer;
 
