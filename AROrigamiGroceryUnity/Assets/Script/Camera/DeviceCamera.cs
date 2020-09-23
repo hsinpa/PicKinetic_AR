@@ -46,6 +46,7 @@ public class DeviceCamera : MonoBehaviour
 
     private Camera _camera;
     TextureUtility TextureUtility;
+    TextureUtility.TextureStructure _textureStructure;
 
     int textureSize = 512;
 
@@ -172,8 +173,9 @@ public class DeviceCamera : MonoBehaviour
 
         //Resize, and rotate to right direction
         //-backCam.videoRotationAngle
-        TextureUtility.RotateAndScaleImage(cameraTex, modelTexRenderer, rotateMat, GrabTextureRadius(), 0);
-        TextureUtility.RotateAndScaleImage(cameraTex, imageProcessRenderer, rotateMat, GrabTextureRadius(), 0);
+        _textureStructure = GrabTextureRadius();
+        TextureUtility.RotateAndScaleImage(cameraTex, modelTexRenderer, rotateMat, _textureStructure, 0);
+        TextureUtility.RotateAndScaleImage(cameraTex, imageProcessRenderer, rotateMat, _textureStructure, 0);
 
         StartCoroutine(texturePreivew.ExecEdgeProcessing(imageProcessRenderer));
 
@@ -181,7 +183,7 @@ public class DeviceCamera : MonoBehaviour
 
         texturePreivew.ProcessCSTextureColor();
 
-        texturePreivew.CaptureEdgeBorderMesh(imageProcessRenderer.width, meshBorder);
+        texturePreivew.CaptureEdgeBorderMesh(imageProcessRenderer.width, meshBorder, _textureStructure);
 
         timer = timer_step + Time.time;
     }
@@ -219,7 +221,7 @@ public class DeviceCamera : MonoBehaviour
         if (scalePreview != null && scalePreview.texture != null) {
             meshObject.meshRenderer.enabled = true;
 
-            texturePreivew.CaptureContourMesh(modelTexRenderer, meshObject);
+            texturePreivew.CaptureContourMesh(modelTexRenderer, meshObject, _textureStructure);
         }
     }
 

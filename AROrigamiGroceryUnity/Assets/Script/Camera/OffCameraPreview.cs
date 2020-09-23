@@ -28,6 +28,7 @@ public class OffCameraPreview : MonoBehaviour
     private RenderTexture imageProcessRenderer;
 
     TextureUtility TextureUtility;
+    TextureUtility.TextureStructure _textureStructure;
     private Camera _camera;
 
     private const float degreeToRadian = Mathf.PI / 180;
@@ -39,6 +40,8 @@ public class OffCameraPreview : MonoBehaviour
 
     private void Start()
     {
+        _textureStructure = GrabTextureRadius();
+
         _camera = Camera.main;
         TextureUtility = new TextureUtility();
         PrepareTexture();
@@ -55,8 +58,8 @@ public class OffCameraPreview : MonoBehaviour
 
     private void Update()
     {
-        TextureUtility.RotateAndScaleImage(inputTex, modelTexRenderer, rotateMat, GrabTextureRadius(), 0);
-        TextureUtility.RotateAndScaleImage(inputTex, imageProcessRenderer, rotateMat, GrabTextureRadius(), 0);
+        TextureUtility.RotateAndScaleImage(inputTex, modelTexRenderer, rotateMat, _textureStructure, 0);
+        TextureUtility.RotateAndScaleImage(inputTex, imageProcessRenderer, rotateMat, _textureStructure, 0);
 
         StartCoroutine(textureMeshPreview.ExecEdgeProcessing(imageProcessRenderer));
 
@@ -64,7 +67,7 @@ public class OffCameraPreview : MonoBehaviour
 
         textureMeshPreview.ProcessCSTextureColor();
 
-        textureMeshPreview.CaptureEdgeBorderMesh(imageProcessRenderer.width, p_meshObject);
+        textureMeshPreview.CaptureEdgeBorderMesh(imageProcessRenderer.width, p_meshObject, _textureStructure);
 
         //textureMeshPreview.CaptureContourMesh(modelTexRenderer, p_meshObject);
 
@@ -73,8 +76,6 @@ public class OffCameraPreview : MonoBehaviour
 
     private void OnMeshDone(TextureMeshManager.MeshCalResult meshResult)
     {
-        Debug.Log("Screen Point " + meshResult.screenPoint);
-
         meshResult.screenPoint.Set(meshResult.screenPoint.x * Screen.width, meshResult.screenPoint.y * Screen.height);
 
         Ray ray = _camera.ScreenPointToRay(meshResult.screenPoint);
@@ -100,7 +101,7 @@ public class OffCameraPreview : MonoBehaviour
     private void Preview3DObject() {
         textureMeshPreview.ProcessCSTextureColor();
 
-        textureMeshPreview.CaptureContourMesh(modelTexRenderer, p_meshObject);
+        textureMeshPreview.CaptureContourMesh(modelTexRenderer, p_meshObject, _textureStructure);
     }
 
     private void PrepareTexture()

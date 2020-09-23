@@ -137,7 +137,7 @@ namespace AROrigami
         #endregion
 
         #region Mask API 
-        public async void CaptureEdgeBorderMesh(int skinSize, MeshObject meshObject)
+        public async void CaptureEdgeBorderMesh(int skinSize, MeshObject meshObject, TextureUtility.TextureStructure textureStructure)
         {
 
             if (OnEdgeTexUpdate != null)
@@ -153,11 +153,10 @@ namespace AROrigami
             meshObject.SetMesh(mesh2DTo3D.CreateMesh(meshObject.mesh, meshData), highlightRenderer, skinSize);
 
             if (OnMeshCalculationDone != null && meshObject != null)
-                OnMeshCalculationDone(GetMeshCalResult(maskColors, meshObject));
-             
+                OnMeshCalculationDone(GetMeshCalResult(maskColors, meshObject, textureStructure));             
         }
 
-        public async void CaptureContourMesh(RenderTexture skinTexture, MeshObject meshObject)
+        public async void CaptureContourMesh(RenderTexture skinTexture, MeshObject meshObject, TextureUtility.TextureStructure textureStructure)
         {
             var maskColors = await imageMaskGeneator.AsyncCreateMask(process_tex_colors_cpu, resize, resize);
 
@@ -174,7 +173,7 @@ namespace AROrigami
             }
 
             if (OnMeshCalculationDone != null && meshObject != null)
-                OnMeshCalculationDone(GetMeshCalResult(maskColors, meshObject));
+                OnMeshCalculationDone(GetMeshCalResult(maskColors, meshObject, textureStructure));
         }
         #endregion
 
@@ -195,7 +194,7 @@ namespace AROrigami
             return (mesh2DTo3D.CreateMesh(mesh, meshData), meshData);
         }
 
-        private MeshCalResult GetMeshCalResult(MooreNeighborhood.MooreNeighborInfo meshInfo, MeshObject meshObject) {
+        private MeshCalResult GetMeshCalResult(MooreNeighborhood.MooreNeighborInfo meshInfo, MeshObject meshObject, TextureUtility.TextureStructure textureStructure) {
 
             meshCalResult.meshObject = meshObject;
             float x = (meshInfo.centerPoint.x * 4) + startPixelX;
@@ -231,7 +230,7 @@ namespace AROrigami
 
         public struct MeshCalResult {
             public MeshObject meshObject;
-            public Vector3 screenPoint;
+            public Vector2 screenPoint;
         }
 
         private void OnApplicationQuit()

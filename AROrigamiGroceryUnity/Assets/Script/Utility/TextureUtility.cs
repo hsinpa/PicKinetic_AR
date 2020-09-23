@@ -23,6 +23,9 @@ public class TextureUtility
         _textureStructure.xRatio = (float)size / p_width;
         _textureStructure.yRatio = (float)size / p_height;
 
+        _textureStructure.xResidualRatio = 1 - _textureStructure.xRatio;
+        _textureStructure.yResidualRatio = 1 - _textureStructure.yRatio;
+
         return _textureStructure;
     }
 
@@ -35,6 +38,8 @@ public class TextureUtility
 
         public float xRatio;
         public float yRatio;
+        public float xResidualRatio;
+        public float yResidualRatio;
     }
 
     public static RenderTexture GetRenderTexture(int size)
