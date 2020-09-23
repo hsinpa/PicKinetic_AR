@@ -73,6 +73,10 @@ public class OffCameraPreview : MonoBehaviour
 
     private void OnMeshDone(TextureMeshManager.MeshCalResult meshResult)
     {
+        Debug.Log("Screen Point " + meshResult.screenPoint);
+
+        meshResult.screenPoint.Set(meshResult.screenPoint.x * Screen.width, meshResult.screenPoint.y * Screen.height);
+
         Ray ray = _camera.ScreenPointToRay(meshResult.screenPoint);
         RaycastHit hit;
 
@@ -85,6 +89,10 @@ public class OffCameraPreview : MonoBehaviour
             float sizeMagnitue = (_camera.transform.position - meshResult.meshObject.transform.position).magnitude * _SizeStrength;
             meshResult.meshObject.transform.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
 
+            var cameraForward = _camera.transform.forward;
+            var cameraBearing = new Vector3(cameraForward.x, 0 , cameraForward.z);
+
+            meshResult.meshObject.transform.rotation = Quaternion.LookRotation(cameraBearing);
         }
     }
 
