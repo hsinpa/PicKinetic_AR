@@ -41,30 +41,6 @@ public class ImageMaskGeneator
         });
     }
 
-
-    //private async void DrawContour() {
-    //    int width = 10, heigth = 10;
-
-    //    int[] TestGrayImage = PrepareFakeContour();
-
-    //    var maskImage = await AsyncCreateMask(TestGrayImage, width, heigth);
-
-    //    LogContour(maskImage, width, heigth);
-    //}
-
-    //private async Task<Color[]> AsyncCreateMask(int[] fakeInt, int width, int height) {
-
-    //    return await Task.Run(() =>
-    //    {
-    //        Color[] intToColor = MaskUtility.ColorFromInt(fakeInt);
-    //        Color[] TestContour = MooreNeighborhood.Execute(intToColor, width, height);
-
-    //        return MNFloodFill.DrawMask(TestContour,, width, height);
-    //    });
-    //}
-
-
-
     private void LogContour(Color[] p_contour, int width, int height) {
 
         string contour = "";

@@ -69,5 +69,9 @@ public class TextureUtility
         return renderer;
     }
 
-
+    public struct RaycastResult
+    {
+        public Vector3 hitPoint;
+        public bool hasHit;
+    }
 }

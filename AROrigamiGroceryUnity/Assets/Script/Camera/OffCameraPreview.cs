@@ -1,4 +1,5 @@
 ﻿using AROrigami;
+using Hsinpa.Study;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,6 +19,9 @@ public class OffCameraPreview : MonoBehaviour
     private TextureMeshManager textureMeshPreview;
 
     [SerializeField]
+    private MeshIndicator _meshIndicator;
+
+    [SerializeField]
     private MeshObject p_meshObject;
 
     public Texture2D inputTex;
@@ -27,8 +31,9 @@ public class OffCameraPreview : MonoBehaviour
     private RenderTexture modelTexRenderer;
     private RenderTexture imageProcessRenderer;
 
-    TextureUtility TextureUtility;
+    TextureUtility _textureUtility;
     TextureUtility.TextureStructure _textureStructure;
+    TextureUtility.RaycastResult _raycastResult;
     private Camera _camera;
 
     private const float degreeToRadian = Mathf.PI / 180;
@@ -41,9 +46,10 @@ public class OffCameraPreview : MonoBehaviour
     private void Start()
     {
         _camera = Camera.main;
-        TextureUtility = new TextureUtility();
+        _raycastResult = new TextureUtility.RaycastResult();
+        _textureUtility = new TextureUtility();
         _textureStructure = GrabTextureRadius();
-
+        _meshIndicator.SetUp(_camera, GetRaycastResult);
         PrepareTexture();
         preview.texture = imageProcessRenderer;
 
@@ -58,6 +64,7 @@ public class OffCameraPreview : MonoBehaviour
 
     private void Update()
     {
+        _meshIndicator.DisplayOnScreenPos(_textureStructure);
         TextureUtility.RotateAndScaleImage(inputTex, modelTexRenderer, rotateMat, _textureStructure, 0);
         TextureUtility.RotateAndScaleImage(inputTex, imageProcessRenderer, rotateMat, _textureStructure, 0);
 
@@ -78,25 +85,30 @@ public class OffCameraPreview : MonoBehaviour
     {
         meshResult.screenPoint.Set(meshResult.screenPoint.x * Screen.width, meshResult.screenPoint.y * Screen.height);
 
-        Ray ray = _camera.ScreenPointToRay(meshResult.screenPoint);
-        RaycastHit hit;
+        TextureUtility.RaycastResult raycast = GetRaycastResult(meshResult.screenPoint);
 
-        if (Physics.Raycast(ray, out hit, 100.0f))
-        {
-            //Debug.Log(string.Format("You selected the {0}, Position {1}", hit.transform.name, hit.point)); // ensure you picked right object
+        if (!raycast.hasHit) return;
 
-            meshResult.meshObject.transform.position = hit.point + new Vector3(0,0.01f,0);
+        meshResult.meshObject.transform.position = raycast.hitPoint;
 
-            float sizeMagnitue = (_camera.transform.position - meshResult.meshObject.transform.position).magnitude * _SizeStrength;
-            meshResult.meshObject.transform.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
+        float sizeMagnitue = (_camera.transform.position - meshResult.meshObject.transform.position).magnitude * _SizeStrength;
+        meshResult.meshObject.transform.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
 
-            var cameraForward = _camera.transform.forward;
-            var cameraBearing = new Vector3(cameraForward.x, 0 , cameraForward.z);
+        var cameraForward = _camera.transform.forward;
+        var cameraBearing = new Vector3(cameraForward.x, 0 , cameraForward.z);
 
-            meshResult.meshObject.transform.rotation = Quaternion.LookRotation(cameraBearing);
-        }
+        meshResult.meshObject.transform.rotation = Quaternion.LookRotation(cameraBearing);
     }
 
+    private TextureUtility.RaycastResult GetRaycastResult(Vector2 screenPos) {
+        Ray ray = _camera.ScreenPointToRay(screenPos);
+        RaycastHit hit;
+
+        _raycastResult.hasHit = Physics.Raycast(ray, out hit, 100.0f);
+        _raycastResult.hitPoint = hit.point + new Vector3(0, 0.02f, 0);
+
+        return _raycastResult;
+    }
 
     private void Preview3DObject() {
         textureMeshPreview.ProcessCSTextureColor();
@@ -115,7 +127,7 @@ public class OffCameraPreview : MonoBehaviour
 
     private TextureUtility.TextureStructure GrabTextureRadius()
     {
-        var texInfo = TextureUtility.GrabTextureRadius(inputTex.width, inputTex.height, 0.6f);
+        var texInfo = _textureUtility.GrabTextureRadius(inputTex.width, inputTex.height, 0.6f);
 
         //Debug.Log("inputTex.width " + inputTex.width +", inputTex.height " + inputTex.height);
         //Debug.Log("texInfo " + texInfo.width + ", texInfo " + texInfo.height);
