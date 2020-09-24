@@ -217,18 +217,6 @@ namespace AROrigami
             return (meshInfo.area > 40);
         }
 
-        //private void OnDrawGizmosSelected()
-        //{
-        //    if (TestBorderArray != null) {
-        //        int count = TestBorderArray.Length;
-        //        for (int i = 0; i < count; i++) {
-        //            float pert = (float)i / count;
-        //            Gizmos.color = new Color(pert, pert, pert);
-        //            Gizmos.DrawSphere(TestBorderArray[i] * 0.12f, 0.04f);
-        //        }
-        //    }
-        //}
-
         public struct MeshCalResult {
             public MeshObject meshObject;
             public Vector2 screenPoint;

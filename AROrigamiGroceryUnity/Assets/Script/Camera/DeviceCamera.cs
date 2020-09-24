@@ -20,6 +20,9 @@ public class DeviceCamera : MonoBehaviour
     private RenderTexture imageProcessRenderer;
     private RenderTexture arBackgroundRenderer;
 
+    [SerializeField]
+    private GameObject _objMappingVisualQueue;
+
     [SerializeField, Range(0, 0.05f)]
     private float _SizeStrength = 1;
 
@@ -170,6 +173,8 @@ public class DeviceCamera : MonoBehaviour
     {
         UpdateCameraTex();
 
+        PlaceObjectOnARPlane(new Vector2(0.5f, 0.5f), _objMappingVisualQueue.transform);
+
         if (cameraTex == null) return;
 
         //Resize, and rotate to right direction
@@ -190,7 +195,7 @@ public class DeviceCamera : MonoBehaviour
     }
 
     private TextureUtility.TextureStructure GrabTextureRadius() {
-        return TextureUtility.GrabTextureRadius(Screen.width, Screen.height, 1f);
+        return TextureUtility.GrabTextureRadius(Screen.width, Screen.height, 0.8f);
     }
 
     private void OnEdgeImageUpdate(Texture2D tex)
@@ -200,21 +205,26 @@ public class DeviceCamera : MonoBehaviour
 
     private void OnMeshDone(TextureMeshManager.MeshCalResult meshResult) {
 
-        var screenCenter = _camera.ViewportToScreenPoint(meshResult.screenPoint);
+        PlaceObjectOnARPlane(meshResult.screenPoint, meshResult.meshObject.transform);
+    }
+
+    private void PlaceObjectOnARPlane(Vector2 screenPoint, Transform targetObj ) {
+
+        var screenCenter = _camera.ViewportToScreenPoint(screenPoint);
         bool hasHitSomething = _arRaycastManager.Raycast(screenCenter, aRRaycastHits, UnityEngine.XR.ARSubsystems.TrackableType.Planes);
 
         if (hasHitSomething)
         {
             //Debug.Log(string.Format("You selected the {0}, Position {1}", hit.transform.name, hit.point)); // ensure you picked right object
 
-            meshResult.meshObject.transform.position = aRRaycastHits[0].pose.position + new Vector3(0, 0.01f, 0);
+            targetObj.position = aRRaycastHits[0].pose.position + new Vector3(0, 0.01f, 0);
 
-            float sizeMagnitue = (_camera.transform.position - meshResult.meshObject.transform.position).magnitude * _SizeStrength;
-            meshResult.meshObject.transform.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
+            float sizeMagnitue = (_camera.transform.position - targetObj.position).magnitude * _SizeStrength;
+            targetObj.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
 
             var cameraForward = _camera.transform.forward;
             var cameraBearing = new Vector3(cameraForward.x, 0, cameraForward.z).normalized;
-            meshResult.meshObject.transform.rotation = Quaternion.LookRotation(cameraBearing);
+            targetObj.rotation = Quaternion.LookRotation(cameraBearing);
         }
     }
 
