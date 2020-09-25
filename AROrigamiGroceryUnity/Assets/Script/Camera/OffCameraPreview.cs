@@ -15,6 +15,9 @@ public class OffCameraPreview : MonoBehaviour
     [SerializeField, Range(0, 1)]
     private float _SizeStrength = 1;
 
+    [SerializeField, Range(0, 1)]
+    private float _CropSize = 1;
+
     [SerializeField]
     private TextureMeshManager textureMeshPreview;
 
@@ -59,12 +62,12 @@ public class OffCameraPreview : MonoBehaviour
         //preview.texture = scaleTex;
 
         //textureMeshPreview.CaptureContourMesh(scaleTex, p_meshObject);
-        //_ = UtilityMethod.DoDelayWork(1, Preview3DObject);
+        _ = UtilityMethod.DoDelayWork(1, Preview3DObject);
     }
 
     private void Update()
     {
-        _meshIndicator.DisplayOnScreenPos(_textureStructure);
+        _meshIndicator.DisplayOnScreenPos(_textureStructure, _CropSize);
         TextureUtility.RotateAndScaleImage(inputTex, modelTexRenderer, rotateMat, _textureStructure, 0);
         TextureUtility.RotateAndScaleImage(inputTex, imageProcessRenderer, rotateMat, _textureStructure, 0);
 
@@ -74,7 +77,7 @@ public class OffCameraPreview : MonoBehaviour
 
         textureMeshPreview.ProcessCSTextureColor();
 
-        textureMeshPreview.CaptureEdgeBorderMesh(imageProcessRenderer.width, p_meshObject, _textureStructure);
+        //textureMeshPreview.CaptureEdgeBorderMesh(imageProcessRenderer.width, p_meshObject, _textureStructure);
 
         //textureMeshPreview.CaptureContourMesh(modelTexRenderer, p_meshObject);
 
@@ -83,7 +86,7 @@ public class OffCameraPreview : MonoBehaviour
 
     private void OnMeshDone(TextureMeshManager.MeshCalResult meshResult)
     {
-        meshResult.screenPoint.Set(meshResult.screenPoint.x * Screen.width, meshResult.screenPoint.y * Screen.height);
+        meshResult.screenPoint.Set(meshResult.screenPoint.x, meshResult.screenPoint.y);
 
         TextureUtility.RaycastResult raycast = GetRaycastResult(meshResult.screenPoint);
 
@@ -101,6 +104,7 @@ public class OffCameraPreview : MonoBehaviour
     }
 
     private TextureUtility.RaycastResult GetRaycastResult(Vector2 screenPos) {
+        screenPos.Set(screenPos.x * Screen.width, screenPos.y * Screen.height);
         Ray ray = _camera.ScreenPointToRay(screenPos);
         RaycastHit hit;
 
@@ -127,7 +131,7 @@ public class OffCameraPreview : MonoBehaviour
 
     private TextureUtility.TextureStructure GrabTextureRadius()
     {
-        var texInfo = _textureUtility.GrabTextureRadius(inputTex.width, inputTex.height, 0.6f);
+        var texInfo = _textureUtility.GrabTextureRadius(inputTex.width, inputTex.height, _CropSize);
 
         //Debug.Log("inputTex.width " + inputTex.width +", inputTex.height " + inputTex.height);
         //Debug.Log("texInfo " + texInfo.width + ", texInfo " + texInfo.height);

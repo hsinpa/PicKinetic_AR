@@ -26,6 +26,9 @@ public class DeviceCamera : MonoBehaviour
     [SerializeField, Range(0, 0.05f)]
     private float _SizeStrength = 1;
 
+    [SerializeField, Range(0, 1)]
+    private float _CropSize = 1;
+
     [SerializeField]
     private ARRaycastManager _arRaycastManager;
 
@@ -47,9 +50,14 @@ public class DeviceCamera : MonoBehaviour
     [SerializeField]
     private Button shotBtn;
 
+    [SerializeField]
+    private MeshIndicator meshIndicator;
+
     private Camera _camera;
     TextureUtility TextureUtility;
     TextureUtility.TextureStructure _textureStructure;
+    TextureUtility.RaycastResult _raycastResult = new TextureUtility.RaycastResult();
+    private Vector3 placementOffset = new Vector3(0, 0.01f, 0);
     List<ARRaycastHit> aRRaycastHits = new List<ARRaycastHit>();
 
     int textureSize = 512;
@@ -113,6 +121,8 @@ public class DeviceCamera : MonoBehaviour
 
         texturePreivew.OnEdgeTexUpdate += OnEdgeImageUpdate;
         texturePreivew.OnMeshCalculationDone += OnMeshDone;
+
+        meshIndicator.SetUp(_camera, GetRaycastResult);
     }
 
     //Fallback function, if ar foundation is not support
@@ -180,6 +190,8 @@ public class DeviceCamera : MonoBehaviour
         //Resize, and rotate to right direction
         //-backCam.videoRotationAngle
         _textureStructure = GrabTextureRadius();
+        meshIndicator.DisplayOnScreenPos(_textureStructure, _CropSize);
+
         TextureUtility.RotateAndScaleImage(cameraTex, modelTexRenderer, rotateMat, _textureStructure, 0);
         TextureUtility.RotateAndScaleImage(cameraTex, imageProcessRenderer, rotateMat, _textureStructure, 0);
 
@@ -195,7 +207,7 @@ public class DeviceCamera : MonoBehaviour
     }
 
     private TextureUtility.TextureStructure GrabTextureRadius() {
-        return TextureUtility.GrabTextureRadius(Screen.width, Screen.height, 0.8f);
+        return TextureUtility.GrabTextureRadius(Screen.width, Screen.height, _CropSize);
     }
 
     private void OnEdgeImageUpdate(Texture2D tex)
@@ -210,14 +222,13 @@ public class DeviceCamera : MonoBehaviour
 
     private void PlaceObjectOnARPlane(Vector2 screenPoint, Transform targetObj ) {
 
-        var screenCenter = _camera.ViewportToScreenPoint(screenPoint);
-        bool hasHitSomething = _arRaycastManager.Raycast(screenCenter, aRRaycastHits, UnityEngine.XR.ARSubsystems.TrackableType.Planes);
+        _raycastResult = GetRaycastResult(screenPoint);
 
-        if (hasHitSomething)
+        if (_raycastResult.hasHit)
         {
             //Debug.Log(string.Format("You selected the {0}, Position {1}", hit.transform.name, hit.point)); // ensure you picked right object
 
-            targetObj.position = aRRaycastHits[0].pose.position + new Vector3(0, 0.01f, 0);
+            targetObj.position = _raycastResult.hitPoint;
 
             float sizeMagnitue = (_camera.transform.position - targetObj.position).magnitude * _SizeStrength;
             targetObj.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
@@ -226,6 +237,21 @@ public class DeviceCamera : MonoBehaviour
             var cameraBearing = new Vector3(cameraForward.x, 0, cameraForward.z).normalized;
             targetObj.rotation = Quaternion.LookRotation(cameraBearing);
         }
+    }
+
+    private TextureUtility.RaycastResult GetRaycastResult(Vector2 screenPos)
+    {
+        var screenCenter = _camera.ViewportToScreenPoint(screenPos);
+        bool hasHitSomething = _arRaycastManager.Raycast(screenCenter, aRRaycastHits, UnityEngine.XR.ARSubsystems.TrackableType.Planes);
+
+        _raycastResult.hasHit = hasHitSomething;
+
+        if (hasHitSomething) {
+            _raycastResult.hitPoint = aRRaycastHits[0].pose.position + placementOffset;
+            _raycastResult.hitRotation = aRRaycastHits[0].pose.rotation;
+        }
+
+        return _raycastResult;
     }
 
     private void TakeAPhoto() {

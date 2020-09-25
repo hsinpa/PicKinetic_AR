@@ -72,6 +72,7 @@ public class TextureUtility
     public struct RaycastResult
     {
         public Vector3 hitPoint;
+        public Quaternion hitRotation;
         public bool hasHit;
     }
 }

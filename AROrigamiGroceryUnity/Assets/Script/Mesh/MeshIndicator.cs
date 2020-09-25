@@ -8,8 +8,8 @@ public class MeshIndicator : MonoBehaviour
     [SerializeField]
     private MeshFilter meshFilter;
 
-    [SerializeField, Range(0.001f, 1f)]
-    private float IndicatorSizeStr = 0.1f;
+    //[SerializeField, Range(0.001f, 1f)]
+    //private float IndicatorSizeStr = 0.1f;
 
     public delegate TextureUtility.RaycastResult RaycastMethod(Vector2 screenPos);
     private RaycastMethod geneticRaycast;
@@ -41,7 +41,7 @@ public class MeshIndicator : MonoBehaviour
 
     }
 
-    public void DisplayOnScreenPos(TextureUtility.TextureStructure textureStructure) {
+    public void DisplayOnScreenPos(TextureUtility.TextureStructure textureStructure, float indicatorSizeStr) {
 
         int width = Screen.width, height = Screen.height;
 
@@ -63,18 +63,17 @@ public class MeshIndicator : MonoBehaviour
         Mesh meshResult = _meshCube.CreateMesh(raycastR.raycastResults);
         meshFilter.mesh = meshResult;
 
-        centerPoint.Set(width * 0.5f, height * 0.5f);
+        centerPoint.Set(0.5f, 0.5f);
 
         var centerResult = geneticRaycast(centerPoint);
         if (centerResult.hasHit) {
             meshFilter.transform.position = centerResult.hitPoint;
 
-            float sizeMagnitue = (_camera.transform.position - meshFilter.transform.position).magnitude * IndicatorSizeStr;
+            float sizeMagnitue = (_camera.transform.position - meshFilter.transform.position).magnitude * (indicatorSizeStr * 0.7f);
             meshFilter.transform.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
 
             var cameraForward = _camera.transform.forward;
             var cameraBearing = new Vector3(cameraForward.x, 0, cameraForward.z);
-
             meshFilter.transform.rotation = Quaternion.LookRotation(cameraBearing);
         }
     }

@@ -430,7 +430,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshFilter: {fileID: 652630607}
-  IndicatorSizeStr: 0.1
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -835,6 +834,7 @@ MonoBehaviour:
   preview: {fileID: 998715918}
   rotateMat: {fileID: 2100000, guid: 2c979822271bf4c13b7198c4c9772745, type: 2}
   _SizeStrength: 0.007
+  _CropSize: 0.6
   textureMeshPreview: {fileID: 130743002}
   _meshIndicator: {fileID: 652630608}
   p_meshObject: {fileID: 1729367509}
