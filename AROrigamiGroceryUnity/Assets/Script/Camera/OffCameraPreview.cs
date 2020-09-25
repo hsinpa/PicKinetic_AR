@@ -88,19 +88,23 @@ public class OffCameraPreview : MonoBehaviour
     {
         meshResult.screenPoint.Set(meshResult.screenPoint.x, meshResult.screenPoint.y);
 
-        TextureUtility.RaycastResult raycast = GetRaycastResult(meshResult.screenPoint);
+        MeshIndicator.IndictatorData indictatorData = _meshIndicator.GetRelativePosRot(meshResult.screenPoint);
 
-        if (!raycast.hasHit) return;
+        //TextureUtility.RaycastResult raycast = GetRaycastResult(meshResult.screenPoint);
 
-        meshResult.meshObject.transform.position = raycast.hitPoint;
+        //if (!raycast.hasHit) return;
+
+        //meshResult.meshObject.transform.position = raycast.hitPoint;
+        meshResult.meshObject.transform.position = indictatorData.position;
 
         float sizeMagnitue = (_camera.transform.position - meshResult.meshObject.transform.position).magnitude * _SizeStrength;
         meshResult.meshObject.transform.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
 
-        var cameraForward = _camera.transform.forward;
-        var cameraBearing = new Vector3(cameraForward.x, 0 , cameraForward.z);
+        meshResult.meshObject.transform.rotation = indictatorData.rotation;
+        //var cameraForward = _camera.transform.forward;
+        //var cameraBearing = new Vector3(cameraForward.x, 0 , cameraForward.z);
 
-        meshResult.meshObject.transform.rotation = Quaternion.LookRotation(cameraBearing);
+        //meshResult.meshObject.transform.rotation = Quaternion.LookRotation(cameraBearing);
     }
 
     private TextureUtility.RaycastResult GetRaycastResult(Vector2 screenPos) {

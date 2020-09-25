@@ -79,15 +79,9 @@ public class MooreNeighborhood
         }
 
         float divident = (1f / area);
-        float dividentX = (1f / width);
-        float dividentY = (1f / height);
+        Debug.Log(string.Format("size {0}, {1}", width, height));
 
-        Debug.Log(string.Format("divident {0}, dividentX {1}, dividentY {2}", divident, dividentX, dividentY));
-        Debug.Log(string.Format("dividentX {0}, dividentY {1}", divident, centerPoint.x * dividentX, centerPoint.y * dividentY));
-        Debug.Log(centerPoint.y);
-        Debug.Log(height);
-
-        Debug.Log(string.Format("divident {0}, {1}", centerPoint.x * divident, centerPoint.y * divident));
+        Debug.Log(string.Format("divident {0}, {1}", (centerPoint.x * divident) / width, (centerPoint.y * divident) / height));
 
         infoContainer.area = area;
         infoContainer.centerPoint.Set(centerPoint.x * divident, centerPoint.y * divident);
