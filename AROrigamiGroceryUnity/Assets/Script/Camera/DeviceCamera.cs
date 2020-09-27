@@ -20,9 +20,6 @@ public class DeviceCamera : MonoBehaviour
     private RenderTexture imageProcessRenderer;
     private RenderTexture arBackgroundRenderer;
 
-    [SerializeField]
-    private GameObject _objMappingVisualQueue;
-
     [SerializeField, Range(0, 0.05f)]
     private float _SizeStrength = 1;
 
@@ -45,7 +42,7 @@ public class DeviceCamera : MonoBehaviour
     MeshObject meshBorder;
 
     [SerializeField]
-    MeshObject meshObject;
+    private MeshObjectManager meshObjManager;
 
     [SerializeField]
     private Button shotBtn;
@@ -172,7 +169,6 @@ public class DeviceCamera : MonoBehaviour
         modelTexRenderer = TextureUtility.GetRenderTexture(textureSize);
         imageProcessRenderer = TextureUtility.GetRenderTexture((int) (textureSize * 0.5f));
 
-        Debug.Log("backCam.width "+ backCam.width + ", backCam.height " + backCam.height);
         arBackgroundRenderer = TextureUtility.GetRenderTexture(Screen.width, Screen.height, 24);
 
         texturePreivew.UpdateScreenInfo((int)((Screen.width / 2f) - (textureSize / 2f)),
@@ -183,7 +179,7 @@ public class DeviceCamera : MonoBehaviour
     {
         UpdateCameraTex();
 
-        PlaceObjectOnARPlane(new Vector2(0.5f, 0.5f), _objMappingVisualQueue.transform);
+        //PlaceObjectOnARPlane(new Vector2(0.5f, 0.5f), _objMappingVisualQueue.transform);
 
         if (cameraTex == null) return;
 
@@ -216,27 +212,12 @@ public class DeviceCamera : MonoBehaviour
     }
 
     private void OnMeshDone(TextureMeshManager.MeshCalResult meshResult) {
+        MeshIndicator.IndictatorData indictatorData = meshIndicator.GetRelativePosRot(meshResult.screenPoint);
 
-        PlaceObjectOnARPlane(meshResult.screenPoint, meshResult.meshObject.transform);
-    }
+        float sizeMagnitue = (_camera.transform.position - meshResult.meshObject.transform.position).magnitude * _SizeStrength;
+        meshResult.meshObject.transform.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
 
-    private void PlaceObjectOnARPlane(Vector2 screenPoint, Transform targetObj ) {
-
-        _raycastResult = GetRaycastResult(screenPoint);
-
-        if (_raycastResult.hasHit)
-        {
-            //Debug.Log(string.Format("You selected the {0}, Position {1}", hit.transform.name, hit.point)); // ensure you picked right object
-
-            targetObj.position = _raycastResult.hitPoint;
-
-            float sizeMagnitue = (_camera.transform.position - targetObj.position).magnitude * _SizeStrength;
-            targetObj.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
-
-            var cameraForward = _camera.transform.forward;
-            var cameraBearing = new Vector3(cameraForward.x, 0, cameraForward.z).normalized;
-            targetObj.rotation = Quaternion.LookRotation(cameraBearing);
-        }
+        meshResult.meshObject.SetPosRotation(indictatorData.position, indictatorData.rotation);
     }
 
     private TextureUtility.RaycastResult GetRaycastResult(Vector2 screenPos)
@@ -255,16 +236,9 @@ public class DeviceCamera : MonoBehaviour
     }
 
     private void TakeAPhoto() {
-        if (meshObject.meshRenderer.enabled) {
-            meshObject.meshRenderer.enabled = false;
-            return;
-        }
+        MeshObject meshObject = meshObjManager.CreateMeshObj(meshBorder.transform.position, meshBorder.transform.rotation, true);
 
-        if (scalePreview != null && scalePreview.texture != null) {
-            meshObject.meshRenderer.enabled = true;
-
-            texturePreivew.CaptureContourMesh(modelTexRenderer, meshObject, _textureStructure);
-        }
+        texturePreivew.CaptureContourMesh(modelTexRenderer, meshObject, _textureStructure);
     }
 
     private void OnDestroy()

@@ -204,8 +204,7 @@ namespace AROrigami
             float x = (meshInfo.centerPoint.x / resize);
             float y = (meshInfo.centerPoint.y / resize);
 
-            Debug.Log(string.Format("Original X {0}, Y {1}", _x, _y));
-            Debug.Log(string.Format("Original X {0}, Y {1}", x, y));
+            //Debug.Log(string.Format("Original X {0}, Y {1}", x, y));
 
             _meshPosition.Set(x, y);
 

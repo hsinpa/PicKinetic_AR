@@ -8,6 +8,8 @@ public class MeshIndicator : MonoBehaviour
     [SerializeField]
     private MeshFilter meshFilter;
 
+    private MeshRenderer _meshRender;
+
     //[SerializeField, Range(0.001f, 1f)]
     //private float IndicatorSizeStr = 0.1f;
 
@@ -25,6 +27,8 @@ public class MeshIndicator : MonoBehaviour
 
     private Vector2[] screenPosArray;
     private Vector3[] raycastResultArray;
+    private TextureUtility.RaycastResult helpOrientPoint;
+
     private RaycastOverallResult raycastOverallResult;
     private IndictatorData indictatorData = new IndictatorData();
     private float finalSizeValue;
@@ -40,20 +44,35 @@ public class MeshIndicator : MonoBehaviour
         this.geneticRaycast = raycastMethod;
 
         this.meshFilter.mesh = this._meshCube.mesh;
+        this._meshRender = this.GetComponent<MeshRenderer>();
 
     }
 
     public IndictatorData GetRelativePosRot(Vector2 positionRatio) {
-        indictatorData.rotation = transform.rotation;
 
-        float x = (Mathf.Lerp(leftBottom.x, rightBottom.x, positionRatio.x) * (finalSizeValue / Screen.width)) + transform.position.x;
-        float z = (Mathf.Lerp(leftTop.y, leftBottom.y,positionRatio.y) *  (finalSizeValue / Screen.height)) + transform.position.z;
+        var cameraDir = (helpOrientPoint.hitPoint - transform.position).normalized;
+        cameraDir.y = 0;
+        indictatorData.rotation = Quaternion.LookRotation(cameraDir);
 
-        Debug.Log(string.Format("leftBottom.x {0}, rightBottom.x {1}", leftBottom.x, rightBottom.x));
+        //if (raycastOverallResult.allHits)
+        //Times 5f, for red border
+        var bound = _meshRender.bounds.extents * 0.2f;
+        var front = _meshRender.transform.forward;
+        var right = _meshRender.transform.right;
 
-        Debug.Log(string.Format("leftBottom.y {0}, leftTop.y {1}", leftBottom.y, leftTop.y));
+        var boundX = Mathf.Lerp(-bound.x, bound.x, positionRatio.x);
+        var boundZ = Mathf.Lerp(-bound.z, bound.z, positionRatio.y);
 
-        indictatorData.position.Set(x, transform.position.y, z);
+        //Debug.Log("boundX " + boundX + ", boundZ " + boundZ);
+        //Debug.Log("Extend " + bound);
+
+        Vector3 xAxis = boundX * right;
+        Vector3 zAxis = boundZ * front;
+        Vector3 finalAxis = xAxis + zAxis + transform.position;
+
+        //Debug.Log(string.Format("positionRatio {0}, x {1}, z {2}", positionRatio, finalAxis.x, finalAxis.z));
+
+        indictatorData.position.Set(finalAxis.x, transform.position.y, finalAxis.z);
 
         return indictatorData;
     }
@@ -68,9 +87,9 @@ public class MeshIndicator : MonoBehaviour
         rightTop.Set(width - (width * textureStructure.xResidualRatio),
                     height - (height * textureStructure.yResidualRatio));
 
-        Debug.Log(string.Format("yResidualRatio {0}, yRatio {1}", textureStructure.yResidualRatio, textureStructure.yRatio));
+        //Debug.Log(string.Format("yResidualRatio {0}, yRatio {1}", textureStructure.yResidualRatio, textureStructure.yRatio));
 
-        Debug.Log(string.Format("LeftBotm {0}, LeftTop {1}, RightBottom {2}, RightTop {3}", leftBottom, leftTop, rightBottom, rightTop));
+        //Debug.Log(string.Format("LeftBotm {0}, LeftTop {1}, RightBottom {2}, RightTop {3}", leftBottom, leftTop, rightBottom, rightTop));
 
         screenPosArray[0] = leftBottom;
         screenPosArray[1] = leftTop;
@@ -85,18 +104,20 @@ public class MeshIndicator : MonoBehaviour
         centerPoint.Set(0.5f, 0.5f);
 
         var centerResult = geneticRaycast(centerPoint);
+
         if (centerResult.hasHit) {
             meshFilter.transform.position = centerResult.hitPoint;
 
-            finalSizeValue = (indicatorSizeStr * 0.75f);
-
-            float sizeMagnitue = (_camera.transform.position - meshFilter.transform.position).magnitude * finalSizeValue;
-            meshFilter.transform.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
+            finalSizeValue = (_camera.transform.position - meshFilter.transform.position).magnitude * (indicatorSizeStr * 0.74f);
+            meshFilter.transform.localScale = new Vector3(finalSizeValue, finalSizeValue, finalSizeValue);
 
             var cameraForward = _camera.transform.forward;
-            var cameraBearing = new Vector3(cameraForward.x, 0, cameraForward.z);
+            var cameraBearing = new Vector3(cameraForward.x, 0, cameraForward.z).normalized;
             meshFilter.transform.rotation = Quaternion.LookRotation(cameraBearing);
         }
+
+        centerPoint.y = 0.51f;
+        helpOrientPoint = geneticRaycast(centerPoint);
     }
 
     private RaycastOverallResult FindFourCornerOfIndicator(Vector2[] screenPosArray) {

@@ -73,7 +73,7 @@ namespace AROrigami {
             //Copy the front vert
             System.Array.Copy(vertices, newVertices, faceVertCount);
 
-            Vector3 dirDiff = new Vector3(0, -1.5f, 0);
+            Vector3 dirDiff = new Vector3(0, -4f, 0);
             for (int i = faceVertCount; i < doubleFaceVertCount; i++)
             {
                 newVertices[i] = vertices[i - faceVertCount] + dirDiff;

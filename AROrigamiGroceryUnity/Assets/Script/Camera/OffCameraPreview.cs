@@ -18,6 +18,12 @@ public class OffCameraPreview : MonoBehaviour
     [SerializeField, Range(0, 1)]
     private float _CropSize = 1;
 
+    [SerializeField, Range(0, 360)]
+    private int Rotation = 0;
+
+    [SerializeField]
+    private Button captureBtn;
+
     [SerializeField]
     private TextureMeshManager textureMeshPreview;
 
@@ -25,7 +31,10 @@ public class OffCameraPreview : MonoBehaviour
     private MeshIndicator _meshIndicator;
 
     [SerializeField]
-    private MeshObject p_meshObject;
+    private MeshObject p_meshOutline;
+
+    [SerializeField]
+    private MeshObjectManager meshObjManager;
 
     public Texture2D inputTex;
     private Texture2D cropTex;
@@ -58,18 +67,20 @@ public class OffCameraPreview : MonoBehaviour
 
         textureMeshPreview.OnMeshCalculationDone += OnMeshDone;
 
+        captureBtn.onClick.AddListener(() => { TakeAPhoto(); });
+
         //var scaleTex = RotateAndScaleImage(inputTex, GrabTextureRadius(), 0);
         //preview.texture = scaleTex;
 
         //textureMeshPreview.CaptureContourMesh(scaleTex, p_meshObject);
-        _ = UtilityMethod.DoDelayWork(1, Preview3DObject);
+        //_ = UtilityMethod.DoDelayWork(1, Preview3DObject);
     }
 
     private void Update()
     {
         _meshIndicator.DisplayOnScreenPos(_textureStructure, _CropSize);
-        TextureUtility.RotateAndScaleImage(inputTex, modelTexRenderer, rotateMat, _textureStructure, 0);
-        TextureUtility.RotateAndScaleImage(inputTex, imageProcessRenderer, rotateMat, _textureStructure, 0);
+        TextureUtility.RotateAndScaleImage(inputTex, modelTexRenderer, rotateMat, _textureStructure, Rotation);
+        TextureUtility.RotateAndScaleImage(inputTex, imageProcessRenderer, rotateMat, _textureStructure, Rotation);
 
         StartCoroutine(textureMeshPreview.ExecEdgeProcessing(imageProcessRenderer));
 
@@ -77,7 +88,7 @@ public class OffCameraPreview : MonoBehaviour
 
         textureMeshPreview.ProcessCSTextureColor();
 
-        //textureMeshPreview.CaptureEdgeBorderMesh(imageProcessRenderer.width, p_meshObject, _textureStructure);
+        textureMeshPreview.CaptureEdgeBorderMesh(imageProcessRenderer.width, p_meshOutline, _textureStructure);
 
         //textureMeshPreview.CaptureContourMesh(modelTexRenderer, p_meshObject);
 
@@ -86,25 +97,12 @@ public class OffCameraPreview : MonoBehaviour
 
     private void OnMeshDone(TextureMeshManager.MeshCalResult meshResult)
     {
-        meshResult.screenPoint.Set(meshResult.screenPoint.x, meshResult.screenPoint.y);
-
         MeshIndicator.IndictatorData indictatorData = _meshIndicator.GetRelativePosRot(meshResult.screenPoint);
-
-        //TextureUtility.RaycastResult raycast = GetRaycastResult(meshResult.screenPoint);
-
-        //if (!raycast.hasHit) return;
-
-        //meshResult.meshObject.transform.position = raycast.hitPoint;
-        meshResult.meshObject.transform.position = indictatorData.position;
 
         float sizeMagnitue = (_camera.transform.position - meshResult.meshObject.transform.position).magnitude * _SizeStrength;
         meshResult.meshObject.transform.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
 
-        meshResult.meshObject.transform.rotation = indictatorData.rotation;
-        //var cameraForward = _camera.transform.forward;
-        //var cameraBearing = new Vector3(cameraForward.x, 0 , cameraForward.z);
-
-        //meshResult.meshObject.transform.rotation = Quaternion.LookRotation(cameraBearing);
+        meshResult.meshObject.SetPosRotation(indictatorData.position, indictatorData.rotation);
     }
 
     private TextureUtility.RaycastResult GetRaycastResult(Vector2 screenPos) {
@@ -113,7 +111,7 @@ public class OffCameraPreview : MonoBehaviour
         RaycastHit hit;
 
         _raycastResult.hasHit = Physics.Raycast(ray, out hit, 100.0f);
-        _raycastResult.hitPoint = hit.point + new Vector3(0, 0.02f, 0);
+        _raycastResult.hitPoint = hit.point + new Vector3(0, 0.01f, 0);
 
         return _raycastResult;
     }
@@ -121,7 +119,7 @@ public class OffCameraPreview : MonoBehaviour
     private void Preview3DObject() {
         textureMeshPreview.ProcessCSTextureColor();
 
-        textureMeshPreview.CaptureContourMesh(modelTexRenderer, p_meshObject, _textureStructure);
+        textureMeshPreview.CaptureContourMesh(modelTexRenderer, p_meshOutline, _textureStructure);
     }
 
     private void PrepareTexture()
@@ -131,6 +129,13 @@ public class OffCameraPreview : MonoBehaviour
 
         textureMeshPreview.UpdateScreenInfo((int) ((Screen.width / 2f) - (textureSize / 2f) ),
                                             (int)((Screen.height / 2f) - (textureSize / 2f)));
+    }
+
+    private void TakeAPhoto()
+    {
+        MeshObject meshObject = meshObjManager.CreateMeshObj(p_meshOutline.transform.position, p_meshOutline.transform.rotation, true);
+
+        textureMeshPreview.CaptureContourMesh(modelTexRenderer, meshObject, _textureStructure);
     }
 
     private TextureUtility.TextureStructure GrabTextureRadius()

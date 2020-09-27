@@ -17,6 +17,12 @@ namespace AROrigami {
         private Animator _animator;
 
         [SerializeField]
+        private BoxCollider _collider;
+
+        [SerializeField]
+        private Rigidbody _rigidbody;
+
+        [SerializeField]
         private MeshRenderer _meshRenderer;
         public MeshRenderer meshRenderer => _meshRenderer;
 
@@ -113,6 +119,25 @@ namespace AROrigami {
             transform.rotation = _ori_quaterion;
 
             _meshFilter.mesh = mesh;
+        }
+
+        public void SetPosRotation(Vector3 p_position, Quaternion p_quaternion) {
+            this.transform.position = p_position;
+            this.transform.rotation = p_quaternion;
+
+            this._collider.enabled = copyUVTexture;
+
+            if (copyUVTexture) {
+                this._collider.size = _meshRenderer.bounds.size / transform.localScale.x;
+                this._collider.center = new Vector3(0, -_collider.size.y * 0.5f, 0);
+
+                this.transform.Rotate(new Vector3(-90, 0, 0), Space.Self);
+
+                Debug.Log(_meshRenderer.bounds.size);
+                this.transform.position = p_position + new Vector3(0, _meshRenderer.bounds.size.y*0.5f, 0);
+            }
+
+            this._rigidbody.isKinematic = !copyUVTexture;
         }
 
         public void Rotate(Vector3 direction) {
