@@ -147,7 +147,7 @@ namespace AROrigami
 
             if (!CheckIfValid(maskColors)) return;
 
-            var marchCubeResult = await AssignMesh(maskColors.img, resize, resize);
+            var marchCubeResult = await ProcessMarchCube(maskColors.img, resize, resize);
             var meshData = mesh2DTo3D.CreateMeshData(marchCubeResult.vertices, marchCubeResult.triangles, marchCubeResult.uv, null);
 
             meshObject.SetMesh(mesh2DTo3D.CreateMesh(meshObject.mesh, meshData), highlightRenderer, skinSize);
@@ -162,7 +162,7 @@ namespace AROrigami
 
             if (!CheckIfValid(maskColors)) return;
 
-            var marchCubeResult = await AssignMesh(maskColors.img, resize, resize);
+            var marchCubeResult = await ProcessMarchCube(maskColors.img, resize, resize);
 
             var mesh = await MeshTo3D(marchCubeResult, meshObject.mesh);
 
@@ -177,7 +177,7 @@ namespace AROrigami
         }
         #endregion
 
-        private async UniTask<MarchingCube.MarchingCubeResult> AssignMesh(Color[] maskImage, int textureWidth, int textureHeight)
+        private async UniTask<MarchingCube.MarchingCubeResult> ProcessMarchCube(Color[] maskImage, int textureWidth, int textureHeight)
         {
             return await UniTask.Run(() =>
             {
