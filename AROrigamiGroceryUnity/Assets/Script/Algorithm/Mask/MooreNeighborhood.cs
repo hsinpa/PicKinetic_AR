@@ -25,10 +25,16 @@ namespace AROrigami
 
         private List<Vector2Int> _eightNeighbors;
         private int _neighbourCount;
+        private LoopUtility loopUtility;
         private MooreNeighborInfo infoContainer = new MooreNeighborInfo();
+
+        public MooreNeighborhood() {
+            loopUtility = new LoopUtility();
+        }
 
         public MooreNeighborInfo Execute(Color[] grayImages, int width, int height, Vector2Int startPoint, float threshold = 0.2f)
         {
+            loopUtility.SetUp(startPoint.x, startPoint.y, width, height);
             int maxStep = 5000;
             int step = 0;
 
@@ -93,30 +99,48 @@ namespace AROrigami
 
         private Point SearchForFirstContact(Point point, int startX, int startY)
         {
+            var looper = loopUtility.GetGeneticLooper(LoopUtility.LoopDirection.Left);
+            
             point.position = ParameterFlag.General.Vector2Zero;
             point.backTracePoint = ParameterFlag.General.Vector2Zero;
 
-            for (int y = startY - 1; y >= 0; y--)
+            foreach (var singleRow in looper)
             {
-                for (int x = startX; x < _width; x++)
+                point.position.Set(singleRow.x, singleRow.y);
+
+                //Is Wall detected
+                if (_images[singleRow.index].r >= _threshold)
                 {
-                    int index = x + (y * _width);
-
-                    point.position.Set(x, y);
-
-                    //Is Wall detected
-                    if (_images[index].r >= _threshold)
-                    {
-                        point.value = 0;
-                        return point;
-                    }
-
-                    point.backTracePoint.Set(x, y);
+                    point.value = 0;
+                    return point;
                 }
+
+                point.backTracePoint.Set(singleRow.x, singleRow.y);
             }
+
+
+            //for (int y = startY - 1; y >= 0; y--)
+            //{
+            //    for (int x = startX; x < _width; x++)
+            //    {
+            //        int index = x + (y * _width);
+
+            //        point.position.Set(x, y);
+
+            //        //Is Wall detected
+            //        if (_images[index].r >= _threshold)
+            //        {
+            //            point.value = 0;
+            //            return point;
+            //        }
+
+            //        point.backTracePoint.Set(x, y);
+            //    }
+            //}
 
             return point;
         }
+
 
         private Point GetMooreNeighborhood(Point boundaryPixel, Vector2 backtracePoint, int neighbourIndex = -1)
         {

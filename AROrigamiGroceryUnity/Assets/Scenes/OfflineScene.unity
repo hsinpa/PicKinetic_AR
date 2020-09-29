@@ -746,7 +746,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.43028867, y: 0}
   m_AnchorMax: {x: 0.56984544, y: 0.12538601}
-  m_AnchoredPosition: {x: 0, y: 8.510864}
+  m_AnchoredPosition: {x: 0, y: 8.5108795}
   m_SizeDelta: {x: -1.6871338, y: -17.021889}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1060021057
@@ -1072,14 +1072,14 @@ MonoBehaviour:
   edgePreview: {fileID: 1471715595}
   rotateMat: {fileID: 2100000, guid: 2c979822271bf4c13b7198c4c9772745, type: 2}
   _SizeStrength: 0.0065
-  _CropSize: 0.9
+  _CropSize: 1
   Rotation: 0
   captureBtn: {fileID: 1060021057}
   textureMeshPreview: {fileID: 130743002}
   _meshIndicator: {fileID: 652630608}
   p_meshOutline: {fileID: 1729367509}
   meshObjManager: {fileID: 1589271882}
-  inputTex: {fileID: 2800000, guid: 0e17248ca1759a146a9fe5a7a0951089, type: 3}
+  inputTex: {fileID: 2800000, guid: 41862c0464f72d549a2df4ac1b5fc259, type: 3}
 --- !u!4 &1669611012
 Transform:
   m_ObjectHideFlags: 0
