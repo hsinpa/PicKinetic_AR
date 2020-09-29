@@ -43,15 +43,22 @@ namespace AROrigami {
 
             targetMesh.Clear();
 
-            targetMesh.vertices = meshData.vertices;
+            try
+            {
+                targetMesh.SetVertices(meshData.vertices);
 
-            targetMesh.triangles = meshData.triangles;
+                targetMesh.SetTriangles( meshData.triangles, 0);
 
-            targetMesh.uv = meshData.uv;
+                targetMesh.SetUVs(0, meshData.uv);
 
-            targetMesh.colors = meshData.colors;
+                targetMesh.SetColors(meshData.colors);
 
-            targetMesh.RecalculateNormals();
+                targetMesh.RecalculateNormals();
+            }
+            catch {
+                Debug.LogError("PlaneMesh to 3D error, either vertice, tri, uv not match");
+            }
+
 
             return targetMesh;
         }

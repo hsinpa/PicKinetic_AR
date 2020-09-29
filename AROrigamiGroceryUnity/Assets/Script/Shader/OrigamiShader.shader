@@ -7,6 +7,8 @@
 
         _CtrlPointRadius ("CtrlPoint Radius", Range(0, 50)) = 1
 
+        _VerticalTransition("Display Vertical", Range(0, 1))  = 1
+
         [Toggle(SHOW_SIDE_TEX)]
         _ShowSideTex("Show Side Texture", Int) = 0
     }
@@ -29,6 +31,8 @@
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 3.0
+            #pragma multi_compile_instancing
+
 
             #include "UnityCG.cginc"
 
@@ -54,6 +58,8 @@
 
             uniform float4 _ControlPoints[3];
             uniform float4 _OriControlPoints[3];
+
+            uniform float _VerticalTransition;
             float _CtrlPointRadius;
 
             float4 GetCtrlPointEffectVertex(float4 vertex) {

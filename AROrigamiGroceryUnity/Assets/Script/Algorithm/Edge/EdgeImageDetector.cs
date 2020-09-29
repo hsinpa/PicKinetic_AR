@@ -42,9 +42,9 @@ namespace AROrigami
 
             //Sharp
             Graphics.Blit(tempTexA, tempTexB, EdgeMaterial, 3);
-            
-            //Dilatiion
-            Graphics.Blit(tempTexB, outputTexture, EdgeMaterial, 4);
+
+            //Dilation
+            Graphics.Blit(tempTexB, outputTexture, EdgeMaterial, 5);
 
             //RenderTexture.active = outputTexture;
             //// Read pixels

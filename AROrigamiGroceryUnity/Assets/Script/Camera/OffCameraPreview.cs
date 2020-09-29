@@ -9,7 +9,10 @@ using Utilities;
 
 public class OffCameraPreview : MonoBehaviour
 {
-    public RawImage preview;
+
+    public RawImage rawPreview;
+    public RawImage edgePreview;
+
     public Material rotateMat;
 
     [SerializeField, Range(0, 1)]
@@ -63,8 +66,9 @@ public class OffCameraPreview : MonoBehaviour
         _textureStructure = GrabTextureRadius();
         _meshIndicator.SetUp(_camera, GetRaycastResult);
         PrepareTexture();
-        preview.texture = imageProcessRenderer;
+        rawPreview.texture = imageProcessRenderer;
 
+        textureMeshPreview.OnEdgeTexUpdate += OnEdgeImageUpdate;
         textureMeshPreview.OnMeshCalculationDone += OnMeshDone;
 
         captureBtn.onClick.AddListener(() => { TakeAPhoto(); });
@@ -136,6 +140,11 @@ public class OffCameraPreview : MonoBehaviour
         MeshObject meshObject = meshObjManager.CreateMeshObj(p_meshOutline.transform.position, p_meshOutline.transform.rotation, true);
 
         textureMeshPreview.CaptureContourMesh(modelTexRenderer, meshObject, _textureStructure);
+    }
+
+    private void OnEdgeImageUpdate(Texture2D tex)
+    {
+        edgePreview.texture = tex;
     }
 
     private TextureUtility.TextureStructure GrabTextureRadius()
