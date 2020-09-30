@@ -49,7 +49,7 @@ namespace AROrigami
             _neighbourCount = _eightNeighbors.Count;
 
             //0, height / 2
-            Point firstContact = SearchForFirstContact(p, startPoint.x, startPoint.y );
+            Point firstContact = SearchForFirstContact(p);
             centerPoint = firstContact.position;
 
             p = firstContact;
@@ -97,7 +97,7 @@ namespace AROrigami
             return infoContainer;
         }
 
-        private Point SearchForFirstContact(Point point, int startX, int startY)
+        private Point SearchForFirstContact(Point point)
         {
             var looper = loopUtility.GetGeneticLooper(LoopUtility.LoopDirection.Left);
             

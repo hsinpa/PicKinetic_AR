@@ -77,24 +77,18 @@ public class LoopUtility
     {
         for (int y = _startY - 1; y >= 0; y--)
         {
-            for (int x = _startX; x < _width; x++)
-            {
-                _loopInfo.Set(x, y);
-                yield return _loopInfo;
-            }
+            _loopInfo.Set(_startX, y);
+            yield return _loopInfo;
         }
     }
 
     //Simple BottomUp Approach
     IEnumerable<LoopInfo> LoopBottom()
     {
-        for (int y = _startY - 1; y >= 0; y--)
+        for (int y = 0; y < _height; y++)
         {
-            for (int x = _startX; x < _width; x++)
-            {
-                _loopInfo.Set(x, y);
-                yield return _loopInfo;
-            }
+            _loopInfo.Set(_startX, y);
+            yield return _loopInfo;
         }
     }
 
