@@ -7,14 +7,15 @@ using System.Threading.Tasks;
 namespace Utilities
 {
 	public class UtilityMethod {
-		
 
-	    /// <summary>
-        ///  Load single sprite from multiple mode
-        /// </summary>
-        /// <param name="spriteArray"></param>
-        /// <param name="spriteName"></param>
-        /// <returns></returns>
+		private static readonly System.Random _random = new System.Random();
+
+		/// <summary>
+		///  Load single sprite from multiple mode
+		/// </summary>
+		/// <param name="spriteArray"></param>
+		/// <param name="spriteName"></param>
+		/// <returns></returns>
 		public static Sprite LoadSpriteFromMulti(Sprite[] spriteArray, string spriteName) {
 			foreach (Sprite s in spriteArray) {
 				
@@ -126,5 +127,14 @@ namespace Utilities
 			if (p_action != null)
 				p_action();
 		}
+
+		public static int GetRandomNumber(int min, int max)
+		{
+			lock (_random) // synchronize
+			{
+				return (_random.Next(min, max));
+			}
+		}
+
 	}
 }

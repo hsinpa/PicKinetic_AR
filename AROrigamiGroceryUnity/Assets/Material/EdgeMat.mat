@@ -23,6 +23,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _BlendTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BumpMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -61,6 +65,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - PixelSnap: 0
+    - _BlendTransition: 0.2
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DeltaX: 0.01
@@ -83,7 +88,7 @@ Material:
     - _SpecularHighlights: 1
     - _Spread: 1
     - _SrcBlend: 1
-    - _Threshold: 0.35
+    - _Threshold: 0.41
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:

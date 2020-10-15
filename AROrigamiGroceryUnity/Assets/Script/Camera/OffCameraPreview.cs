@@ -130,9 +130,6 @@ public class OffCameraPreview : MonoBehaviour
     {
         modelTexRenderer = TextureUtility.GetRenderTexture(textureSize);
         imageProcessRenderer = TextureUtility.GetRenderTexture((int)(textureSize * 0.5f));
-
-        textureMeshPreview.UpdateScreenInfo((int) ((Screen.width / 2f) - (textureSize / 2f) ),
-                                            (int)((Screen.height / 2f) - (textureSize / 2f)));
     }
 
     private void TakeAPhoto()

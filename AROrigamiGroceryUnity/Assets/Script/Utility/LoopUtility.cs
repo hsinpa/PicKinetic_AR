@@ -64,7 +64,7 @@ public class LoopUtility
     {
         for (int y = _startY; y < _height; y++)
         {
-            for (int x = _startX; x >= 0; x--)
+            for (int x = _startX-1; x >= 0; x--)
             {
                 _loopInfo.Set(x, y);
                 yield return _loopInfo;

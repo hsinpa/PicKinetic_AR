@@ -40,11 +40,7 @@ namespace AROrigami
         public System.Action<Texture2D> OnEdgeTexUpdate;
         public System.Action<MeshCalResult> OnMeshCalculationDone;
 
-        private Vector3[] TestBorderArray;
-
         int resize = 64;
-        int startPixelX;
-        int startPixelY;
 
         //ComputeShader Properties
         private Color[] process_tex_colors;
@@ -78,11 +74,6 @@ namespace AROrigami
             PrepareComputeShader();
 
             Graphics.Blit(highlightTexture, highlightRenderer);
-        }
-
-        public void UpdateScreenInfo(int startPixelX, int startPixelY) {
-            this.startPixelX = startPixelX;
-            this.startPixelY = startPixelY;
         }
 
         public IEnumerator ExecEdgeProcessing(RenderTexture processTex)
@@ -143,7 +134,7 @@ namespace AROrigami
             if (OnEdgeTexUpdate != null)
                 OnEdgeTexUpdate(edgeOutputTex);
 
-            var maskColors = await imageMaskGeneator.AsyncCreateBorder(process_tex_colors_cpu, resize, resize);
+            var maskColors = await imageMaskGeneator.AsyncCreateBorder(process_tex_colors_cpu);
 
             if (!CheckIfValid(maskColors)) return;
 
@@ -158,7 +149,7 @@ namespace AROrigami
 
         public async void CaptureContourMesh(RenderTexture skinTexture, MeshObject meshObject, TextureUtility.TextureStructure textureStructure)
         {
-            var maskColors = await imageMaskGeneator.AsyncCreateMask(process_tex_colors_cpu, resize, resize);
+            var maskColors = await imageMaskGeneator.AsyncCreateMask(process_tex_colors_cpu);
 
             if (!CheckIfValid(maskColors)) return;
 

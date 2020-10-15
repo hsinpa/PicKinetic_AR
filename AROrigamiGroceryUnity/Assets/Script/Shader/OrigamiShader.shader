@@ -4,10 +4,11 @@
     {
         _MainTex ("Texture", 2D) = "white" {}
         _SideTex ("Side Texture", 2D) = "white" {}
-
+        _NoiseTex("Noise Texture", 2D) = "white" {}
+        
         _CtrlPointRadius ("CtrlPoint Radius", Range(0, 50)) = 1
 
-        _VerticalTransition("Display Vertical", Range(0, 1))  = 1
+        _RenderTransition("Verticle Render Transition", Range(0, 1))  = 1
 
         [Toggle(SHOW_SIDE_TEX)]
         _ShowSideTex("Show Side Texture", Int) = 0
@@ -59,7 +60,7 @@
             uniform float4 _ControlPoints[3];
             uniform float4 _OriControlPoints[3];
 
-            uniform float _VerticalTransition;
+            uniform float _RenderTransition;
             float _CtrlPointRadius;
 
             float4 GetCtrlPointEffectVertex(float4 vertex) {
@@ -102,9 +103,13 @@
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv);
 
+               fixed isShowBool = step(i.vertex.z, _RenderTransition); 
+
                if (i.color.r > 0.1) {
                     col = tex2D(_SideTex, i.uv);                
                }
+
+                col = isShowBool * col;
 
                 return col;
             }

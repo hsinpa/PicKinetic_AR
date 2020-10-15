@@ -24,7 +24,6 @@ namespace AROrigami {
 
         [SerializeField]
         private MeshRenderer _meshRenderer;
-        public MeshRenderer meshRenderer => _meshRenderer;
 
         [SerializeField]
         private MeshFilter _meshFilter;
@@ -133,7 +132,6 @@ namespace AROrigami {
 
                 this.transform.Rotate(new Vector3(-90, 0, 0), Space.Self);
 
-                Debug.Log(_meshRenderer.bounds.size);
                 this.transform.position = p_position + new Vector3(0, _meshRenderer.bounds.size.y*0.5f, 0);
             }
 

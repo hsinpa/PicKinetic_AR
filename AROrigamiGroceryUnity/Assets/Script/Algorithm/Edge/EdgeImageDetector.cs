@@ -11,12 +11,10 @@ namespace AROrigami
         private RenderTexture outputTexture;
         private RenderTexture tempTexA;
         private RenderTexture tempTexB;
-
-        private Texture2D outputTex;
-        private Rect rectReadPicture;
+        private RenderTexture previousSobel;
+        
         int textureSize = 64;
 
-        // Start is called before the first frame update
         public EdgeImageDetector(Material EdgeMaterial)
         {
             this.EdgeMaterial = EdgeMaterial;
@@ -24,9 +22,9 @@ namespace AROrigami
 
             tempTexA = TextureUtility.GetRenderTexture(textureSize);
             tempTexB = TextureUtility.GetRenderTexture(textureSize);
-            rectReadPicture = new Rect(0, 0, textureSize, textureSize);
+            previousSobel = TextureUtility.GetRenderTexture(textureSize);
 
-            outputTex = new Texture2D(textureSize, textureSize, TextureFormat.ARGB32, true);
+            this.EdgeMaterial.SetTexture("_BlendTex", previousSobel);
         }
 
         public RenderTexture GetEdgeTex(RenderTexture input)
@@ -43,32 +41,17 @@ namespace AROrigami
             //Sharp
             Graphics.Blit(tempTexA, tempTexB, EdgeMaterial, 3);
 
-            //Dilation
-            Graphics.Blit(tempTexB, outputTexture, EdgeMaterial, 5);
+            //Copy
+            Graphics.Blit(tempTexB, previousSobel);
 
-            //RenderTexture.active = outputTexture;
-            //// Read pixels
-            //outputTex.ReadPixels(rectReadPicture, 0, 0);
-            //outputTex.Apply();
-            //RenderTexture.active = null;
+            //Blend
+            Graphics.Blit(tempTexB, tempTexA, EdgeMaterial, 4);
+
+            //Dilation
+            Graphics.Blit(tempTexA, outputTexture, EdgeMaterial, 6);
 
             return outputTexture;
         }
-
-        //IEnumerator GetEdgeTexAsync(Texture2D input)
-        //{
-        //    while (true)
-        //    {
-        //        yield return new WaitForSeconds(1);
-        //        yield return new WaitForEndOfFrame();
-
-        //        var rt = RenderTexture.GetTemporary(Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32);
-        //        ScreenCapture.CaptureScreenshotIntoRenderTexture(rt);
-        //        AsyncGPUReadback.Request(rt, 0, TextureFormat.ARGB32, OnCompleteReadback);
-        //        RenderTexture.ReleaseTemporary(rt);
-        //    }
-        //}
-
 
     }
 }

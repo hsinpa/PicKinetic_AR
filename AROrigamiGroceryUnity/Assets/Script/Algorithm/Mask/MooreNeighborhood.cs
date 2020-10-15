@@ -26,16 +26,18 @@ namespace AROrigami
         private List<Vector2Int> _eightNeighbors;
         private int _neighbourCount;
         private LoopUtility loopUtility;
+        private LoopUtility.LoopDirection loopDirection;
         private MooreNeighborInfo infoContainer = new MooreNeighborInfo();
 
         public MooreNeighborhood() {
             loopUtility = new LoopUtility();
         }
 
-        public MooreNeighborInfo Execute(Color[] grayImages, int width, int height, Vector2Int startPoint, float threshold = 0.2f)
+        public MooreNeighborInfo Execute(Color[] grayImages, int width, int height, Vector2Int startPoint, LoopUtility.LoopDirection loopDirection, float threshold = 0.2f)
         {
+            this.loopDirection = loopDirection;
             loopUtility.SetUp(startPoint.x, startPoint.y, width, height);
-            int maxStep = 5000;
+            int maxStep = 2000;
             int step = 0;
 
             int area = 1;
@@ -64,7 +66,7 @@ namespace AROrigami
                 if (c.value == 0)
                 {
                     //insert c in B
-                    DrawDotOnContour(c.GetIndex(_width));
+                    bool isNewPoint = DrawDotOnContour(c.GetIndex(_width));
 
                     //set p=c
                     p = c;
@@ -72,8 +74,10 @@ namespace AROrigami
                     //backtrack (move the current pixel c to the pixel from which p was entered)
                     c = GetMooreNeighborhood(p, p.backTracePoint);
 
-                    area++;
-                    centerPoint += p.position;
+                    if (isNewPoint) {
+                        area++;
+                        centerPoint += p.position;
+                    }
                 }
                 //advance the current pixel c to the next clockwise pixel in M(p)
                 else
@@ -88,6 +92,10 @@ namespace AROrigami
                 step++;
             }
 
+            if (step >= maxStep)
+                area = 1;
+
+
             float divident = (1f / area);
 
             infoContainer.area = area;
@@ -99,7 +107,7 @@ namespace AROrigami
 
         private Point SearchForFirstContact(Point point)
         {
-            var looper = loopUtility.GetGeneticLooper(LoopUtility.LoopDirection.Left);
+            var looper = loopUtility.GetGeneticLooper(this.loopDirection);
             
             point.position = ParameterFlag.General.Vector2Zero;
             point.backTracePoint = ParameterFlag.General.Vector2Zero;
@@ -179,9 +187,12 @@ namespace AROrigami
             return boundaryPixel;
         }
 
-        private void DrawDotOnContour(int index)
+        private bool DrawDotOnContour(int index)
         {
+            bool isNewCountorPoint = contourImage[index] != blockColor;
             contourImage[index] = blockColor;
+
+            return isNewCountorPoint;
         }
 
         private Color[] ResetOutputImage(int length)

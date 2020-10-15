@@ -56,9 +56,9 @@ public class DeviceCamera : MonoBehaviour
     TextureUtility.RaycastResult _raycastResult = new TextureUtility.RaycastResult();
     private Vector3 placementOffset = new Vector3(0, 0.01f, 0);
     List<ARRaycastHit> aRRaycastHits = new List<ARRaycastHit>();
-
+    private CommandBuffer commandBuffer;
     int textureSize = 512;
-
+    //bool _applicationPause = false;
 
     float timer;
     float timer_step = 0.1f;
@@ -79,8 +79,6 @@ public class DeviceCamera : MonoBehaviour
             return null;
         }
     }
-
-
 
     private IEnumerator Start()
     {
@@ -106,7 +104,9 @@ public class DeviceCamera : MonoBehaviour
     }
 
     private void Init() {
-        AccessToFrontCamera();
+        Debug.Log("Init");
+
+        //AccessToFrontCamera();
 
         TextureUtility = new TextureUtility();
 
@@ -120,6 +120,9 @@ public class DeviceCamera : MonoBehaviour
         texturePreivew.OnMeshCalculationDone += OnMeshDone;
 
         meshIndicator.SetUp(_camera, GetRaycastResult);
+
+        commandBuffer = new CommandBuffer();
+        commandBuffer.name = "AR Camera Background Blit Pass";
     }
 
     //Fallback function, if ar foundation is not support
@@ -153,10 +156,11 @@ public class DeviceCamera : MonoBehaviour
     }
 
     private void UpdateCameraTex() {
-        if (arBackgroundRenderer != null && _arCameraBG.material != null) {
+        if (arBackgroundRenderer != null && _arCameraBG.material != null && commandBuffer != null) {
+            //var commandBuffer = new CommandBuffer();
+            //commandBuffer.name = "AR Camera Background Blit Pass";
+            commandBuffer.Clear();
 
-            var commandBuffer = new CommandBuffer();
-            commandBuffer.name = "AR Camera Background Blit Pass";
             var texture = !_arCameraBG.material.HasProperty("_MainTex") ? null : _arCameraBG.material.GetTexture("_MainTex");
             Graphics.SetRenderTarget(arBackgroundRenderer.colorBuffer, arBackgroundRenderer.depthBuffer);
             commandBuffer.ClearRenderTarget(true, false, Color.clear);
@@ -170,19 +174,15 @@ public class DeviceCamera : MonoBehaviour
         imageProcessRenderer = TextureUtility.GetRenderTexture((int) (textureSize * 0.5f));
 
         arBackgroundRenderer = TextureUtility.GetRenderTexture(Screen.width, Screen.height, 24);
-
-        texturePreivew.UpdateScreenInfo((int)((Screen.width / 2f) - (textureSize / 2f)),
-                                    (int)((Screen.height / 2f) - (textureSize / 2f)));
     }
 
     private void Update()
     {
+        if (cameraTex == null) return;
+
         UpdateCameraTex();
 
         //PlaceObjectOnARPlane(new Vector2(0.5f, 0.5f), _objMappingVisualQueue.transform);
-
-        if (cameraTex == null) return;
-
         //Resize, and rotate to right direction
         //-backCam.videoRotationAngle
         _textureStructure = GrabTextureRadius();
@@ -247,4 +247,14 @@ public class DeviceCamera : MonoBehaviour
         texturePreivew.OnEdgeTexUpdate -= OnEdgeImageUpdate;
         texturePreivew.OnMeshCalculationDone -= OnMeshDone;
     }
+
+    //void OnApplicationFocus(bool hasFocus)
+    //{
+    //    _applicationPause = !hasFocus;
+    //}
+
+    //void OnApplicationPause(bool pauseStatus)
+    //{
+    //        _applicationPause = pauseStatus;
+    //}
 }

@@ -746,7 +746,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.43028867, y: 0}
   m_AnchorMax: {x: 0.56984544, y: 0.12538601}
-  m_AnchoredPosition: {x: 0, y: 8.5108795}
+  m_AnchoredPosition: {x: 0, y: 8.510864}
   m_SizeDelta: {x: -1.6871338, y: -17.021889}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1060021057
@@ -1079,7 +1079,7 @@ MonoBehaviour:
   _meshIndicator: {fileID: 652630608}
   p_meshOutline: {fileID: 1729367509}
   meshObjManager: {fileID: 1589271882}
-  inputTex: {fileID: 2800000, guid: 41862c0464f72d549a2df4ac1b5fc259, type: 3}
+  inputTex: {fileID: 2800000, guid: c554ad60ca1123148af332fe004bda6f, type: 3}
 --- !u!4 &1669611012
 Transform:
   m_ObjectHideFlags: 0

@@ -3,8 +3,10 @@
     Properties
     {
         _MainTex("Texture", 2D) = "white" {}
+        _BlendTex("Blending Tex", 2D) = "white" {}
         _KernelSize("Kernel Size (N)", Int) = 21
 		_Threshold("Line threshold", Float) = 0.1
+		_BlendTransition("Blending", Range(0, 1)) = 1
 
 		_DeltaX ("Delta X", Float) = 0.01
 		_DeltaY ("Delta Y", Float) = 0.01
@@ -192,6 +194,31 @@
 		ENDCG
 		}
 
+		//Blending
+		Pass
+		{
+			CGPROGRAM
+			#pragma vertex vert_img
+			#pragma fragment frag
+            #pragma target 3.0
+
+			#include "UnityCG.cginc"
+
+			sampler2D _MainTex;
+			float2 _MainTex_TexelSize;
+			float _BlendTransition;
+			uniform sampler2D _BlendTex;
+		
+			float4 frag (v2f_img IN) : COLOR {
+				fixed4 presentTex = tex2D(_MainTex, IN.uv);
+				fixed4 previousTex = tex2D(_BlendTex, IN.uv);
+
+				fixed4 blendTex = lerp(previousTex, presentTex, _BlendTransition);
+
+				return blendTex;
+			}
+		ENDCG
+		}
 		//Erosion
 		Pass
 		{
