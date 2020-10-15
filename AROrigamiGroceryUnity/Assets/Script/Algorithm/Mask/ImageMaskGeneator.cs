@@ -9,7 +9,7 @@ namespace AROrigami
 
     public class ImageMaskGeneator
     {
-        private MooreNeighborhood MooreNeighborhood;
+        //private MooreNeighborhood MooreNeighborhood;
         private MNFloodFill MNFloodFill;
 
         //// Start is called before the first frame update
@@ -23,11 +23,11 @@ namespace AROrigami
 
         private UniTask<MooreNeighborhood.MooreNeighborInfo>[] taskArray;
 
-        public static readonly List<(Vector2, LoopUtility.LoopDirection)> RaycastStartPos = new List<(Vector2, LoopUtility.LoopDirection)> {
-            (new Vector2(0, 0.5f), LoopUtility.LoopDirection.Left), // Left
-            //(new Vector2(1, 0.5f), LoopUtility.LoopDirection.Right), // Right
-            //(new Vector2(0.5f, 1), LoopUtility.LoopDirection.Top), // Top
-            //(new Vector2(0.5f, 0), LoopUtility.LoopDirection.Down), // Bottom , 
+        public static readonly List<(Vector2, LoopUtility.LoopDirection, MooreNeighborhood)> RaycastStartPos = new List<(Vector2, LoopUtility.LoopDirection, MooreNeighborhood)> {
+            (new Vector2(0, 0.5f), LoopUtility.LoopDirection.Left, new MooreNeighborhood()), // Left
+            (new Vector2(1, 0.5f), LoopUtility.LoopDirection.Right, new MooreNeighborhood()), // Right
+            (new Vector2(0.5f, 1), LoopUtility.LoopDirection.Top, new MooreNeighborhood()), // Top
+            (new Vector2(0.5f, 0), LoopUtility.LoopDirection.Down, new MooreNeighborhood()), // Bottom , 
         };
 
         private int taskCount = RaycastStartPos.Count;
@@ -40,7 +40,7 @@ namespace AROrigami
         {
             _width = size;
             _height = size;
-            MooreNeighborhood = new MooreNeighborhood();
+            //MooreNeighborhood = new MooreNeighborhood();
             MNFloodFill = new MNFloodFill();
 
             taskArray = new UniTask<MooreNeighborhood.MooreNeighborInfo>[RaycastStartPos.Count];
@@ -66,7 +66,7 @@ namespace AROrigami
             return await PrpareMooreNeighborProcess();
         }
 
-        private async UniTask<MooreNeighborhood.MooreNeighborInfo> AsyncContourDirection(Vector2 startVector, LoopUtility.LoopDirection direction) {
+        private async UniTask<MooreNeighborhood.MooreNeighborInfo> AsyncContourDirection(Vector2 startVector, LoopUtility.LoopDirection direction, MooreNeighborhood mooreNeighborhood) {
             return await UniTask.Run(() =>
             {
                 _indexVector.Set(
@@ -74,7 +74,7 @@ namespace AROrigami
                     Mathf.FloorToInt(this._height * startVector.y)
                 ); ;
 
-                return MooreNeighborhood.Execute(this._scaledImage, this._width, this._height, _indexVector, direction);
+                return mooreNeighborhood.Execute(this._scaledImage, this._width, this._height, _indexVector, direction);
             });
         }
 
@@ -82,7 +82,7 @@ namespace AROrigami
 
             for (int i = 0; i < RaycastStartPos.Count; i++)
             {
-                taskArray[i] = AsyncContourDirection(RaycastStartPos[i].Item1, RaycastStartPos[i].Item2);
+                taskArray[i] = AsyncContourDirection(RaycastStartPos[i].Item1, RaycastStartPos[i].Item2, RaycastStartPos[i].Item3);
             }
 
             var taskResultArray = await UniTask.WhenAll(taskArray);
@@ -90,7 +90,9 @@ namespace AROrigami
             int largestIndex = 0;
 
             for (int i = 0; i < taskCount; i++) {
+
                 if (taskResultArray[i].area > largestArea) {
+
                     largestArea = taskResultArray[i].area;
                     largestIndex = i;
                 }
