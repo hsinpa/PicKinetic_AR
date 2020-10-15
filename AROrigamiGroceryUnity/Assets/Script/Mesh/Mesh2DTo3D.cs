@@ -174,10 +174,12 @@ namespace AROrigami {
             //Assign border UV 
             int faceVert = 4;
             Vector2 BottomLeft = new Vector2(0, 0), BottomRight = new Vector2(0.3f, 0), TopLeft = new Vector2(0, 0.3f), TopRIght = new Vector2(0.3f, 0.3f);
-
-            for (int i = 0; i < doubleBorderCount; i += faceVert)
+            
+            for (int i = 0; i < doubleBorderCount - faceVert; i += faceVert)
             {
                 int baseIndex = (newCount) + (i);
+
+                //Debug.Log("baseIndex " + baseIndex);
 
                 newUV[baseIndex] = BottomLeft;
                 newUV[baseIndex + 1] = BottomRight;

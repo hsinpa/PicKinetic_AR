@@ -126,26 +126,6 @@ namespace AROrigami
                 point.backTracePoint.Set(singleRow.x, singleRow.y);
             }
 
-
-            //for (int y = startY - 1; y >= 0; y--)
-            //{
-            //    for (int x = startX; x < _width; x++)
-            //    {
-            //        int index = x + (y * _width);
-
-            //        point.position.Set(x, y);
-
-            //        //Is Wall detected
-            //        if (_images[index].r >= _threshold)
-            //        {
-            //            point.value = 0;
-            //            return point;
-            //        }
-
-            //        point.backTracePoint.Set(x, y);
-            //    }
-            //}
-
             return point;
         }
 

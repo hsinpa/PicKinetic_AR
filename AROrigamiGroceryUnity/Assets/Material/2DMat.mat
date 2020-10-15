@@ -71,7 +71,7 @@ Material:
     - PixelSnap: 0
     - _BumpScale: 1
     - _CtrlInterpolation: 0
-    - _CtrlPointRadius: 23.5
+    - _CtrlPointRadius: 21.6
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
@@ -83,7 +83,7 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _RenderTransition: 0.006
+    - _RenderTransition: 0.747
     - _ShowSideTex: 1
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1

@@ -72,12 +72,6 @@ public class OffCameraPreview : MonoBehaviour
         textureMeshPreview.OnMeshCalculationDone += OnMeshDone;
 
         captureBtn.onClick.AddListener(() => { TakeAPhoto(); });
-
-        //var scaleTex = RotateAndScaleImage(inputTex, GrabTextureRadius(), 0);
-        //preview.texture = scaleTex;
-
-        //textureMeshPreview.CaptureContourMesh(scaleTex, p_meshObject);
-        //_ = UtilityMethod.DoDelayWork(1, Preview3DObject);
     }
 
     private void Update()

@@ -175,7 +175,7 @@
 
 				//Center
 				sum += tex2D(tex, (uv + float2( -1.0,  0.0) * _MainTex_TexelSize)) * -1;
-				sum += tex2D(tex, (uv + float2( 0.0,  0.0) * _MainTex_TexelSize)) *  6;
+				sum += tex2D(tex, (uv + float2( 0.0,  0.0) * _MainTex_TexelSize)) *  5;
 				sum += tex2D(tex, (uv + float2( 1.0,  0.0) * _MainTex_TexelSize)) * -1;
 				
 				//Top
@@ -275,28 +275,31 @@
 			sampler2D _MainTex;
 			float2 _MainTex_TexelSize;
 			float _Threshold;
+			float _DeltaX;
+			float _DeltaY;
 
 			float Dilation (sampler2D tex, float2 uv) {
 			
 				float4 sum = tex2D(tex, (uv + float2( 0.0,  0.0) * _MainTex_TexelSize));
 
-				//Center
-				//float sideValue = -1.0/9.0;
-				//Bottom
-				sum = max(sum, tex2D(tex, (uv + float2(-1.0, -1.0) * _MainTex_TexelSize)));
-				sum = max(sum, tex2D(tex, (uv + float2( 1.0, -1.0) * _MainTex_TexelSize)));
-				sum = max(sum, tex2D(tex, (uv + float2( 1.0,  -1.0) * _MainTex_TexelSize)));
+                 float2 _min = float2(0,0);
+                 float2 _max = float2(1,1);
+ 
+                 //get the color of 8 neighbour pixel
+                 fixed4 U = tex2D(_MainTex,clamp(uv + float2(0,_DeltaY),_min,_max));
+                 fixed4 UR = tex2D(_MainTex,clamp(uv + float2(_DeltaX,_DeltaY),_min,_max));
+                 fixed4 R = tex2D(_MainTex,clamp(uv + float2(_DeltaX,0),_min,_max));
+                 fixed4 DR = tex2D(_MainTex,clamp(uv + float2(_DeltaX,-_DeltaY),_min,_max));
+                 fixed4 D = tex2D(_MainTex,clamp(uv + float2(0,-_DeltaY),_min,_max));
+                 fixed4 DL = tex2D(_MainTex,clamp(uv + float2(-_DeltaX,-_DeltaY),_min,_max));
+                 fixed4 L = tex2D(_MainTex,clamp(uv + float2(-_DeltaX,0),_min,_max));
+                 fixed4 UL = tex2D(_MainTex,clamp(uv + float2(-_DeltaX,_DeltaY),_min,_max));
+                 
+                 //add all colors up to one final color
+                 fixed4 finalColor = U + UR + R + DR + D + DL + L + UL;
 
-				//Center
-				sum = max(sum, tex2D(tex, (uv + float2( -1.0,  0.0) * _MainTex_TexelSize)));
-				sum = max(sum, tex2D(tex, (uv + float2( 1.0,  0.0) * _MainTex_TexelSize)));
-				
-				//Top
-				sum = max(sum, tex2D(tex, (uv + float2(-1.0, 1.0) * _MainTex_TexelSize)));
-				sum = max(sum, tex2D(tex, (uv + float2( 0.0, 1.0) * _MainTex_TexelSize)));
-				sum = max(sum, tex2D(tex, (uv + float2( 1.0, 1.0) * _MainTex_TexelSize)));
 
-				return float4(sum.xyz , 1.0);
+				return float4(finalColor.xyz, 1.0);
 			}
 		
 			float4 frag (v2f_img IN) : COLOR {

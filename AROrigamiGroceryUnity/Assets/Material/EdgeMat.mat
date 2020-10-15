@@ -82,13 +82,14 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
+    - _PixelOffset: 0.01
     - _Quality: 7.9
     - _Size: 3.8
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _Spread: 1
     - _SrcBlend: 1
-    - _Threshold: 0.41
+    - _Threshold: 0.25
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
