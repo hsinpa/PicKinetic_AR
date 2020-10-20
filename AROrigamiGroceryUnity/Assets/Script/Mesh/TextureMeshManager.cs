@@ -29,6 +29,7 @@ namespace AROrigami
         #endregion
 
         #region Private Parameters
+        Rect androidOnlyEdgeRect;
         ImageMaskGeneator imageMaskGeneator;
         MeshGenerator meshGenerator;
         MarchingCube marchingCube;
@@ -60,7 +61,8 @@ namespace AROrigami
         {
             meshCalResult = new MeshCalResult();
             highlightRenderer = TextureUtility.GetRenderTexture(resize);
-            edgeOutputTex = new Texture2D(resize, resize, TextureFormat.ARGB32, false);
+            edgeOutputTex = new Texture2D(resize, resize, TextureFormat.RGB24, false);
+            androidOnlyEdgeRect = new Rect(0, 0, resize, resize);
             imageMaskGeneator = new ImageMaskGeneator(resize);
             marchingCube = new MarchingCube();
             meshGenerator = new MeshGenerator();
@@ -81,17 +83,26 @@ namespace AROrigami
             if (IsComputeShaderFree)
             {
                 IsComputeShaderFree = false;
-
                 var edgeTex = edgeImage.GetEdgeTex(processTex);
-
                 yield return new WaitForEndOfFrame();
 
-                AsyncGPUReadback.Request(edgeTex, 0, TextureFormat.ARGB32, OnTexCompleteReadback);
+#if !UNITY_EDITOR && UNITY_ANDROID
+
+                RenderTexture.active = edgeTex;
+                edgeOutputTex.ReadPixels(androidOnlyEdgeRect, 0, 0);
+                edgeOutputTex.Apply();
+
+                yield return new WaitForEndOfFrame();
+                IsComputeShaderFree = true;
+#else
+                AsyncGPUReadback.Request(edgeTex, 0, TextureFormat.RGB24, OnTexCompleteReadback);
+#endif
+
             }
         }
 
-        #region ComputeShader API
-        public void ProcessCSTextureColor()
+            #region ComputeShader API
+            public void ProcessCSTextureColor()
         {
             textureComputeShader.Dispatch(GetColorKernelHandle, resize / 16, resize / 16, 1);
 
@@ -125,9 +136,9 @@ namespace AROrigami
 
             IsComputeShaderFree = true;
         }
-        #endregion
+#endregion
 
-        #region Mask API 
+#region Mask API 
         public async void CaptureEdgeBorderMesh(int skinSize, MeshObject meshObject, TextureUtility.TextureStructure textureStructure)
         {
 
@@ -166,7 +177,7 @@ namespace AROrigami
             if (OnMeshCalculationDone != null && meshObject != null)
                 OnMeshCalculationDone(GetMeshCalResult(maskColors, meshObject, textureStructure));
         }
-        #endregion
+#endregion
 
         private async UniTask<MarchingCube.MarchingCubeResult> ProcessMarchCube(Color[] maskImage, int textureWidth, int textureHeight)
         {
