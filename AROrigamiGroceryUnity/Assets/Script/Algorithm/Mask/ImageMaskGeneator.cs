@@ -24,10 +24,10 @@ namespace AROrigami
         private UniTask<MooreNeighborhood.MooreNeighborInfo>[] taskArray;
 
         public static readonly List<(Vector2, LoopUtility.LoopDirection, MooreNeighborhood)> RaycastStartPos = new List<(Vector2, LoopUtility.LoopDirection, MooreNeighborhood)> {
-            //(new Vector2(0, 0.5f), LoopUtility.LoopDirection.Left, new MooreNeighborhood()), // Left
+            (new Vector2(0, 0.5f), LoopUtility.LoopDirection.Left, new MooreNeighborhood()), // Left
             (new Vector2(1, 0.5f), LoopUtility.LoopDirection.Right, new MooreNeighborhood()), // Right
-            //(new Vector2(0.5f, 1), LoopUtility.LoopDirection.Top, new MooreNeighborhood()), // Top
-            //(new Vector2(0.5f, 0), LoopUtility.LoopDirection.Down, new MooreNeighborhood()), // Bottom , 
+            (new Vector2(0.5f, 1), LoopUtility.LoopDirection.Top, new MooreNeighborhood()), // Top
+            (new Vector2(0.5f, 0), LoopUtility.LoopDirection.Down, new MooreNeighborhood()), // Bottom , 
         };
 
         private int taskCount = RaycastStartPos.Count;

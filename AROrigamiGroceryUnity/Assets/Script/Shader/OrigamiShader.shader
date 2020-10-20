@@ -100,18 +100,13 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-                // sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv);
-
-               fixed isShowBool = step(i.vertex.z, _RenderTransition); 
 
                if (i.color.r > 0.1) {
                     col = tex2D(_SideTex, i.uv);                
                }
 
-                col = isShowBool * col;
-
-                return col;
+               return col;
             }
             ENDCG
         }
