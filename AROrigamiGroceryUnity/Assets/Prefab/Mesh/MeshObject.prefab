@@ -166,6 +166,7 @@ MonoBehaviour:
   _meshRenderer: {fileID: 3944398867031601212}
   _meshFilter: {fileID: 1027879038294183300}
   rotateSensibility: 1
+  transitionTime: 2
   copyUVTexture: 0
 --- !u!95 &5710905835860536605
 Animator:

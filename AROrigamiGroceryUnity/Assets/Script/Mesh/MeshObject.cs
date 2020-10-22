@@ -31,6 +31,13 @@ namespace AROrigami {
         [SerializeField, Range(1, 10)]
         private float rotateSensibility = 1;
 
+        [SerializeField, Range(0, 5)]
+        private float transitionTime = 1;
+        private float transitionVelocity = -1;
+        private float transitionBot = 0;
+        private float transitionTop = 0;
+
+
         public bool copyUVTexture = false;
 
         private RenderTexture dstTexture;
@@ -38,6 +45,8 @@ namespace AROrigami {
         private MaterialPropertyBlock m_PropertyBlock;
 
         private Quaternion _ori_quaterion; 
+
+
 
         private Mesh _mesh;
         public Mesh mesh => _mesh;
@@ -63,7 +72,19 @@ namespace AROrigami {
 
             ctrlPoints.top_control_point = topVertice;
             ctrlPoints.bottom_control_point = bottomVertice;
+
+            Debug.Log($"top_vertice {topVertice}, bottom_vertice {bottomVertice}");
+
             ctrlPoints.center_control_point = new Vector3(0,0, (topVertice.z + bottomVertice.z) * 0.5f);
+
+            float dist = Mathf.Abs(bottomVertice.z) + Mathf.Abs(topVertice.z);
+            transitionVelocity = (dist / transitionTime) * (Time.deltaTime);
+            Debug.Log($"transitionVelocity {transitionVelocity}");
+
+            transitionBot = bottomVertice.z;
+            transitionTop = topVertice.z + 10;
+
+            UpdateShader(ParameterFlag.ShaderProperty.RenderTransition, transitionBot);
 
             return ctrlPoints;
         }
@@ -89,7 +110,7 @@ namespace AROrigami {
             worldControlPoint[2] = c_point3;
             originalPoints[2] = ctrlPoints.center_control_point;
 
-            UpdateShader("_OriControlPoints", originalPoints);
+            UpdateArrayShader("_OriControlPoints", originalPoints);
         }
 
         public void SetMesh(Mesh mesh, RenderTexture uvTexture, int size) {
@@ -111,8 +132,8 @@ namespace AROrigami {
                     dstTexture = uvTexture;
                 }
 
-                m_PropertyBlock.SetTexture("_MainTex", dstTexture);
-                m_PropertyBlock.SetInt("_ShowSideTex", (copyUVTexture) ? 1 : 0);
+                m_PropertyBlock.SetTexture(ParameterFlag.ShaderProperty.MainTex, dstTexture);
+                m_PropertyBlock.SetInt(ParameterFlag.ShaderProperty.ShowSideTex, (copyUVTexture) ? 1 : 0);
                 _meshRenderer.SetPropertyBlock(m_PropertyBlock);
             }
             transform.rotation = _ori_quaterion;
@@ -146,7 +167,16 @@ namespace AROrigami {
         private void Update()
         {
             UpdateControlPoint();
-            UpdateShader("_ControlPoints", shaderCtrlPoints);
+            UpdateArrayShader(ParameterFlag.ShaderProperty.ControlPoints, shaderCtrlPoints);
+
+            if (transitionBot < transitionTop && transitionVelocity > 0) {
+                transitionBot += transitionVelocity;
+                UpdateShader(ParameterFlag.ShaderProperty.RenderTransition, transitionBot);
+            }
+        }
+
+        private void ProcessTransitionAnim() { 
+            
         }
 
         private void UpdateControlPoint() {
@@ -159,11 +189,21 @@ namespace AROrigami {
             }
         }
 
-        private void UpdateShader(string variableName, Vector4[] ctrlPoints) {
+        private void UpdateArrayShader(string variableName, Vector4[] ctrlPoints) {
             if (m_PropertyBlock == null)
                 m_PropertyBlock = new MaterialPropertyBlock();
 
             m_PropertyBlock.SetVectorArray(variableName, ctrlPoints);
+
+            _meshRenderer.SetPropertyBlock(m_PropertyBlock);
+        }
+
+        private void UpdateShader(string variableName, float numberValue)
+        {
+            if (m_PropertyBlock == null)
+                m_PropertyBlock = new MaterialPropertyBlock();
+
+            m_PropertyBlock.SetFloat(variableName, numberValue);
 
             _meshRenderer.SetPropertyBlock(m_PropertyBlock);
         }

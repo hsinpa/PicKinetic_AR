@@ -14,5 +14,14 @@ namespace AROrigami
             public static Vector3 VectorZero = new Vector3(0, 0, 0);
             public static Vector2Int Vector2Zero = new Vector2Int(0, 0);
         }
+
+        public class ShaderProperty {
+            public const string MainTex = "_MainTex";
+            public const string ShowSideTex = "_ShowSideTex";
+            public const string ControlPoints = "_ControlPoints";
+            public const string RenderTransition = "_RenderTransition";
+
+
+        }
     }
 }
