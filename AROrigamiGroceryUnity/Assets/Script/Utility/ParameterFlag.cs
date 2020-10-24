@@ -20,8 +20,10 @@ namespace AROrigami
             public const string ShowSideTex = "_ShowSideTex";
             public const string ControlPoints = "_ControlPoints";
             public const string RenderTransition = "_RenderTransition";
+        }
 
-
+        public class ColliderLayer {
+            public const int FloorLayer = 1 << 8;
         }
     }
 }
