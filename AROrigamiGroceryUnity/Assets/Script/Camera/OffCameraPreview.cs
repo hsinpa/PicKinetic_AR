@@ -108,7 +108,7 @@ public class OffCameraPreview : MonoBehaviour
         Ray ray = _camera.ScreenPointToRay(screenPos);
         RaycastHit hit;
 
-        _raycastResult.hasHit = Physics.Raycast(ray, out hit, 100.0f);
+        _raycastResult.hasHit = Physics.Raycast(ray, out hit, 100.0f, ParameterFlag.ColliderLayer.FloorLayer);
         _raycastResult.hitPoint = hit.point + new Vector3(0, 0.01f, 0);
 
         return _raycastResult;

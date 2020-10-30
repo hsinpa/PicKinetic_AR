@@ -7,7 +7,14 @@ namespace AROrigami
 {
     public class UnitMovementCtrl
     {
-        private float move_speed = 2;
+        private float _move_speed = 2;
+
+#if UNITY_EDITOR
+        private float speedScale = 1;
+#else
+        private float speedScale = 0.05f;
+#endif
+
 
         //Only detect plane collider
         private static RaycastHit[] m_Results = new RaycastHit[1];
@@ -82,9 +89,10 @@ namespace AROrigami
 
         private void ChangeForwardDir() {
 
-            float randomNum = UtilityMethod.GetRandomNumber(-60, 60);
+            float randomNum = UtilityMethod.GetRandomNumber(-270, 270);
+            Debug.Log("RandomNum " + randomNum);
 
-            randomNum += (moveDirection.y - 180);
+            randomNum += (moveDirection.y);
 
             moveDirection.Set(0, Mathf.Abs(GetAngle(randomNum)), 0);
         }
@@ -97,12 +105,12 @@ namespace AROrigami
             {
                 float perlinNoise = (Mathf.PerlinNoise(_sPerlinX, _sPerlinY) * 2) - 1;
                 float yDir = (perlinNoise * 360);
-                yDir = Mathf.Lerp(moveDirection.y, yDir, 0.1f) * 0.001f;
+                yDir = Mathf.Lerp(moveDirection.y, yDir, 0.1f) * 0.02f;
                 
-                moveDirection.Set(-90, GetAngle(moveDirection.y + (yDir * 0.0035f)), 0);
+                moveDirection.Set(-90, GetAngle(moveDirection.y + (yDir * 0.035f)), 0);
 
                 transform.rotation = Quaternion.Euler(moveDirection);
-                transform.position = transform.position + (transform.right * Time.deltaTime * (move_speed + (perlinNoise * 2)));
+                transform.position = transform.position + (transform.right * Time.deltaTime * (_move_speed + (perlinNoise * 2))) * speedScale;
             }
             else
             {
