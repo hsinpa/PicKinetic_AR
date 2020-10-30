@@ -37,8 +37,10 @@ namespace AROrigami {
         private float transitionBot = 0;
         private float transitionTop = 0;
 
-
+        [Header("Optional")]
         public bool copyUVTexture = false;
+
+        private UnitMovementCtrl unitMovementCtrl;
 
         private RenderTexture dstTexture;
 
@@ -46,11 +48,8 @@ namespace AROrigami {
 
         private Quaternion _ori_quaterion; 
 
-
-
         private Mesh _mesh;
         public Mesh mesh => _mesh;
-
 
         #region Control Point Variable
         private ControlPoints ctrlPoints;
@@ -65,6 +64,8 @@ namespace AROrigami {
         {
             _mesh = new Mesh();
             _ori_quaterion = transform.rotation;
+            m_PropertyBlock = new MaterialPropertyBlock();
+            unitMovementCtrl = new UnitMovementCtrl(this.transform);
         }
 
         public ControlPoints SetControlPoint(Vector3 topVertice, Vector3 bottomVertice) {
@@ -166,17 +167,18 @@ namespace AROrigami {
 
         private void Update()
         {
+            if (!copyUVTexture) return;
+
             UpdateControlPoint();
             UpdateArrayShader(ParameterFlag.ShaderProperty.ControlPoints, shaderCtrlPoints);
 
             if (transitionBot < transitionTop && transitionVelocity > 0) {
                 transitionBot += transitionVelocity;
                 UpdateShader(ParameterFlag.ShaderProperty.RenderTransition, transitionBot);
+            } else
+            {
+               unitMovementCtrl.OnUpdate();
             }
-        }
-
-        private void ProcessTransitionAnim() { 
-            
         }
 
         private void UpdateControlPoint() {

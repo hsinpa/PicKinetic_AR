@@ -5,7 +5,7 @@ using Utilities;
 
 namespace AROrigami
 {
-    public class UnitMovementCtrl : MonoBehaviour
+    public class UnitMovementCtrl
     {
         [SerializeField]
         private float move_speed = 1;
@@ -17,28 +17,26 @@ namespace AROrigami
         private float raycastLength = 10;
         private Vector3 moveDirection = Vector3.zero;
 
+        private Transform transform;
+
         private enum State { 
             Idle, Rotate, Move
         }
 
         private State state;
 
-        private void Start()
+        public UnitMovementCtrl(Transform targetTransform)
         {
-            SetUp();
-        }
-
-
-        private void SetUp()
-        {
-            state = State.Rotate;
+            this.transform = targetTransform;
+            state = State.Move;
             int minP = 0, maxP = 30000;
             _sPerlinX = UtilityMethod.GetRandomNumber(minP, maxP);
             _sPerlinY = UtilityMethod.GetRandomNumber(minP, maxP);
-            ChangeForwardDir();
+            //ChangeForwardDir();
         }
 
-        private void Update() {
+        public void OnUpdate() {
+
             _sPerlinX += 0.001f;
             _sPerlinY += 0.001f;
             ProcessBahavior();
@@ -69,7 +67,7 @@ namespace AROrigami
             float faceAngle = GetAngle(currentFace.y);
 
             float diff = Mathf.Abs( GetAngle(moveDirection.y) - faceAngle);
-
+            Debug.Log("diff " + diff);
 
             if (diff < 1f)
             {
@@ -95,20 +93,20 @@ namespace AROrigami
 
             bool canWalk = DetectIsFloorFront();
 
-            if (canWalk)
-            {
+            //if (canWalk)
+            //{
                 float yDir = ((Mathf.PerlinNoise(_sPerlinX, _sPerlinY) * 2) - 1) * 360;
                 //yDir = Mathf.Lerp(moveDirection.y, yDir, 0.1f) * 0.001f;
 
                 moveDirection.Set(0, GetAngle(moveDirection.y + (yDir * 0.0035f)), 0);
 
-                transform.rotation = Quaternion.Euler(moveDirection);
+                //transform.rotation = Quaternion.Euler(moveDirection);
                 transform.position = transform.position + (transform.forward * Time.deltaTime * move_speed);
-            }
-            else {
-                ChangeForwardDir();
-                state = State.Rotate;
-            }
+            //}
+            //else {
+            //    ChangeForwardDir();
+            //    state = State.Rotate;
+            //}
         }
 
         private float GetAngle(float angle) {
@@ -117,7 +115,7 @@ namespace AROrigami
 
         private bool DetectIsFloorFront() {
 
-            Vector3 direciton = (transform.forward) + new Vector3(0, -0.6f, 0);
+            Vector3 direciton = (transform.forward) + new Vector3(0, -0.7f, 0);
 
             int hits = Physics.RaycastNonAlloc(transform.position, direciton, m_Results, raycastLength, ParameterFlag.ColliderLayer.FloorLayer);
 
