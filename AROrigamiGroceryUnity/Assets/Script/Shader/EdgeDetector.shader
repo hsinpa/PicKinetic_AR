@@ -239,7 +239,7 @@
 
 
 				sum = min(sum, tex2D(tex, (uv + (float2(-1.0, -1.0) * _MainTex_TexelSize))));
-				sum = min(sum,tex2D(tex, (uv + (float2( 1.0, -1.0) * _MainTex_TexelSize))));
+				sum = min(sum,tex2D(tex, (uv + (float2( 0.0, -1.0) * _MainTex_TexelSize))));
 				sum = min(sum,tex2D(tex, (uv + (float2( 1.0,  -1.0) * _MainTex_TexelSize))));
 
 				//Center
@@ -310,6 +310,57 @@
 		ENDCG
 
 		}
+
+
+				Pass
+			{
+				CGPROGRAM
+				#pragma vertex vert_img
+				#pragma fragment frag
+				#pragma target 3.0
+
+				#include "UnityCG.cginc"
+
+				sampler2D _MainTex;
+				float2 _MainTex_TexelSize;
+
+				float4 Dilation(sampler2D tex, float2 uv) {
+
+					fixed4 center = tex2D(tex, (uv));
+
+					//Center
+					float sideValue = 1.0/8.0;
+					//Bottom
+					float4 sum = tex2D(tex, (uv + float2(-1.0, -1.0) * _MainTex_TexelSize)) *  1;
+					sum += tex2D(tex, (uv + float2(0.0, -1.0) * _MainTex_TexelSize)) * 1;
+					sum += tex2D(tex, (uv + float2( 1.0,  -1.0) * _MainTex_TexelSize)) *  1;
+
+					//Center
+					sum += tex2D(tex, (uv + float2(-1.0, 0.0) * _MainTex_TexelSize)) * 1;
+					//sum += tex2D(tex, (uv + float2(0.0, 0.0) * _MainTex_TexelSize)) * 5;
+					sum += tex2D(tex, (uv + float2(1.0, 0.0) * _MainTex_TexelSize)) * 1;
+
+					//Top
+					sum += tex2D(tex, (uv + float2(-1.0, 1.0) * _MainTex_TexelSize)) *  1;
+					sum += tex2D(tex, (uv + float2(0.0, 1.0) * _MainTex_TexelSize)) * 1;
+					sum += tex2D(tex, (uv + float2( 1.0, 1.0) * _MainTex_TexelSize)) *  1;
+
+					sum *= sideValue;
+					
+
+					fixed4 finalValue = ((sum.x <= 0.15) ? 0 : 1) * (center.x);
+
+					return float4(center.xyz, 1.0);
+				}
+
+				float4 frag(v2f_img IN) : COLOR {
+					float4 s = Dilation(_MainTex, IN.uv);
+
+					return s;
+				}
+			ENDCG
+
+			}
 
 
     }

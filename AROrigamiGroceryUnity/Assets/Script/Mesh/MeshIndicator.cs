@@ -73,8 +73,8 @@ namespace AROrigami
             //Debug.Log("boundX " + boundX + ", boundZ " + boundZ);
             //Debug.Log("Extend " + bound);
 
-            Vector3 xAxis = boundX * right;
-            Vector3 zAxis = boundZ * front;
+            Vector3 xAxis = boundZ * right;
+            Vector3 zAxis = boundX * front;
             Vector3 finalAxis = xAxis + zAxis + transform.position;
 
             //Debug.Log(string.Format("positionRatio {0}, x {1}, z {2}", positionRatio, finalAxis.x, finalAxis.z));

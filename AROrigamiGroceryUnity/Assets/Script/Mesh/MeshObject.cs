@@ -74,13 +74,10 @@ namespace AROrigami {
             ctrlPoints.top_control_point = topVertice;
             ctrlPoints.bottom_control_point = bottomVertice;
 
-            Debug.Log($"top_vertice {topVertice}, bottom_vertice {bottomVertice}");
-
             ctrlPoints.center_control_point = new Vector3(0,0, (topVertice.z + bottomVertice.z) * 0.5f);
 
             float dist = Mathf.Abs(bottomVertice.z) + Mathf.Abs(topVertice.z);
             transitionVelocity = (dist / transitionTime) * (Time.deltaTime);
-            Debug.Log($"transitionVelocity {transitionVelocity}");
 
             transitionBot = bottomVertice.z;
             transitionTop = topVertice.z + 10;

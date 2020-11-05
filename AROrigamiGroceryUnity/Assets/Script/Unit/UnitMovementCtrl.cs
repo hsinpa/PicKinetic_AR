@@ -90,7 +90,6 @@ namespace AROrigami
         private void ChangeForwardDir() {
 
             float randomNum = UtilityMethod.GetRandomNumber(-270, 270);
-            Debug.Log("RandomNum " + randomNum);
 
             randomNum += (moveDirection.y);
 

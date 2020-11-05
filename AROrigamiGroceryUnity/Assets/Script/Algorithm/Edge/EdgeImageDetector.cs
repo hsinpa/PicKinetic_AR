@@ -11,8 +11,8 @@ namespace AROrigami
         private RenderTexture outputTexture;
         private RenderTexture tempTexA;
         private RenderTexture tempTexB;
-        private RenderTexture previousSobel;
-        
+        private RenderTexture dynamicSobel;
+
         int textureSize = 64;
 
         public EdgeImageDetector(Material EdgeMaterial)
@@ -22,9 +22,9 @@ namespace AROrigami
 
             tempTexA = TextureUtility.GetRenderTexture(textureSize);
             tempTexB = TextureUtility.GetRenderTexture(textureSize);
-            previousSobel = TextureUtility.GetRenderTexture(textureSize);
+            dynamicSobel = TextureUtility.GetRenderTexture(textureSize);
 
-            this.EdgeMaterial.SetTexture("_BlendTex", previousSobel);
+            this.EdgeMaterial.SetTexture("_BlendTex", dynamicSobel);
         }
 
         public RenderTexture GetEdgeTex(RenderTexture input)
@@ -41,13 +41,12 @@ namespace AROrigami
             //Sharp
             Graphics.Blit(tempTexA, tempTexB, EdgeMaterial, 3);
 
-            //Copy
-            Graphics.Blit(tempTexB, previousSobel);
-
-            //Blend
+            ////Blend
             Graphics.Blit(tempTexB, tempTexA, EdgeMaterial, 4);
 
-            //Dilation
+            Graphics.Blit(tempTexA, dynamicSobel);
+
+            ////Dilation
             Graphics.Blit(tempTexA, outputTexture, EdgeMaterial, 6);
 
             return outputTexture;
