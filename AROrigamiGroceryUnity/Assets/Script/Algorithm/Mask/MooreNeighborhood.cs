@@ -112,18 +112,24 @@ namespace AROrigami
             point.position = ParameterFlag.General.Vector2Zero;
             point.backTracePoint = ParameterFlag.General.Vector2Zero;
 
-            foreach (var singleRow in looper)
+            try
             {
-                point.position.Set(singleRow.x, singleRow.y);
-
-                //Is Wall detected
-                if (_images[singleRow.index].r >= _threshold)
+                foreach (var singleRow in looper)
                 {
-                    point.value = 0;
-                    return point;
-                }
+                    point.position.Set(singleRow.x, singleRow.y);
 
-                point.backTracePoint.Set(singleRow.x, singleRow.y);
+                    //Is Wall detected
+                    if (_images[singleRow.index].r >= _threshold)
+                    {
+                        point.value = 0;
+                        return point;
+                    }
+
+                    point.backTracePoint.Set(singleRow.x, singleRow.y);
+                }
+            }
+            catch { 
+            
             }
 
             return point;

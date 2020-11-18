@@ -65,7 +65,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - PixelSnap: 0
-    - _BlendTransition: 0.18
+    - _BlendTransition: 0.25
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DeltaX: 0.01
@@ -89,7 +89,7 @@ Material:
     - _SpecularHighlights: 1
     - _Spread: 1
     - _SrcBlend: 1
-    - _Threshold: 0.2
+    - _Threshold: 0.22
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:

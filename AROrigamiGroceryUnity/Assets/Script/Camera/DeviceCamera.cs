@@ -247,14 +247,4 @@ public class DeviceCamera : MonoBehaviour
         texturePreivew.OnEdgeTexUpdate -= OnEdgeImageUpdate;
         texturePreivew.OnMeshCalculationDone -= OnMeshDone;
     }
-
-    //void OnApplicationFocus(bool hasFocus)
-    //{
-    //    _applicationPause = !hasFocus;
-    //}
-
-    //void OnApplicationPause(bool pauseStatus)
-    //{
-    //        _applicationPause = pauseStatus;
-    //}
 }

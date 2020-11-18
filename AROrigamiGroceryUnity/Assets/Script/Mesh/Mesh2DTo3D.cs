@@ -40,14 +40,20 @@ namespace AROrigami {
 
         public Mesh CreateMesh(Mesh targetMesh, MeshData meshData) {
             if (targetMesh == null) return targetMesh;
-
             targetMesh.Clear();
 
-            try
-            {
+            int verticesLength = meshData.vertices.Length;
+            int uvLength = meshData.uv.Length;
+            int trianglesLength = meshData.triangles.Length;
+
+            bool IsVerticesValid = verticesLength == uvLength && verticesLength > 0;
+            bool IsTriangleValid = trianglesLength % 3 == 0;
+
+            if (IsTriangleValid && IsVerticesValid) {
+
                 targetMesh.SetVertices(meshData.vertices);
 
-                targetMesh.SetTriangles( meshData.triangles, 0);
+                targetMesh.SetTriangles(meshData.triangles, 0);
 
                 targetMesh.SetUVs(0, meshData.uv);
 
@@ -55,10 +61,6 @@ namespace AROrigami {
 
                 targetMesh.RecalculateNormals();
             }
-            catch {
-                Debug.LogError("PlaneMesh to 3D error, either vertice, tri, uv not match");
-            }
-
 
             return targetMesh;
         }

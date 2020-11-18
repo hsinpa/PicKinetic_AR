@@ -1079,7 +1079,7 @@ MonoBehaviour:
   _meshIndicator: {fileID: 652630608}
   p_meshOutline: {fileID: 1729367509}
   meshObjManager: {fileID: 1589271882}
-  inputTex: {fileID: 2800000, guid: 1ea4271e0d20b594ea4e85cb1a343cc1, type: 3}
+  inputTex: {fileID: 2800000, guid: c554ad60ca1123148af332fe004bda6f, type: 3}
 --- !u!4 &1669611012
 Transform:
   m_ObjectHideFlags: 0

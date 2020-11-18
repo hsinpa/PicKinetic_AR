@@ -356,7 +356,7 @@ MonoBehaviour:
   linePreview: {fileID: 2007126181}
   rotateMat: {fileID: 2100000, guid: 2c979822271bf4c13b7198c4c9772745, type: 2}
   _SizeStrength: 0.0057
-  _CropSize: 0.6
+  _CropSize: 0.7
   _arRaycastManager: {fileID: 714661513}
   _arCameraBG: {fileID: 130228054}
   _arSession: {fileID: 1751368926}
@@ -835,7 +835,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &823230743
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1150,7 +1150,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2007126180
 RectTransform:
   m_ObjectHideFlags: 0
