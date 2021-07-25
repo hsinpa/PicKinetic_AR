@@ -1,4 +1,4 @@
-# AROrigamiGrocery
+# PicKinetic AR
 
 ### Algorithm flow
 1. Scale and crop(into power of 2) the camera image down, for faster computation
