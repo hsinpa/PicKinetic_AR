@@ -5,22 +5,25 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Cysharp.Threading.Tasks;
 
-namespace AROrigami
+namespace PicKinetic
 {
 
     public class TextureMeshManager : MonoBehaviour
     {
-        #region Inspector 
+        #region Inspector
+        [Header("Editor Feature")]
         [SerializeField]
         private Texture2D rawColorTexture;
 
         [SerializeField]
-        private Texture2D edgeOutputTex;
+        private Texture2D _edgeLineTex;
+        public Texture2D edgeLineTex => this._edgeLineTex;
 
         [SerializeField]
         private Texture2D highlightTexture;
         private RenderTexture highlightRenderer;
 
+        [Header("Reference Asset")]
         [SerializeField]
         private Material EdgeMaterial;
 
@@ -31,15 +34,13 @@ namespace AROrigami
         #region Private Parameters
         Rect androidOnlyEdgeRect;
         ImageMaskGeneator imageMaskGeneator;
-        MeshGenerator meshGenerator;
+        MeshBuilder meshBuilder;
         MarchingCube marchingCube;
-        MeshCalResult meshCalResult;
+        MeshLocData meshCalResult;
         private Mesh2DTo3D mesh2DTo3D;
-
-        EdgeImageDetector edgeImage;
+        EdgeImageDetector edgeDetector;
         MarchingCubeBorder marchingCubeBorder;
         public System.Action<Texture2D> OnEdgeTexUpdate;
-        public System.Action<MeshCalResult> OnMeshCalculationDone;
 
         int resize = 64;
 
@@ -52,24 +53,21 @@ namespace AROrigami
         int GetColorKernelHandle;
         bool IsComputeShaderFree = true;
 
-        Camera _camera;
         Vector2 _meshPosition = new Vector2();
         #endregion
 
-
-        public void Start()
+        public void SetUp()
         {
-            meshCalResult = new MeshCalResult();
+            meshCalResult = new MeshLocData();
             highlightRenderer = TextureUtility.GetRenderTexture(resize);
-            edgeOutputTex = new Texture2D(resize, resize, TextureFormat.RGB24, false);
+            _edgeLineTex = new Texture2D(resize, resize, TextureFormat.RGB24, false);
             androidOnlyEdgeRect = new Rect(0, 0, resize, resize);
             imageMaskGeneator = new ImageMaskGeneator(resize);
             marchingCube = new MarchingCube();
-            meshGenerator = new MeshGenerator();
+            meshBuilder = new MeshBuilder();
             marchingCubeBorder = new MarchingCubeBorder();
             mesh2DTo3D = new Mesh2DTo3D();
-            edgeImage = new EdgeImageDetector(EdgeMaterial);
-            _camera = Camera.main;
+            edgeDetector = new EdgeImageDetector(EdgeMaterial);
 
             process_tex_colors = new Color[resize * resize];
             process_tex_colors_cpu = new Color[resize * resize];
@@ -83,14 +81,14 @@ namespace AROrigami
             if (IsComputeShaderFree)
             {
                 IsComputeShaderFree = false;
-                var edgeTex = edgeImage.GetEdgeTex(processTex);
+                var edgeTex = edgeDetector.GetEdgeTex(processTex);
                 yield return new WaitForEndOfFrame();
 
 #if !UNITY_EDITOR && UNITY_ANDROID
 
                 RenderTexture.active = edgeTex;
-                edgeOutputTex.ReadPixels(androidOnlyEdgeRect, 0, 0);
-                edgeOutputTex.Apply();
+                _edgeLineTex.ReadPixels(androidOnlyEdgeRect, 0, 0);
+                _edgeLineTex.Apply();
 
                 yield return new WaitForEndOfFrame();
                 IsComputeShaderFree = true;
@@ -101,8 +99,8 @@ namespace AROrigami
             }
         }
 
-            #region ComputeShader API
-            public void ProcessCSTextureColor()
+#region ComputeShader API
+        public void ProcessCSTextureColor()
         {
             textureComputeShader.Dispatch(GetColorKernelHandle, resize / 16, resize / 16, 1);
 
@@ -116,7 +114,7 @@ namespace AROrigami
 
             textureComputeShader.SetInt("TexWidth", resize);
 
-            textureComputeShader.SetTexture(GetColorKernelHandle, "MainTex", edgeOutputTex);
+            textureComputeShader.SetTexture(GetColorKernelHandle, "MainTex", _edgeLineTex);
 
             textureComputeShader.SetBuffer(GetColorKernelHandle, "ColorBuffer", _colorBuffer);
         }
@@ -129,40 +127,35 @@ namespace AROrigami
                 return;
             }
 
-            if (edgeOutputTex == null) return;
+            if (_edgeLineTex == null) return;
 
-            edgeOutputTex.LoadRawTextureData(request.GetData<uint>());
-            edgeOutputTex.Apply();
+            _edgeLineTex.LoadRawTextureData(request.GetData<uint>());
+            _edgeLineTex.Apply();
 
             IsComputeShaderFree = true;
         }
 #endregion
 
 #region Mask API 
-        public async void CaptureEdgeBorderMesh(int skinSize, MeshObject meshObject, TextureUtility.TextureStructure textureStructure)
+        public async UniTask<MeshLocData> CaptureEdgeBorderMesh(int skinSize, MeshObject meshObject, TextureUtility.TextureStructure textureStructure)
         {
-
-            if (OnEdgeTexUpdate != null)
-                OnEdgeTexUpdate(edgeOutputTex);
-
             var maskColors = await imageMaskGeneator.AsyncCreateBorder(process_tex_colors_cpu);
 
-            if (!CheckIfValid(maskColors)) return;
+            if (!CheckIfValid(maskColors)) return default(MeshLocData);
 
             var marchCubeResult = await ProcessMarchCube(maskColors.img, resize, resize);
             var meshData = mesh2DTo3D.CreateMeshData(marchCubeResult.vertices, marchCubeResult.triangles, marchCubeResult.uv, null);
 
             meshObject.SetMesh(mesh2DTo3D.CreateMesh(meshObject.mesh, meshData), highlightRenderer, skinSize);
 
-            if (OnMeshCalculationDone != null && meshObject != null)
-                OnMeshCalculationDone(GetMeshCalResult(maskColors, meshObject, textureStructure));             
+            return GetMeshLocData(maskColors, meshObject, textureStructure);             
         }
 
-        public async void CaptureContourMesh(RenderTexture skinTexture, MeshObject meshObject, TextureUtility.TextureStructure textureStructure)
+        public async UniTask<MeshLocData> CaptureContourMesh(RenderTexture skinTexture, MeshObject meshObject, TextureUtility.TextureStructure textureStructure)
         {
             var maskColors = await imageMaskGeneator.AsyncCreateMask(process_tex_colors_cpu);
 
-            if (!CheckIfValid(maskColors)) return;
+            if (!CheckIfValid(maskColors)) return default(MeshLocData);
 
             var marchCubeResult = await ProcessMarchCube(maskColors.img, resize, resize);
 
@@ -174,8 +167,7 @@ namespace AROrigami
                 meshObject.GenerateControlPoints();
             }
 
-            if (OnMeshCalculationDone != null && meshObject != null)
-                OnMeshCalculationDone(GetMeshCalResult(maskColors, meshObject, textureStructure));
+            return GetMeshLocData(maskColors, meshObject, textureStructure);
         }
 #endregion
 
@@ -183,8 +175,8 @@ namespace AROrigami
         {
             return await UniTask.Run(() =>
             {
-                meshGenerator.GenerateMesh(maskImage, textureWidth, textureHeight, 1);
-                return marchingCube.Calculate(meshGenerator.squareGrid);
+                meshBuilder.GenerateMesh(maskImage, textureWidth, textureHeight, 1);
+                return marchingCube.Calculate(meshBuilder.squareGrid);
             });
         }
 
@@ -196,12 +188,9 @@ namespace AROrigami
             return (mesh2DTo3D.CreateMesh(mesh, meshData), meshData);
         }
 
-        private MeshCalResult GetMeshCalResult(MooreNeighborhood.MooreNeighborInfo meshInfo, MeshObject meshObject, TextureUtility.TextureStructure textureStructure) {
-
-            meshCalResult.meshObject = meshObject;
-            float _x = ((meshInfo.centerPoint.x / resize) * textureStructure.xRatio) + (textureStructure.xResidualRatio * 0.5f);
-            //float y = (meshInfo.centerPoint.y * 4) + startPixelY;
-            float _y = ((meshInfo.centerPoint.y / resize) * textureStructure.yRatio) + (textureStructure.yResidualRatio * 0.5f);
+        private MeshLocData GetMeshLocData(MooreNeighborhood.MooreNeighborInfo meshInfo, MeshObject meshObject, TextureUtility.TextureStructure textureStructure) {
+            //float _x = ((meshInfo.centerPoint.x / resize) * textureStructure.xRatio) + (textureStructure.xResidualRatio * 0.5f);
+            //float _y = ((meshInfo.centerPoint.y / resize) * textureStructure.yRatio) + (textureStructure.yResidualRatio * 0.5f);
 
             float x = (meshInfo.centerPoint.x / resize);
             float y = (meshInfo.centerPoint.y / resize);
@@ -214,24 +203,18 @@ namespace AROrigami
             meshCalResult.meshObject = meshObject;
 
             return meshCalResult;
-            //point.z = 0;
-
-            //if (meshObject != null)
-            //    meshObject.transform.position = point;
         }
 
+        //Prevent small area image count as valid
         private bool CheckIfValid(MooreNeighborhood.MooreNeighborInfo meshInfo) {
             return (meshInfo.area > 40);
         }
 
-        public struct MeshCalResult {
+        public struct MeshLocData {
             public MeshObject meshObject;
             public Vector2 screenPoint;
-        }
 
-        private void OnApplicationQuit()
-        {
-            ResetData();
+            public bool isValid => this.meshObject != null;
         }
 
         private void ResetData()

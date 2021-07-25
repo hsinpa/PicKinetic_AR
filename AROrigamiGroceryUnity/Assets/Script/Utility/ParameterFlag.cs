@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace AROrigami
+namespace PicKinetic
 {
     public class ParameterFlag
     {

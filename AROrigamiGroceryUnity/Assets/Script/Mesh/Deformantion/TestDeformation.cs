@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace AROrigami
+namespace PicKinetic
 {
     public class TestDeformation : MonoBehaviour
     {

@@ -1,4 +1,4 @@
-﻿// Each #kernel tells which function to compile; you can have many kernels
+﻿//Get the pixel and color info of image, without a multi-dim ForLoop
 #pragma kernel GetColors
 
 Texture2D<float4> MainTex;

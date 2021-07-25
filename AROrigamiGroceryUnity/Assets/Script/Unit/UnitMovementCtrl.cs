@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Utilities;
 
-namespace AROrigami
+namespace PicKinetic
 {
     public class UnitMovementCtrl
     {

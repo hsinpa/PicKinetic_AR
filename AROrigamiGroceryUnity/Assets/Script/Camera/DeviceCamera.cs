@@ -1,4 +1,4 @@
-﻿using AROrigami;
+﻿using PicKinetic;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -106,6 +106,7 @@ public class DeviceCamera : MonoBehaviour
     private void Init() {
         Debug.Log("Init");
 
+        texturePreivew.SetUp();
         //AccessToFrontCamera();
 
         TextureUtility = new TextureUtility();
@@ -115,9 +116,6 @@ public class DeviceCamera : MonoBehaviour
         shotBtn.onClick.AddListener(TakeAPhoto);
 
         scalePreview.texture = modelTexRenderer;
-
-        texturePreivew.OnEdgeTexUpdate += OnEdgeImageUpdate;
-        texturePreivew.OnMeshCalculationDone += OnMeshDone;
 
         meshIndicator.SetUp(_camera, GetRaycastResult);
 
@@ -172,8 +170,9 @@ public class DeviceCamera : MonoBehaviour
     private void PrepareTexture() {
         modelTexRenderer = TextureUtility.GetRenderTexture(textureSize);
         imageProcessRenderer = TextureUtility.GetRenderTexture((int) (textureSize * 0.5f));
-
         arBackgroundRenderer = TextureUtility.GetRenderTexture(Screen.width, Screen.height, 24);
+
+        linePreview.texture = texturePreivew.edgeLineTex;
     }
 
     private void Update()
@@ -185,7 +184,7 @@ public class DeviceCamera : MonoBehaviour
         //PlaceObjectOnARPlane(new Vector2(0.5f, 0.5f), _objMappingVisualQueue.transform);
         //Resize, and rotate to right direction
         //-backCam.videoRotationAngle
-        _textureStructure = GrabTextureRadius();
+        _textureStructure = GrabTextureRadius(Screen.width, Screen.height);
         meshIndicator.DisplayOnScreenPos(_textureStructure, _CropSize);
 
         TextureUtility.RotateAndScaleImage(cameraTex, modelTexRenderer, rotateMat, _textureStructure, 0);
@@ -195,23 +194,18 @@ public class DeviceCamera : MonoBehaviour
 
         if (timer > Time.time) return;
 
-        texturePreivew.ProcessCSTextureColor();
-
-        texturePreivew.CaptureEdgeBorderMesh(imageProcessRenderer.width, meshBorder, _textureStructure);
+        PreviewEdgeMesh();
 
         timer = timer_step + Time.time;
     }
 
-    private TextureUtility.TextureStructure GrabTextureRadius() {
-        return TextureUtility.GrabTextureRadius(Screen.width, Screen.height, _CropSize);
+    private TextureUtility.TextureStructure GrabTextureRadius(int width, int height) {
+        return TextureUtility.GrabTextureRadius(width, height, _CropSize);
     }
 
-    private void OnEdgeImageUpdate(Texture2D tex)
-    {
-        linePreview.texture = tex;
-    }
+    private void OnMeshDone(TextureMeshManager.MeshLocData meshResult) {
+        if (!meshResult.isValid) return;
 
-    private void OnMeshDone(TextureMeshManager.MeshCalResult meshResult) {
         MeshIndicator.IndictatorData indictatorData = meshIndicator.GetRelativePosRot(meshResult.screenPoint);
 
         float sizeMagnitue = (_camera.transform.position - meshResult.meshObject.transform.position).magnitude * _SizeStrength;
@@ -235,16 +229,17 @@ public class DeviceCamera : MonoBehaviour
         return _raycastResult;
     }
 
-    private void TakeAPhoto() {
+    private async void PreviewEdgeMesh()
+    {
+        texturePreivew.ProcessCSTextureColor();
+
+        OnMeshDone(await texturePreivew.CaptureEdgeBorderMesh(imageProcessRenderer.width, meshBorder, _textureStructure));
+    }
+
+    private async void TakeAPhoto() {
         MeshObject meshObject = meshObjManager.CreateMeshObj(meshBorder.transform.position, meshBorder.transform.rotation, true);
 
-        texturePreivew.CaptureContourMesh(modelTexRenderer, meshObject, _textureStructure);
+        OnMeshDone(await texturePreivew.CaptureContourMesh(modelTexRenderer, meshObject, _textureStructure));
     }
 
-    private void OnDestroy()
-    {
-
-        texturePreivew.OnEdgeTexUpdate -= OnEdgeImageUpdate;
-        texturePreivew.OnMeshCalculationDone -= OnMeshDone;
-    }
 }

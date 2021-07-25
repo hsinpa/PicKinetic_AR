@@ -5,7 +5,10 @@ using System.Linq;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 
-namespace AROrigami {
+namespace PicKinetic {
+    /// <summary>
+    /// Convert 2D plane mesh into 3D with depth (zindex)
+    /// </summary>
     public class Mesh2DTo3D
     {
         private MeshData _meshData = new MeshData();
@@ -27,6 +30,12 @@ namespace AROrigami {
             return _meshData;
         }
 
+        /// <summary>
+        /// Basically duplicate what the array, and add zIndex into vertices array
+        /// </summary>
+        /// <param name="marchingCubeResult"></param>
+        /// <param name="borderVertices"></param>
+        /// <returns></returns>
         public async UniTask<MeshData> Convert(MarchingCube.MarchingCubeResult marchingCubeResult, Vector3[] borderVertices) {
             return await UniTask.Run(() =>
             {
@@ -116,6 +125,7 @@ namespace AROrigami {
             return vertInfo;
         }
 
+        //Triangle Index
         private int[] TriangleTo3D(int[] triangle, int vertexLength, int startBorderIndex, int numOfBorderVertex)
         {
             int originCount = triangle.Length;

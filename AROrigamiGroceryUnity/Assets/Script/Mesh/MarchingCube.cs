@@ -18,7 +18,7 @@ public class MarchingCube
     }
 
 
-    public MarchingCubeResult Calculate(MeshGenerator.SquareGrid squareGrid)
+    public MarchingCubeResult Calculate(MeshBuilder.SquareGrid squareGrid)
     {
         Reset();
 
@@ -63,7 +63,7 @@ public class MarchingCube
         return marchingCubeResult;
     }
 
-    private void TriangulateSquare(MeshGenerator.Square square) {
+    private void TriangulateSquare(MeshBuilder.Square square) {
         switch (square.configuration) {
             // 1 points
             case 1:
@@ -159,7 +159,7 @@ public class MarchingCube
             borders.Add(vector);
     }
 
-    private void MeshFromPoints(params MeshGenerator.Node[] points) {
+    private void MeshFromPoints(params MeshBuilder.Node[] points) {
         AssignVertices(points);
 
         if (points.Length >= 3) 
@@ -175,7 +175,7 @@ public class MarchingCube
             CreateTriangle(points[0], points[4], points[5]);
     }
 
-    private void AssignVertices(MeshGenerator.Node[] points) { 
+    private void AssignVertices(MeshBuilder.Node[] points) { 
         for (int i = 0; i < points.Length; i++)
         {
             if (points[i].vertexIndex == -1) {
@@ -195,7 +195,7 @@ public class MarchingCube
         borders.Clear();
     }
 
-    private void CreateTriangle(MeshGenerator.Node a, MeshGenerator.Node b, MeshGenerator.Node c)
+    private void CreateTriangle(MeshBuilder.Node a, MeshBuilder.Node b, MeshBuilder.Node c)
     {
         triangles.Add(a.vertexIndex);
         triangles.Add(b.vertexIndex);

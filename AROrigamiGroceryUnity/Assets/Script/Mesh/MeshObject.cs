@@ -4,7 +4,7 @@ using UnityEngine;
 using Utilities;
 
 
-namespace AROrigami {
+namespace PicKinetic {
     public class MeshObject : MonoBehaviour
     {
         [SerializeField]

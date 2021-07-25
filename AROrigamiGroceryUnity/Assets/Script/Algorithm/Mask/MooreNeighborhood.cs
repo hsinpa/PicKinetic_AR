@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-namespace AROrigami
+namespace PicKinetic
 {
     public class MooreNeighborhood
     {
@@ -175,6 +175,10 @@ namespace AROrigami
 
         private bool DrawDotOnContour(int index)
         {
+            int length = _width * _height;
+
+            if (index < 0 || index >= length) return false;
+
             bool isNewCountorPoint = contourImage[index] != blockColor;
             contourImage[index] = blockColor;
 

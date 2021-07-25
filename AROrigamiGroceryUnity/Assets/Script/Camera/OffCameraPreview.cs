@@ -1,4 +1,4 @@
-﻿using AROrigami;
+﻿using PicKinetic;
 using Hsinpa.Study;
 using System.Collections;
 using System.Collections.Generic;
@@ -68,9 +68,6 @@ public class OffCameraPreview : MonoBehaviour
         PrepareTexture();
         rawPreview.texture = imageProcessRenderer;
 
-        textureMeshPreview.OnEdgeTexUpdate += OnEdgeImageUpdate;
-        textureMeshPreview.OnMeshCalculationDone += OnMeshDone;
-
         captureBtn.onClick.AddListener(() => { TakeAPhoto(); });
     }
 
@@ -84,17 +81,15 @@ public class OffCameraPreview : MonoBehaviour
 
         if (timer > Time.time) return;
 
-        textureMeshPreview.ProcessCSTextureColor();
-
-        textureMeshPreview.CaptureEdgeBorderMesh(imageProcessRenderer.width, p_meshOutline, _textureStructure);
-
-        //textureMeshPreview.CaptureContourMesh(modelTexRenderer, p_meshObject);
+        PreviewEdgeMesh();
 
         timer = timer_step + Time.time;
     }
 
-    private void OnMeshDone(TextureMeshManager.MeshCalResult meshResult)
+    private void OnMeshDone(TextureMeshManager.MeshLocData meshResult)
     {
+        if (!meshResult.isValid) return;
+
         MeshIndicator.IndictatorData indictatorData = _meshIndicator.GetRelativePosRot(meshResult.screenPoint);
 
         float sizeMagnitue = (_camera.transform.position - meshResult.meshObject.transform.position).magnitude * _SizeStrength;
@@ -114,28 +109,25 @@ public class OffCameraPreview : MonoBehaviour
         return _raycastResult;
     }
 
-    private void Preview3DObject() {
+    private async void PreviewEdgeMesh() {
         textureMeshPreview.ProcessCSTextureColor();
 
-        textureMeshPreview.CaptureContourMesh(modelTexRenderer, p_meshOutline, _textureStructure);
+        OnMeshDone(await textureMeshPreview.CaptureEdgeBorderMesh(imageProcessRenderer.width, p_meshOutline, _textureStructure));
     }
 
     private void PrepareTexture()
     {
         modelTexRenderer = TextureUtility.GetRenderTexture(textureSize);
         imageProcessRenderer = TextureUtility.GetRenderTexture((int)(textureSize * 0.5f));
+
+        edgePreview.texture = textureMeshPreview.edgeLineTex;
     }
 
-    private void TakeAPhoto()
+    private async void TakeAPhoto()
     {
         MeshObject meshObject = meshObjManager.CreateMeshObj(p_meshOutline.transform.position, p_meshOutline.transform.rotation, true);
 
-        textureMeshPreview.CaptureContourMesh(modelTexRenderer, meshObject, _textureStructure);
-    }
-
-    private void OnEdgeImageUpdate(Texture2D tex)
-    {
-        edgePreview.texture = tex;
+        OnMeshDone(await textureMeshPreview.CaptureContourMesh(modelTexRenderer, meshObject, _textureStructure));
     }
 
     private TextureUtility.TextureStructure GrabTextureRadius()

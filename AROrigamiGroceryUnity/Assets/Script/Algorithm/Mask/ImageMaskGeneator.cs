@@ -4,25 +4,18 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using System.Linq;
-namespace AROrigami
+namespace PicKinetic
 {
 
     public class ImageMaskGeneator
     {
-        //private MooreNeighborhood MooreNeighborhood;
         private MNFloodFill MNFloodFill;
-
-        //// Start is called before the first frame update
-        //void Start()
-        //{
-        //    MooreNeighborhood = new MooreNeighborhood();
-        //    MNFloodFill = new MNFloodFill();
-
-        //    DrawContour();
-        //}
 
         private UniTask<MooreNeighborhood.MooreNeighborInfo>[] taskArray;
 
+        /// <summary>
+        /// Start from 4 direction in parallel, save execute time
+        /// </summary>
         public static readonly List<(Vector2, LoopUtility.LoopDirection, MooreNeighborhood)> RaycastStartPos = new List<(Vector2, LoopUtility.LoopDirection, MooreNeighborhood)> {
             (new Vector2(0, 0.5f), LoopUtility.LoopDirection.Left, new MooreNeighborhood()), // Left
             (new Vector2(1, 0.5f), LoopUtility.LoopDirection.Right, new MooreNeighborhood()), // Right

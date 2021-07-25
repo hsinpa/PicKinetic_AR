@@ -8,6 +8,11 @@ using Cysharp.Threading.Tasks;
 public class MarchingCubeBorder
 {
 
+    /// <summary>
+    /// Need border vertices in sort state, so depth / connection mesh can be make in order
+    /// </summary>
+    /// <param name="hashVertices"></param>
+    /// <returns></returns>
     private List<Vector3> Sort(Vector3[] hashVertices) {
         List<Vector3> sorted = new List<Vector3>();
         List<Vector3> opended = hashVertices.ToList();
@@ -69,7 +74,7 @@ public class MarchingCubeBorder
         });
     }
 
-    public bool CheckIsBorder(MeshGenerator.Square[,] sqaures, int height, int width, int index_x, int index_y) {
+    public bool CheckIsBorder(MeshBuilder.Square[,] sqaures, int height, int width, int index_x, int index_y) {
         bool isBorder = false;
             
         //if (!isBorder && index_x < width)
