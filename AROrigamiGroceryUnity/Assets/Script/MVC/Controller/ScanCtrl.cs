@@ -74,6 +74,10 @@ namespace PicKinetic.Controller {
 
         private void OnScanBtnClick()
         {
+            StructType.GrabTextures grabTextures = generalCameraView.GetCurrentTexturesClone();
+
+            PicKineticAR.Instance.models.textureModel.SaveTextureToDisk("ScanPhoto.jpg", grabTextures.mainTex);
+
             generalCameraView.TakeAPhoto();
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using ObserverPattern;
+using PicKinetic.Model;
 
 namespace PicKinetic
 {
@@ -13,18 +14,20 @@ namespace PicKinetic
 
         private Observer[] observers = new Observer[0];
 
+        private ModelsManager _models;
+        public ModelsManager models => this._models;
+
         private void Awake()
         {
             subject = new Subject();
+            _models = new ModelsManager();
 
             RegisterAllController(subject);
-
-            Init();
         }
 
         private void Start()
         {
-            RegisterModels();
+            Init();
         }
 
         public void Notify(string entity, params object[] objects)
@@ -49,10 +52,6 @@ namespace PicKinetic
             {
                 subject.addObserver(observer);
             }
-        }
-
-        private void RegisterModels()
-        {
         }
 
         public T GetObserver<T>() where T : Observer

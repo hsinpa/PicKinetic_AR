@@ -128,6 +128,14 @@ namespace PicKinetic
             OnMeshDone(await texturePreivew.CaptureContourMesh(modelTexRenderer, meshObject, _textureStructure));
         }
 
+        public StructType.GrabTextures GetCurrentTexturesClone() {
+            return new StructType.GrabTextures
+            {
+                mainTex = TextureUtility.TextureToTexture2D(modelTexRenderer),
+                processedTex = TextureUtility.TextureToTexture2D(imageProcessRenderer)
+            };
+        }
+
         protected virtual TextureUtility.RaycastResult GetRaycastResult(Vector2 screenPos)
         {
             return default(TextureUtility.RaycastResult);
@@ -142,5 +150,6 @@ namespace PicKinetic
         {
             _isEnable = enable;
         }
+
     }
 }
