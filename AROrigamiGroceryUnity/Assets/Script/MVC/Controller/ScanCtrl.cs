@@ -78,6 +78,9 @@ namespace PicKinetic.Controller {
 
             PicKineticAR.Instance.models.textureModel.SaveTextureToDisk("ScanPhoto.jpg", grabTextures.mainTex);
 
+            TextureUtility.Dispose2D(grabTextures.mainTex);
+            TextureUtility.Dispose2D(grabTextures.processedTex);
+
             generalCameraView.TakeAPhoto();
         }
 

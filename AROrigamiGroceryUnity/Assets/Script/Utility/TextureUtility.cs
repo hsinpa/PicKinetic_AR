@@ -110,7 +110,7 @@ public class TextureUtility
     //    });
     //}
 
-    public void Dispose2D(Texture2D t) {
+    public static void Dispose2D(Texture2D t) {
         Object.Destroy(t);
     }
 

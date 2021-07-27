@@ -40,7 +40,7 @@ namespace PicKinetic
         int textureSize = 512;
 
         float timer;
-        float timer_step = 0.1f;
+        float timer_step = 0.2f;
 
         private Texture _sourceTexture;
 
@@ -50,6 +50,8 @@ namespace PicKinetic
 
         protected bool _isEnable = false;
         public bool isEnable => this._isEnable;
+
+        private bool isScanProcessReady = true;
 
         public virtual void CameraInitProcess() { 
             
@@ -85,7 +87,10 @@ namespace PicKinetic
 
             StartCoroutine(texturePreivew.ExecEdgeProcessing(imageProcessRenderer));
 
-            if (timer > Time.time) return;
+            //if (timer > Time.time) return;
+            if (!isScanProcessReady) return;
+
+            isScanProcessReady = false;
 
             PreviewEdgeMesh();
 
@@ -104,6 +109,7 @@ namespace PicKinetic
 
         private void OnMeshDone(TextureMeshManager.MeshLocData meshResult)
         {
+            isScanProcessReady = true;
             if (!meshResult.isValid) return;
 
             MeshIndicator.IndictatorData indictatorData = meshIndicator.GetRelativePosRot(meshResult.screenPoint);
@@ -112,6 +118,7 @@ namespace PicKinetic
             meshResult.meshObject.transform.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
 
             meshResult.meshObject.SetPosRotation(indictatorData.position, indictatorData.rotation);
+
         }
 
         public async void PreviewEdgeMesh()
