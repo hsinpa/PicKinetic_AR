@@ -16,14 +16,8 @@ namespace PicKinetic
         /// <summary>
         /// Start from 4 direction in parallel, save execute time
         /// </summary>
-        public static readonly List<(Vector2, LoopUtility.LoopDirection, MooreNeighborhood)> RaycastStartPos = new List<(Vector2, LoopUtility.LoopDirection, MooreNeighborhood)> {
-            (new Vector2(0, 0.5f), LoopUtility.LoopDirection.Left, new MooreNeighborhood()), // Left
-            (new Vector2(1, 0.5f), LoopUtility.LoopDirection.Right, new MooreNeighborhood()), // Right
-            (new Vector2(0.5f, 1), LoopUtility.LoopDirection.Top, new MooreNeighborhood()), // Top
-            (new Vector2(0.5f, 0), LoopUtility.LoopDirection.Down, new MooreNeighborhood()), // Bottom , 
-        };
-
-        private int taskCount = RaycastStartPos.Count;
+        public readonly List<(Vector2, LoopUtility.LoopDirection, MooreNeighborhood)> RaycastStartPos;
+        private int taskCount;
 
         private Vector2Int _indexVector = new Vector2Int();
         private Color[] _scaledImage;
@@ -35,6 +29,15 @@ namespace PicKinetic
             _height = size;
             //MooreNeighborhood = new MooreNeighborhood();
             MNFloodFill = new MNFloodFill();
+
+            RaycastStartPos = new List<(Vector2, LoopUtility.LoopDirection, MooreNeighborhood)> {
+                (new Vector2(0, 0.5f), LoopUtility.LoopDirection.Left, new MooreNeighborhood(size, size)), // Left
+                (new Vector2(1, 0.5f), LoopUtility.LoopDirection.Right, new MooreNeighborhood(size, size)), // Right
+                (new Vector2(0.5f, 1), LoopUtility.LoopDirection.Top, new MooreNeighborhood(size, size)), // Top
+                (new Vector2(0.5f, 0), LoopUtility.LoopDirection.Down, new MooreNeighborhood(size, size)), // Bottom , 
+            };
+
+            taskCount = RaycastStartPos.Count;
 
             taskArray = new UniTask<MooreNeighborhood.MooreNeighborInfo>[RaycastStartPos.Count];
         }

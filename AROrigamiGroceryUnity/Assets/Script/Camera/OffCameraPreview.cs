@@ -77,7 +77,7 @@ public class OffCameraPreview : MonoBehaviour
         TextureUtility.RotateAndScaleImage(inputTex, modelTexRenderer, rotateMat, _textureStructure, Rotation);
         TextureUtility.RotateAndScaleImage(inputTex, imageProcessRenderer, rotateMat, _textureStructure, Rotation);
 
-        StartCoroutine(textureMeshPreview.ExecEdgeProcessing(imageProcessRenderer));
+        textureMeshPreview.ExecEdgeProcessing(imageProcessRenderer);
 
         if (timer > Time.time) return;
 
@@ -111,8 +111,8 @@ public class OffCameraPreview : MonoBehaviour
 
     private async void PreviewEdgeMesh() {
         textureMeshPreview.ProcessCSTextureColor();
-
-        OnMeshDone(await textureMeshPreview.CaptureEdgeBorderMesh(imageProcessRenderer.width, p_meshOutline, _textureStructure));
+        await textureMeshPreview.CaptureEdgeBorderMesh(imageProcessRenderer.width, p_meshOutline, _textureStructure);
+        //OnMeshDone(await textureMeshPreview.CaptureEdgeBorderMesh(imageProcessRenderer.width, p_meshOutline, _textureStructure));
     }
 
     private void PrepareTexture()

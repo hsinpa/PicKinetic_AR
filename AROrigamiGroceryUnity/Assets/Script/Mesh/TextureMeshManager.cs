@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Cysharp.Threading.Tasks;
+using System.Threading;
 
 namespace PicKinetic
 {
@@ -37,6 +38,7 @@ namespace PicKinetic
         MeshBuilder meshBuilder;
         MarchingCube marchingCube;
         MeshLocData meshCalResult;
+
         private Mesh2DTo3D mesh2DTo3D;
         EdgeImageDetector edgeDetector;
         MarchingCubeBorder marchingCubeBorder;
@@ -55,6 +57,9 @@ namespace PicKinetic
 
         Vector2 _meshPosition = new Vector2();
         #endregion
+
+        
+        
 
         public void SetUp()
         {
@@ -76,13 +81,12 @@ namespace PicKinetic
             Graphics.Blit(highlightTexture, highlightRenderer);
         }
 
-        public IEnumerator ExecEdgeProcessing(RenderTexture processTex)
+        public void ExecEdgeProcessing(RenderTexture processTex)
         {
             if (IsComputeShaderFree)
             {
                 IsComputeShaderFree = false;
                 var edgeTex = edgeDetector.GetEdgeTex(processTex);
-                yield return new WaitForEndOfFrame();
 
 #if !UNITY_EDITOR && UNITY_ANDROID
 
@@ -90,7 +94,6 @@ namespace PicKinetic
                 _edgeLineTex.ReadPixels(androidOnlyEdgeRect, 0, 0);
                 _edgeLineTex.Apply();
 
-                yield return new WaitForEndOfFrame();
                 IsComputeShaderFree = true;
 #else
                 AsyncGPUReadback.Request(edgeTex, 0, TextureFormat.RGB24, OnTexCompleteReadback);
@@ -137,18 +140,20 @@ namespace PicKinetic
 #endregion
 
 #region Mask API 
-        public async UniTask<MeshLocData> CaptureEdgeBorderMesh(int skinSize, MeshObject meshObject, TextureUtility.TextureStructure textureStructure)
+        public async Task<MeshLocData> CaptureEdgeBorderMesh(int skinSize, MeshObject meshObject, TextureUtility.TextureStructure textureStructure)
         {
             var maskColors = await imageMaskGeneator.AsyncCreateBorder(process_tex_colors_cpu);
+            if (!CheckIfValid(maskColors)) 
+                return default(MeshLocData);
+            
+            return await Task.Run(() =>
+            {
+                var marchCubeResult = ProcessMarchCube(maskColors.img, resize, resize);
+                var meshData = mesh2DTo3D.CreateMeshData(marchCubeResult.vertices, marchCubeResult.triangles, marchCubeResult.uv, null);
 
-            if (!CheckIfValid(maskColors)) return default(MeshLocData);
-
-            var marchCubeResult = await ProcessMarchCube(maskColors.img, resize, resize);
-            var meshData = mesh2DTo3D.CreateMeshData(marchCubeResult.vertices, marchCubeResult.triangles, marchCubeResult.uv, null);
-
-            meshObject.SetMesh(mesh2DTo3D.CreateMesh(meshObject.mesh, meshData), highlightRenderer, skinSize);
-
-            return GetMeshLocData(maskColors, meshObject, textureStructure);             
+                meshObject.SetMesh(mesh2DTo3D.CreateMesh(meshObject.mesh, meshData), highlightRenderer, skinSize);
+                return GetMeshLocData(maskColors, meshObject, textureStructure, MeshLocData.Type.Edge);
+            });
         }
 
         public async UniTask<MeshLocData> CaptureContourMesh(RenderTexture skinTexture, MeshObject meshObject, TextureUtility.TextureStructure textureStructure)
@@ -157,9 +162,9 @@ namespace PicKinetic
 
             if (!CheckIfValid(maskColors)) return default(MeshLocData);
 
-            var marchCubeResult = await ProcessMarchCube(maskColors.img, resize, resize);
+            var marchCubeResult = ProcessMarchCube(maskColors.img, resize, resize);
 
-            var mesh = await MeshTo3D(marchCubeResult, meshObject.mesh);
+            var mesh = MeshTo3D(marchCubeResult, meshObject.mesh);
 
             if (mesh.Item1 != null) {
                 meshObject.SetMesh(mesh.Item1, skinTexture, skinTexture.width);
@@ -167,28 +172,25 @@ namespace PicKinetic
                 meshObject.GenerateControlPoints();
             }
 
-            return GetMeshLocData(maskColors, meshObject, textureStructure);
+            return GetMeshLocData(maskColors, meshObject, textureStructure, MeshLocData.Type.Contour);
         }
 #endregion
 
-        private async UniTask<MarchingCube.MarchingCubeResult> ProcessMarchCube(Color[] maskImage, int textureWidth, int textureHeight)
+        private MarchingCube.MarchingCubeResult ProcessMarchCube(Color[] maskImage, int textureWidth, int textureHeight)
         {
-            return await UniTask.Run(() =>
-            {
-                meshBuilder.GenerateMesh(maskImage, textureWidth, textureHeight, 1);
-                return marchingCube.Calculate(meshBuilder.squareGrid);
-            });
+            meshBuilder.GenerateMesh(maskImage, textureWidth, textureHeight, 1);
+            return marchingCube.Calculate(meshBuilder.squareGrid);
         }
 
-        private async UniTask<(Mesh, Mesh2DTo3D.MeshData)> MeshTo3D(MarchingCube.MarchingCubeResult meshResult, Mesh mesh) {
-            Vector3[] borderVertices = await marchingCubeBorder.AsynSort(meshResult.borderVertices);
+        private (Mesh, Mesh2DTo3D.MeshData) MeshTo3D(MarchingCube.MarchingCubeResult meshResult, Mesh mesh) {
+            Vector3[] borderVertices = marchingCubeBorder.Sort(meshResult.borderVertices).ToArray();
             //TestBorderArray = borderVertices;
-            Mesh2DTo3D.MeshData meshData = await mesh2DTo3D.Convert(meshResult, borderVertices);
+            Mesh2DTo3D.MeshData meshData = mesh2DTo3D.Convert(meshResult, borderVertices);
 
             return (mesh2DTo3D.CreateMesh(mesh, meshData), meshData);
         }
 
-        private MeshLocData GetMeshLocData(MooreNeighborhood.MooreNeighborInfo meshInfo, MeshObject meshObject, TextureUtility.TextureStructure textureStructure) {
+        private MeshLocData GetMeshLocData(MooreNeighborhood.MooreNeighborInfo meshInfo, MeshObject meshObject, TextureUtility.TextureStructure textureStructure, MeshLocData.Type type) {
             //float _x = ((meshInfo.centerPoint.x / resize) * textureStructure.xRatio) + (textureStructure.xResidualRatio * 0.5f);
             //float _y = ((meshInfo.centerPoint.y / resize) * textureStructure.yRatio) + (textureStructure.yResidualRatio * 0.5f);
 
@@ -201,6 +203,7 @@ namespace PicKinetic
 
             meshCalResult.screenPoint = _meshPosition;
             meshCalResult.meshObject = meshObject;
+            meshCalResult.type = type;
 
             return meshCalResult;
         }
@@ -211,6 +214,9 @@ namespace PicKinetic
         }
 
         public struct MeshLocData {
+
+            public enum Type {Edge, Contour}
+            public Type type;
             public MeshObject meshObject;
             public Vector2 screenPoint;
 

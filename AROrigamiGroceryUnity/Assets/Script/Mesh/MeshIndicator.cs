@@ -131,6 +131,11 @@ namespace PicKinetic
             helpOrientPoint = geneticRaycast(centerPoint);
         }
 
+        /// <summary>
+        /// Make sure the whole surface of target object is lay on top of plane mesh
+        /// </summary>
+        /// <param name="screenPosArray"></param>
+        /// <returns></returns>
         private RaycastOverallResult FindFourCornerOfIndicator(Vector2[] screenPosArray)
         {
             int cornerLen = screenPosArray.Length;

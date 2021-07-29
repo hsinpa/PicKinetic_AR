@@ -9,7 +9,6 @@ namespace PicKinetic
     public class MooreNeighborhood
     {
         private Color[] contourImage = new Color[0];
-        private int currentLength;
 
         private Point p = new Point(); //current boundary pixel
         private Point c = new Point(); //current pixel under consideration i.e.c is in M(p).
@@ -29,8 +28,9 @@ namespace PicKinetic
         private LoopUtility.LoopDirection loopDirection;
         private MooreNeighborInfo infoContainer = new MooreNeighborInfo();
 
-        public MooreNeighborhood() {
+        public MooreNeighborhood(int width, int height) {
             loopUtility = new LoopUtility();
+            contourImage = CreateOutputImage(width * height);
         }
 
         public MooreNeighborInfo Execute(Color[] grayImages, int width, int height, Vector2Int startPoint, LoopUtility.LoopDirection loopDirection, float threshold = 0.2f)
@@ -42,7 +42,7 @@ namespace PicKinetic
 
             int area = 1;
             Vector2 centerPoint;
-            contourImage = ResetOutputImage(width * height);
+            contourImage = ResetOutputImage(contourImage, width * height);
             _images = grayImages;
             _width = width;
             _height = height;
@@ -185,16 +185,19 @@ namespace PicKinetic
             return isNewCountorPoint;
         }
 
-        private Color[] ResetOutputImage(int length)
+        private Color[] CreateOutputImage(int length)
         {
-            if (currentLength != length)
-                contourImage = new Color[length];
+            return new Color[length];
+        }
 
+        private Color[] ResetOutputImage(Color[] contourImage, int length)
+        {
             for (int i = 0; i < length; i++)
             {
                 //Set As white
                 contourImage[i] = emptyColor;
             }
+
             return contourImage;
         }
 

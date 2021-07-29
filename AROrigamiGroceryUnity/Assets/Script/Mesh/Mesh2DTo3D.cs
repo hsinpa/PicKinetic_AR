@@ -36,15 +36,12 @@ namespace PicKinetic {
         /// <param name="marchingCubeResult"></param>
         /// <param name="borderVertices"></param>
         /// <returns></returns>
-        public async UniTask<MeshData> Convert(MarchingCube.MarchingCubeResult marchingCubeResult, Vector3[] borderVertices) {
-            return await UniTask.Run(() =>
-            {
-                var vertInfo = VerticesTo3D(marchingCubeResult.vertices, borderVertices);
-                var triangles = TriangleTo3D(marchingCubeResult.triangles, marchingCubeResult.vertices.Length, vertInfo.borderStartCount, vertInfo.borderVertexCount);
-                var uv = UVTo3D(marchingCubeResult.uv, vertInfo.borderVertexCount);
+        public MeshData Convert(MarchingCube.MarchingCubeResult marchingCubeResult, Vector3[] borderVertices) {
+            var vertInfo = VerticesTo3D(marchingCubeResult.vertices, borderVertices);
+            var triangles = TriangleTo3D(marchingCubeResult.triangles, marchingCubeResult.vertices.Length, vertInfo.borderStartCount, vertInfo.borderVertexCount);
+            var uv = UVTo3D(marchingCubeResult.uv, vertInfo.borderVertexCount);
 
-                return CreateMeshData(vertInfo.vectors, triangles, uv, vertInfo.colors, vertInfo.topVertice, vertInfo.bottomVertice);
-            });
+            return CreateMeshData(vertInfo.vectors, triangles, uv, vertInfo.colors, vertInfo.topVertice, vertInfo.bottomVertice);
         }
 
         public Mesh CreateMesh(Mesh targetMesh, MeshData meshData) {

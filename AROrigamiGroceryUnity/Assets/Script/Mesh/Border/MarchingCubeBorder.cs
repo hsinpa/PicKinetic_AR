@@ -13,7 +13,7 @@ public class MarchingCubeBorder
     /// </summary>
     /// <param name="hashVertices"></param>
     /// <returns></returns>
-    private List<Vector3> Sort(Vector3[] hashVertices) {
+    public List<Vector3> Sort(Vector3[] hashVertices) {
         List<Vector3> sorted = new List<Vector3>();
         List<Vector3> opended = hashVertices.ToList();
 

@@ -63,7 +63,6 @@ namespace PicKinetic
             _sourceTexture = sourceTexture;
 
             texturePreivew.SetUp();
-
             TextureUtility = new TextureUtility();
 
             _textureStructure = GrabTextureRadius(sourceTexWidth, sourceTexHeight);
@@ -85,7 +84,7 @@ namespace PicKinetic
             TextureUtility.RotateAndScaleImage(_sourceTexture, modelTexRenderer, rotateMat, _textureStructure, 0);
             TextureUtility.RotateAndScaleImage(_sourceTexture, imageProcessRenderer, rotateMat, _textureStructure, 0);
 
-            StartCoroutine(texturePreivew.ExecEdgeProcessing(imageProcessRenderer));
+            texturePreivew.ExecEdgeProcessing(imageProcessRenderer);
 
             //if (timer > Time.time) return;
             if (!isScanProcessReady) return;
@@ -107,7 +106,7 @@ namespace PicKinetic
         }
 
 
-        private void OnMeshDone(TextureMeshManager.MeshLocData meshResult)
+        private void OnMeshLocDone(TextureMeshManager.MeshLocData meshResult)
         {
             isScanProcessReady = true;
             if (!meshResult.isValid) return;
@@ -118,21 +117,20 @@ namespace PicKinetic
             meshResult.meshObject.transform.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
 
             meshResult.meshObject.SetPosRotation(indictatorData.position, indictatorData.rotation);
-
         }
 
         public async void PreviewEdgeMesh()
         {
             texturePreivew.ProcessCSTextureColor();
 
-            OnMeshDone(await texturePreivew.CaptureEdgeBorderMesh(imageProcessRenderer.width, meshBorder, _textureStructure));
+            OnMeshLocDone(await texturePreivew.CaptureEdgeBorderMesh(imageProcessRenderer.width, meshBorder, _textureStructure));
         }
 
         public async void TakeAPhoto()
         {
             MeshObject meshObject = meshObjManager.CreateMeshObj(meshBorder.transform.position, meshBorder.transform.rotation, true);
 
-            OnMeshDone(await texturePreivew.CaptureContourMesh(modelTexRenderer, meshObject, _textureStructure));
+            OnMeshLocDone(await texturePreivew.CaptureContourMesh(modelTexRenderer, meshObject, _textureStructure));
         }
 
         public StructType.GrabTextures GetCurrentTexturesClone() {

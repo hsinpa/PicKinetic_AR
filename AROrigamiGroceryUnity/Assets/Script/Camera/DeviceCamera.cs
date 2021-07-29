@@ -190,13 +190,13 @@ public class DeviceCamera : MonoBehaviour
         TextureUtility.RotateAndScaleImage(cameraTex, modelTexRenderer, rotateMat, _textureStructure, 0);
         TextureUtility.RotateAndScaleImage(cameraTex, imageProcessRenderer, rotateMat, _textureStructure, 0);
 
-        StartCoroutine(texturePreivew.ExecEdgeProcessing(imageProcessRenderer));
+        texturePreivew.ExecEdgeProcessing(imageProcessRenderer);
 
-        if (timer > Time.time) return;
+       // if (timer > Time.time) return;
 
         PreviewEdgeMesh();
 
-        timer = timer_step + Time.time;
+        //timer = timer_step + Time.time;
     }
 
     private TextureUtility.TextureStructure GrabTextureRadius(int width, int height) {
@@ -232,8 +232,8 @@ public class DeviceCamera : MonoBehaviour
     private async void PreviewEdgeMesh()
     {
         texturePreivew.ProcessCSTextureColor();
-
-        OnMeshDone(await texturePreivew.CaptureEdgeBorderMesh(imageProcessRenderer.width, meshBorder, _textureStructure));
+        await texturePreivew.CaptureEdgeBorderMesh(imageProcessRenderer.width, meshBorder, _textureStructure);
+        //OnMeshDone(await texturePreivew.CaptureEdgeBorderMesh(imageProcessRenderer.width, meshBorder, _textureStructure));
     }
 
     private async void TakeAPhoto() {

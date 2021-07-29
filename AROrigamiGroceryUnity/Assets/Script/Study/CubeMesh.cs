@@ -26,12 +26,12 @@ namespace Hsinpa.Study {
             //meshFilter.mesh = mesh2DTo3D.Convert(meshData, meshData.borderVertices);
         }
 
-        private async void Form3DMesh()
+        private void Form3DMesh()
         {
             Mesh mesh = new Mesh();
             var meshData = DrawQuad();
 
-            var d = await mesh2DTo3D.Convert(meshData, meshData.borderVertices);
+            var d = mesh2DTo3D.Convert(meshData, meshData.borderVertices);
 
             mesh.vertices = d.vertices;
             mesh.triangles = d.triangles;
