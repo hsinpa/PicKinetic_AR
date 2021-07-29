@@ -11,7 +11,7 @@ namespace PicKinetic
     {
         private MNFloodFill MNFloodFill;
 
-        private UniTask<MooreNeighborhood.MooreNeighborInfo>[] taskArray;
+        private MooreNeighborhood.MooreNeighborInfo[] taskArray;
 
         /// <summary>
         /// Start from 4 direction in parallel, save execute time
@@ -39,62 +39,56 @@ namespace PicKinetic
 
             taskCount = RaycastStartPos.Count;
 
-            taskArray = new UniTask<MooreNeighborhood.MooreNeighborInfo>[RaycastStartPos.Count];
+            taskArray = new MooreNeighborhood.MooreNeighborInfo[RaycastStartPos.Count];
         }
 
-        public async UniTask<MooreNeighborhood.MooreNeighborInfo> AsyncCreateMask(Color[] scaledImage)
+        public MooreNeighborhood.MooreNeighborInfo AsyncCreateMask(Color[] scaledImage)
         {
             this._scaledImage = scaledImage;
 
-            var mooreNeighbor = await PrpareMooreNeighborProcess();
+            var mooreNeighbor = PrpareMooreNeighborProcess();
 
-            return await UniTask.Run(() =>
-            {
-                mooreNeighbor.img = MNFloodFill.Execute(mooreNeighbor.img, _width, _height);
-                return mooreNeighbor;
-            });
+            mooreNeighbor.img = MNFloodFill.Execute(mooreNeighbor.img, _width, _height);
+            return mooreNeighbor;
         }
 
-        public async UniTask<MooreNeighborhood.MooreNeighborInfo> AsyncCreateBorder(Color[] scaledImage)
+        public MooreNeighborhood.MooreNeighborInfo AsyncCreateBorder(Color[] scaledImage)
         {
             this._scaledImage = scaledImage;
 
-            return await PrpareMooreNeighborProcess();
+            return PrpareMooreNeighborProcess();
         }
 
-        private async UniTask<MooreNeighborhood.MooreNeighborInfo> AsyncContourDirection(Vector2 startVector, LoopUtility.LoopDirection direction, MooreNeighborhood mooreNeighborhood) {
-            return await UniTask.Run(() =>
-            {
-                _indexVector.Set(
-                    Mathf.FloorToInt(this._width * startVector.x),
-                    Mathf.FloorToInt(this._height * startVector.y)
-                ); ;
+        private MooreNeighborhood.MooreNeighborInfo AsyncContourDirection(Vector2 startVector, LoopUtility.LoopDirection direction, MooreNeighborhood mooreNeighborhood) {
+            _indexVector.Set(
+                Mathf.FloorToInt(this._width * startVector.x),
+                Mathf.FloorToInt(this._height * startVector.y)
+            );
 
-                return mooreNeighborhood.Execute(this._scaledImage, this._width, this._height, _indexVector, direction);
-            });
+            return mooreNeighborhood.Execute(this._scaledImage, this._width, this._height, _indexVector, direction);
         }
 
-        private async UniTask<MooreNeighborhood.MooreNeighborInfo> PrpareMooreNeighborProcess() {
+        private MooreNeighborhood.MooreNeighborInfo PrpareMooreNeighborProcess() {
 
             for (int i = 0; i < RaycastStartPos.Count; i++)
             {
                 taskArray[i] = AsyncContourDirection(RaycastStartPos[i].Item1, RaycastStartPos[i].Item2, RaycastStartPos[i].Item3);
             }
 
-            var taskResultArray = await UniTask.WhenAll(taskArray);
+            //var taskResultArray = await UniTask.WhenAll(taskArray);
             float largestArea = 0;
             int largestIndex = 0;
 
             for (int i = 0; i < taskCount; i++) {
 
-                if (taskResultArray[i].area > largestArea) {
+                if (taskArray[i].area > largestArea) {
 
-                    largestArea = taskResultArray[i].area;
+                    largestArea = taskArray[i].area;
                     largestIndex = i;
                 }
             }
 
-            return taskResultArray[largestIndex];
+            return taskArray[largestIndex];
         }
     }
 }

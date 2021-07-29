@@ -142,52 +142,57 @@ namespace PicKinetic
 #region Mask API 
         public async Task<MeshLocData> CaptureEdgeBorderMesh(int skinSize, MeshObject meshObject, TextureUtility.TextureStructure textureStructure)
         {
-            var maskColors = await imageMaskGeneator.AsyncCreateBorder(process_tex_colors_cpu);
-            if (!CheckIfValid(maskColors)) 
-                return default(MeshLocData);
-            
-            return await Task.Run(() =>
+            ParallelMeshResult pEdgeMesh = await Task.Run(() =>
             {
-                var marchCubeResult = ProcessMarchCube(maskColors.img, resize, resize);
-                var meshData = mesh2DTo3D.CreateMeshData(marchCubeResult.vertices, marchCubeResult.triangles, marchCubeResult.uv, null);
+                var maskColors = imageMaskGeneator.AsyncCreateBorder(process_tex_colors_cpu);
 
-                meshObject.SetMesh(mesh2DTo3D.CreateMesh(meshObject.mesh, meshData), highlightRenderer, skinSize);
-                return GetMeshLocData(maskColors, meshObject, textureStructure, MeshLocData.Type.Edge);
+                var marchCubeResult = ProcessMarchCube(maskColors.img, resize, resize);
+
+                return new ParallelMeshResult() {
+                    maskColors = maskColors,
+                    meshData = mesh2DTo3D.CreateMeshData(marchCubeResult.vertices, marchCubeResult.triangles, marchCubeResult.uv, null) 
+                };
             });
+
+            //Mesh is Unity object, so can't put inside thread
+            meshObject.SetMesh(mesh2DTo3D.CreateMesh(meshObject.mesh, pEdgeMesh.meshData), highlightRenderer, skinSize);
+
+            return GetMeshLocData(pEdgeMesh.maskColors, meshObject, textureStructure, MeshLocData.Type.Edge);
         }
 
         public async UniTask<MeshLocData> CaptureContourMesh(RenderTexture skinTexture, MeshObject meshObject, TextureUtility.TextureStructure textureStructure)
         {
-            var maskColors = await imageMaskGeneator.AsyncCreateMask(process_tex_colors_cpu);
+            ParallelMeshResult pEdgeMesh = await Task.Run(() =>
+            {
+                var maskColors = imageMaskGeneator.AsyncCreateMask(process_tex_colors_cpu);
 
-            if (!CheckIfValid(maskColors)) return default(MeshLocData);
+                var marchCubeResult = ProcessMarchCube(maskColors.img, resize, resize);
 
-            var marchCubeResult = ProcessMarchCube(maskColors.img, resize, resize);
+                Vector3[] borderVertices = marchingCubeBorder.Sort(marchCubeResult.borderVertices).ToArray();
 
-            var mesh = MeshTo3D(marchCubeResult, meshObject.mesh);
+                Mesh2DTo3D.MeshData meshData = mesh2DTo3D.Convert(marchCubeResult, borderVertices);
 
-            if (mesh.Item1 != null) {
-                meshObject.SetMesh(mesh.Item1, skinTexture, skinTexture.width);
-                meshObject.SetControlPoint(mesh.Item2.topVertice, mesh.Item2.bottomVertice);
-                meshObject.GenerateControlPoints();
-            }
+                return new ParallelMeshResult()
+                {
+                    maskColors = maskColors,
+                    meshData = meshData
+                };
+            });
 
-            return GetMeshLocData(maskColors, meshObject, textureStructure, MeshLocData.Type.Contour);
+            var mesh = mesh2DTo3D.CreateMesh(meshObject.mesh, pEdgeMesh.meshData);
+
+            meshObject.SetMesh(mesh, skinTexture, skinTexture.width);
+            meshObject.SetControlPoint(pEdgeMesh.meshData.topVertice, pEdgeMesh.meshData.bottomVertice);
+            meshObject.GenerateControlPoints();
+            
+            return GetMeshLocData(pEdgeMesh.maskColors, meshObject, textureStructure, MeshLocData.Type.Contour);
         }
-#endregion
+        #endregion
 
         private MarchingCube.MarchingCubeResult ProcessMarchCube(Color[] maskImage, int textureWidth, int textureHeight)
         {
             meshBuilder.GenerateMesh(maskImage, textureWidth, textureHeight, 1);
             return marchingCube.Calculate(meshBuilder.squareGrid);
-        }
-
-        private (Mesh, Mesh2DTo3D.MeshData) MeshTo3D(MarchingCube.MarchingCubeResult meshResult, Mesh mesh) {
-            Vector3[] borderVertices = marchingCubeBorder.Sort(meshResult.borderVertices).ToArray();
-            //TestBorderArray = borderVertices;
-            Mesh2DTo3D.MeshData meshData = mesh2DTo3D.Convert(meshResult, borderVertices);
-
-            return (mesh2DTo3D.CreateMesh(mesh, meshData), meshData);
         }
 
         private MeshLocData GetMeshLocData(MooreNeighborhood.MooreNeighborInfo meshInfo, MeshObject meshObject, TextureUtility.TextureStructure textureStructure, MeshLocData.Type type) {
@@ -221,6 +226,12 @@ namespace PicKinetic
             public Vector2 screenPoint;
 
             public bool isValid => this.meshObject != null;
+        }
+
+        private struct ParallelMeshResult
+        {
+            public MooreNeighborhood.MooreNeighborInfo maskColors;
+            public Mesh2DTo3D.MeshData meshData;
         }
 
         private void ResetData()
