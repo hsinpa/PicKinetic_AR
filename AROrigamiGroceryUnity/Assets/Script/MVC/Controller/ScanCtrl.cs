@@ -81,7 +81,7 @@ namespace PicKinetic.Controller {
             TextureUtility.Dispose2D(grabTextures.mainTex);
             TextureUtility.Dispose2D(grabTextures.processedTex);
 
-            generalCameraView.TakeAPhoto();
+            generalCameraView.queueContourNextFrame = true;
         }
 
         #endregion

@@ -34,32 +34,11 @@ public class MarchingCube
             }
         }
 
-        try
-        {
-            //mesh.Clear();
-
-            //mesh.SetVertices(vertices);
-            //mesh.SetTriangles(triangles, 0);
-            //mesh.SetUVs(0, uv);
-            marchingCubeResult.borderVertices = borders.ToArray();
-            marchingCubeResult.vertices = vertices.ToArray();
-            marchingCubeResult.uv = uv.ToArray();
-            marchingCubeResult.triangles = triangles.ToArray();
-        }
-        catch { 
+        marchingCubeResult.borderVertices = borders.ToArray();
+        marchingCubeResult.vertices = vertices.ToArray();
+        marchingCubeResult.uv = uv.ToArray();
+        marchingCubeResult.triangles = triangles.ToArray();
         
-        }
-        //mesh.vertices = (vertices).ToArray();
-        //mesh.triangles = (triangles).ToArray();
-        //mesh.uv = (uv).ToArray();
-
-        //mesh.SetVertices(vertices);
-        //mesh.SetTriangles(triangles, 0);
-        //mesh.SetUVs(0, uv);
-
-        //if (mesh != null)
-        //    mesh.RecalculateNormals();
-
         return marchingCubeResult;
     }
 

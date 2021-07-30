@@ -50,6 +50,7 @@ namespace PicKinetic
 
         protected bool _isEnable = false;
         public bool isEnable => this._isEnable;
+        public bool queueContourNextFrame = false;
 
         private bool isScanProcessReady = true;
 
@@ -86,14 +87,14 @@ namespace PicKinetic
 
             texturePreivew.ExecEdgeProcessing(imageProcessRenderer);
 
-            //if (timer > Time.time) return;
             if (!isScanProcessReady) return;
 
             isScanProcessReady = false;
 
-            PreviewEdgeMesh();
-
-            timer = timer_step + Time.time;
+            if (queueContourNextFrame) 
+                CaptureContourMesh();
+             else
+                CaptureEdgeMesh();
         }
 
         private void PrepareTexture()
@@ -105,6 +106,21 @@ namespace PicKinetic
                 OnDebugTextureEvent(modelTexRenderer, texturePreivew.edgeLineTex);
         }
 
+        private async void CaptureEdgeMesh()
+        {
+            texturePreivew.ProcessCSTextureColor();
+
+            OnMeshLocDone(await texturePreivew.CaptureEdgeBorderMesh(imageProcessRenderer.width, meshBorder, _textureStructure));
+        }
+
+        private async void CaptureContourMesh()
+        {
+            MeshObject meshObject = meshObjManager.CreateMeshObj(meshBorder.transform.position, meshBorder.transform.rotation, true);
+
+            OnMeshLocDone(await texturePreivew.CaptureContourMesh(modelTexRenderer, meshObject, _textureStructure));
+
+            queueContourNextFrame = false;
+        }
 
         private void OnMeshLocDone(TextureMeshManager.MeshLocData meshResult)
         {
@@ -117,20 +133,6 @@ namespace PicKinetic
             meshResult.meshObject.transform.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
 
             meshResult.meshObject.SetPosRotation(indictatorData.position, indictatorData.rotation);
-        }
-
-        public async void PreviewEdgeMesh()
-        {
-            texturePreivew.ProcessCSTextureColor();
-
-            OnMeshLocDone(await texturePreivew.CaptureEdgeBorderMesh(imageProcessRenderer.width, meshBorder, _textureStructure));
-        }
-
-        public async void TakeAPhoto()
-        {
-            MeshObject meshObject = meshObjManager.CreateMeshObj(meshBorder.transform.position, meshBorder.transform.rotation, true);
-
-            OnMeshLocDone(await texturePreivew.CaptureContourMesh(modelTexRenderer, meshObject, _textureStructure));
         }
 
         public StructType.GrabTextures GetCurrentTexturesClone() {

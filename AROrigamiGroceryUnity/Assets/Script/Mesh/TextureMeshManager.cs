@@ -58,9 +58,6 @@ namespace PicKinetic
         Vector2 _meshPosition = new Vector2();
         #endregion
 
-        
-        
-
         public void SetUp()
         {
             meshCalResult = new MeshLocData();
@@ -171,6 +168,7 @@ namespace PicKinetic
                 Vector3[] borderVertices = marchingCubeBorder.Sort(marchCubeResult.borderVertices).ToArray();
 
                 Mesh2DTo3D.MeshData meshData = mesh2DTo3D.Convert(marchCubeResult, borderVertices);
+                //Mesh2DTo3D.MeshData meshData = mesh2DTo3D.CreateMeshData(marchCubeResult.vertices, marchCubeResult.triangles, marchCubeResult.uv, null);
 
                 return new ParallelMeshResult()
                 {
@@ -211,11 +209,6 @@ namespace PicKinetic
             meshCalResult.type = type;
 
             return meshCalResult;
-        }
-
-        //Prevent small area image count as valid
-        private bool CheckIfValid(MooreNeighborhood.MooreNeighborInfo meshInfo) {
-            return (meshInfo.area > 40);
         }
 
         public struct MeshLocData {

@@ -31,8 +31,6 @@ public class MeshBuilder
             _mapWidth = nodeCountX * squareSize;
             _mapHeight = nodeCountY * squareSize;
 
-            int totalLen = map.Length;
-
             if (controlNodes == null)
                 controlNodes = new ControlNode[nodeCountX, nodeCountY];
 
