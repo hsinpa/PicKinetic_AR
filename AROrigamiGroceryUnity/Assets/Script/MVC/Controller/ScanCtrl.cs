@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Hsinpa.Utility;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,7 +23,6 @@ namespace PicKinetic.Controller {
         [Header("System")]
         [SerializeField]
         private GeneralCameraView generalCameraView;
-
 
         public override void OnNotify(string p_event, params object[] p_objects)
         {
