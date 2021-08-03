@@ -174,7 +174,7 @@ namespace PicKinetic {
                 UpdateShader(ParameterFlag.ShaderProperty.RenderTransition, transitionBot);
             } else
             {
-               unitMovementCtrl.OnUpdate();
+               //unitMovementCtrl.OnUpdate();
             }
         }
 

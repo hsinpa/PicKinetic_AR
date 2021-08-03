@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Hsinpa.Utility;
+using Hsinpa.Utility.Input;
 
 namespace PicKinetic.Controller
 {
@@ -12,17 +13,28 @@ namespace PicKinetic.Controller
         [SerializeField, Range(0.1f, 200)]
         private float DragThreshold = 0.1f;
 
+        private InputWrapper inputWrapper;
+
         public override void OnNotify(string p_event, params object[] p_objects)
         {
             switch (p_event)
             {
+
             }
         }
 
         private void Start()
         {
             Camera camera = Camera.main;
-            unitInspectModule = new UnitInspectModule(SetCurrentSelectedObject, SetFaceInfo, ReleaseSelectObject, ProcessVertical, DragThreshold, camera);
+            inputWrapper = new InputWrapper();
+            unitInspectModule = new UnitInspectModule(inputWrapper, SetCurrentSelectedObject, SetFaceInfo, ReleaseSelectObject, ProcessVertical, DragThreshold, camera);
+        }
+
+        private void Update()
+        {
+            if (unitInspectModule == null) return;
+            inputWrapper.OnUpdate();
+            unitInspectModule.OnUpdate();
         }
 
         private void SetFaceInfo(UnitInspectModule.Face p_face)

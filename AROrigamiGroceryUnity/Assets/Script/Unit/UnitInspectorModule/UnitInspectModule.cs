@@ -3,13 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using Hsinpa.Utility.Input;
 
 namespace Hsinpa.Utility
 {
     public class UnitInspectModule
     {
         private bool hasHitOnPuffObj = false;
-        private Vector3 lastStandPoint;
+        private Vector2 lastTouchPoint;
+        private Vector2 currentTouchPoint;
         private GameObject SelectedObject;
 
         private GestureEvent gestureEvent = GestureEvent.None;
@@ -22,8 +25,8 @@ namespace Hsinpa.Utility
         public enum Face { Front, RightSide, Back, LeftSide };
         public enum GestureEvent { Release, Save, None };
 
-        private float moveXDist => (Input.mousePosition - lastStandPoint).x;
-        private float moveYDist => (Input.mousePosition - lastStandPoint).y;
+        private float moveXDist => (currentTouchPoint - lastTouchPoint).x;
+        private float moveYDist => (currentTouchPoint - lastTouchPoint).y;
         private float absX => Mathf.Abs(moveXDist);
         private float absY => Mathf.Abs(moveYDist);
         private Vector3 centerPosition => _camera.transform.position + (_camera.transform.forward * 0.75f);
@@ -39,14 +42,17 @@ namespace Hsinpa.Utility
         private System.Action<Face> SetFaceCallback;
         private System.Action<GestureEvent> ReleaseObjectCallback;
         private System.Action<DragDir, float, float, Vector3> ProcessVerticalCallback;
-
+        private InputWrapper inputWrapper;
 
         private DragDir dragMode = DragDir.None;
 
-        public UnitInspectModule(System.Func<GameObject, bool> SetCurrentSelectedObjectCallback,
+        public UnitInspectModule(
+                                InputWrapper inputWrapper,
+                                System.Func<GameObject, bool> SetCurrentSelectedObjectCallback,
                                 System.Action<Face> SetFaceCallback,
                                 System.Action<GestureEvent> ReleaseObjectCallback,
                                 System.Action<DragDir, float, float, Vector3> ProcessVerticalCallback, float dragThreshold, Camera camera) {
+            this.inputWrapper = inputWrapper;
             this.SetCurrentSelectedObjectCallback = SetCurrentSelectedObjectCallback;
             this.SetFaceCallback = SetFaceCallback;
             this.ReleaseObjectCallback = ReleaseObjectCallback;
@@ -73,18 +79,20 @@ namespace Hsinpa.Utility
 
         public void OnUpdate()
         {
+            currentTouchPoint = inputWrapper.mousePosition;
+
             if (HasHitUIComponent()) {
                 PlaySmoothAnimation();
                 return;
             }
 
-            if (!hasHitOnPuffObj && Input.GetMouseButtonDown(0))
+            if (!hasHitOnPuffObj && inputWrapper.primaryBtnClick.OnClickDown())
             {
                 hasHitOnPuffObj = HasHitPuffObject();
 
                 if (hasHitOnPuffObj)
                 {
-                    lastStandPoint = Input.mousePosition;
+                    lastTouchPoint = currentTouchPoint;
 
                     if (SelectedObject == null)
                         this.SetCurrentSelectedObjectCallback(raycastHits[0].transform.GetComponent<GameObject>());
@@ -112,7 +120,7 @@ namespace Hsinpa.Utility
                 ProcessVertical(dragDirection);
             }
 
-            if (Input.GetMouseButtonUp(0))
+            if (inputWrapper.primaryBtnClick.OnClickUp())
             {
                 dragMode = DragDir.None;
                 hasHitOnPuffObj = false;
@@ -147,7 +155,7 @@ namespace Hsinpa.Utility
 
         private bool HasHitPuffObject()
         {
-            Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
+            Ray ray = _camera.ScreenPointToRay(currentTouchPoint);
 
             int hitCount = Physics.RaycastNonAlloc(ray, raycastHits, 100, UnitInspectorStatic.TargetLayer);
 
@@ -175,8 +183,8 @@ namespace Hsinpa.Utility
 
         private int ProcessRotation()
         {
-            Vector3 currentStandPoint = Input.mousePosition;
-            float direction = (currentStandPoint - lastStandPoint).x;
+            Vector2 currentStandPoint = currentTouchPoint;
+            float direction = (currentStandPoint - lastTouchPoint).x;
             direction = Mathf.Clamp(direction, -5, 5);
 
             //Rotation
@@ -221,7 +229,7 @@ namespace Hsinpa.Utility
         private bool HasHitUIComponent() {
             raycastResults.Clear();
 
-            eventData.position = UnityEngine.Input.mousePosition;
+            eventData.position = currentTouchPoint;
             EventSystem.current.RaycastAll(eventData, raycastResults);
             return raycastResults.Count > 0;
         }
