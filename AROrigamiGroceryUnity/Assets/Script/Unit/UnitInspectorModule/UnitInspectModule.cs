@@ -13,7 +13,7 @@ namespace Hsinpa.Utility
         private bool hasHitOnPuffObj = false;
         private Vector2 lastTouchPoint;
         private Vector2 currentTouchPoint;
-        private GameObject SelectedObject;
+        private Transform SelectedObject;
 
         private GestureEvent gestureEvent = GestureEvent.None;
         private Face currentFace = Face.Front;
@@ -29,7 +29,9 @@ namespace Hsinpa.Utility
         private float moveYDist => (currentTouchPoint - lastTouchPoint).y;
         private float absX => Mathf.Abs(moveXDist);
         private float absY => Mathf.Abs(moveYDist);
-        private Vector3 centerPosition => _camera.transform.position + (_camera.transform.forward * 0.75f);
+
+        private float zDepth = 2;
+        private Vector3 centerPosition => _camera.transform.position + (_camera.transform.forward * zDepth);
 
         private float DragThreshold = 0.1f;
         private Camera _camera;
@@ -38,7 +40,7 @@ namespace Hsinpa.Utility
         private PointerEventData eventData;
         private List<RaycastResult> raycastResults = new List<RaycastResult>();
 
-        private System.Func<GameObject, bool> SetCurrentSelectedObjectCallback;
+        private System.Func<Transform, bool> SetCurrentSelectedObjectCallback;
         private System.Action<Face> SetFaceCallback;
         private System.Action<GestureEvent> ReleaseObjectCallback;
         private System.Action<DragDir, float, float, Vector3> ProcessVerticalCallback;
@@ -48,7 +50,7 @@ namespace Hsinpa.Utility
 
         public UnitInspectModule(
                                 InputWrapper inputWrapper,
-                                System.Func<GameObject, bool> SetCurrentSelectedObjectCallback,
+                                System.Func<Transform, bool> SetCurrentSelectedObjectCallback,
                                 System.Action<Face> SetFaceCallback,
                                 System.Action<GestureEvent> ReleaseObjectCallback,
                                 System.Action<DragDir, float, float, Vector3> ProcessVerticalCallback, float dragThreshold, Camera camera) {
@@ -63,7 +65,7 @@ namespace Hsinpa.Utility
             this.eventData = new PointerEventData(EventSystem.current);
         }
 
-        public void SetInputSelectObject(GameObject puffItem) {
+        public void SetInputSelectObject(Transform puffItem) {
             this.SelectedObject = puffItem;
 
             if (this.SelectedObject == null)
@@ -95,7 +97,7 @@ namespace Hsinpa.Utility
                     lastTouchPoint = currentTouchPoint;
 
                     if (SelectedObject == null)
-                        this.SetCurrentSelectedObjectCallback(raycastHits[0].transform.GetComponent<GameObject>());
+                        this.SetCurrentSelectedObjectCallback(raycastHits[0].transform);
                 }
             }
 
@@ -211,7 +213,7 @@ namespace Hsinpa.Utility
 
         private void GraudaulyFlyToCenter()
         {
-            Vector3 frontPosition = _camera.transform.position + (_camera.transform.forward * 0.75f);
+            Vector3 frontPosition = _camera.transform.position + (_camera.transform.forward * zDepth);
 
             SelectedObject.transform.position = Vector3.Lerp(SelectedObject.transform.position, frontPosition, 0.1f);
         }

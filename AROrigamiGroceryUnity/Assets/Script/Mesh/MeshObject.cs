@@ -46,10 +46,13 @@ namespace PicKinetic {
 
         private MaterialPropertyBlock m_PropertyBlock;
 
-        private Quaternion _ori_quaterion; 
+        private Quaternion _ori_quaterion;
+        private Vector3 _ori_position;
 
         private Mesh _mesh;
         public Mesh mesh => _mesh;
+
+ 
 
         #region Control Point Variable
         private ControlPoints ctrlPoints;
@@ -154,7 +157,9 @@ namespace PicKinetic {
                 this.transform.position = p_position + new Vector3(0, _meshRenderer.bounds.size.y*0.5f, 0);
             }
 
-            this._rigidbody.isKinematic = !copyUVTexture;
+            this._ori_position = this.transform.position;
+            this._ori_quaterion = this.transform.rotation;
+            //this._rigidbody.isKinematic = !copyUVTexture;
         }
 
         public void Rotate(Vector3 direction) {
@@ -168,6 +173,7 @@ namespace PicKinetic {
 
             UpdateControlPoint();
             UpdateArrayShader(ParameterFlag.ShaderProperty.ControlPoints, shaderCtrlPoints);
+            UpdateOriPosRotate();
 
             if (transitionBot < transitionTop && transitionVelocity > 0) {
                 transitionBot += transitionVelocity;
@@ -205,6 +211,20 @@ namespace PicKinetic {
             m_PropertyBlock.SetFloat(variableName, numberValue);
 
             _meshRenderer.SetPropertyBlock(m_PropertyBlock);
+        }
+
+        private bool UpdateOriPosRotate() {
+
+            float diff = Vector3.Distance(transform.position, this._ori_position);
+            float threshold = 0.1f;
+
+            if (diff < threshold) 
+                return false;
+
+            transform.position = Vector3.Lerp(transform.position, this._ori_position, 0.1f);
+            transform.rotation = Quaternion.Lerp(transform.rotation, this._ori_quaterion, 0.05f);
+
+            return false;
         }
 
         private void OnDestroy()

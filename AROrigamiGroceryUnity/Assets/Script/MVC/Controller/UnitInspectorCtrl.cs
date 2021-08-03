@@ -15,6 +15,8 @@ namespace PicKinetic.Controller
 
         private InputWrapper inputWrapper;
 
+        private MeshObject selectedMeshObject;
+
         public override void OnNotify(string p_event, params object[] p_objects)
         {
             switch (p_event)
@@ -48,17 +50,27 @@ namespace PicKinetic.Controller
 
         private void ProcessVertical(UnitInspectModule.DragDir dragDir, float ratio, float offset, Vector3 puff_center)
         {
-            Debug.Log("Vertical ratio " + ratio + ", offset "+ offset);
+            selectedMeshObject.transform.position = new Vector3(puff_center.x, puff_center.y + offset, puff_center.z);
         }
 
-        private bool SetCurrentSelectedObject(GameObject item)
+        private bool SetCurrentSelectedObject(Transform item)
         {
-            return false;
+            selectedMeshObject = item.GetComponent<MeshObject>();
+            selectedMeshObject.enabled = false;
+            unitInspectModule.SetInputSelectObject(item);
+
+            return true;
         }
 
         private void ReleaseSelectObject(UnitInspectModule.GestureEvent gestureInput)
         {
+            if (gestureInput != UnitInspectModule.GestureEvent.None) {
 
+                selectedMeshObject.enabled = true;
+                selectedMeshObject = null;
+
+                unitInspectModule.SetInputSelectObject(null);
+            }
         }
 
     }
