@@ -29,13 +29,13 @@ namespace PicKinetic.Controller
         {
             Camera camera = Camera.main;
             inputWrapper = new InputWrapper();
-            unitInspectModule = new UnitInspectModule(inputWrapper, SetCurrentSelectedObject, SetFaceInfo, ReleaseSelectObject, ProcessVertical, DragThreshold, camera);
+            unitInspectModule = new UnitInspectModule(new Vector3(0, 0, 1),
+                inputWrapper, SetCurrentSelectedObject, SetFaceInfo, ReleaseSelectObject, ProcessVertical, DragThreshold, camera);
         }
 
         private void Update()
         {
             if (unitInspectModule == null) return;
-            inputWrapper.OnUpdate();
             unitInspectModule.OnUpdate();
         }
 
@@ -56,6 +56,7 @@ namespace PicKinetic.Controller
         private bool SetCurrentSelectedObject(Transform item)
         {
             selectedMeshObject = item.GetComponent<MeshObject>();
+
             selectedMeshObject.enabled = false;
             unitInspectModule.SetInputSelectObject(item);
 

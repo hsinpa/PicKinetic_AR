@@ -6,8 +6,7 @@ using UnityEngine.InputSystem;
 namespace Hsinpa.Utility.Input {
     public class InputWrapper
     {
-        public Vector2 cacheMousePosition;
-        public Vector2 mousePosition => Mouse.current.position.ReadValue();
+        public Vector2 mousePosition => _primaryBtnClick.fingerPosition;
 
         private BtnClickInterface _primaryBtnClick;
         public BtnClickInterface primaryBtnClick => _primaryBtnClick;
@@ -16,12 +15,8 @@ namespace Hsinpa.Utility.Input {
 #if UNITY_EDITOR
             _primaryBtnClick = new MouseLeftClick();
 #else
-            primaryBtnClick = new TouchClick();
+            _primaryBtnClick = new TouchClick();
 #endif
-        }
-
-        public void OnUpdate() {
-            cacheMousePosition = Mouse.current.position.ReadValue();
         }
     }
 }

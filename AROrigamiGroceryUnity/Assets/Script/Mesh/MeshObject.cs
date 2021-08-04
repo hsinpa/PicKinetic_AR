@@ -66,6 +66,7 @@ namespace PicKinetic {
         private void Awake()
         {
             _mesh = new Mesh();
+
             _ori_quaterion = transform.rotation;
             m_PropertyBlock = new MaterialPropertyBlock();
             unitMovementCtrl = new UnitMovementCtrl(this.transform);

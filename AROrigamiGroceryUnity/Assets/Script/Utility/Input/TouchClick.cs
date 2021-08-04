@@ -1,4 +1,5 @@
-﻿using UnityEngine.InputSystem;
+﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 
 namespace Hsinpa.Utility.Input
@@ -7,16 +8,15 @@ namespace Hsinpa.Utility.Input
     {
         bool isPressLastFrame = false;
 
+        public Vector2 fingerPosition => Touchscreen.current.primaryTouch.position.ReadValue();
+
         public bool OnClick()
         {
-            UnityEngine.Debug.Log("touch OnClick");
             return Touchscreen.current.primaryTouch.press.isPressed;
         }
 
         public bool OnClickDown()
         {
-            UnityEngine.Debug.Log("touch OnClickDown");
-
             bool currentState = Touchscreen.current.primaryTouch.press.isPressed;
             bool isClickDown = !isPressLastFrame && currentState;
             isPressLastFrame = currentState;
@@ -26,8 +26,6 @@ namespace Hsinpa.Utility.Input
 
         public bool OnClickUp()
         {
-            UnityEngine.Debug.Log("touch OnClickUp");
-
             bool currentState = Touchscreen.current.primaryTouch.press.isPressed;
             bool isClickUp = isPressLastFrame && !currentState;
             isPressLastFrame = currentState;

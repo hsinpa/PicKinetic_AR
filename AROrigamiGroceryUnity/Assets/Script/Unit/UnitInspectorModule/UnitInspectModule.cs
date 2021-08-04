@@ -20,6 +20,7 @@ namespace Hsinpa.Utility
         private int rotDir = 1;
         private float recordRotationY;
         private Quaternion lerpQuaterion;
+        private Vector3 modelRotateDir;
 
         public enum DragDir { VerticalUp, VerticalDown, Horizontal, None };
         public enum Face { Front, RightSide, Back, LeftSide };
@@ -30,7 +31,12 @@ namespace Hsinpa.Utility
         private float absX => Mathf.Abs(moveXDist);
         private float absY => Mathf.Abs(moveYDist);
 
-        private float zDepth = 2;
+#if UNITY_EDITOR
+        private float zDepth = 2.8f;
+#else
+        private float zDepth = 0.1f;
+#endif
+
         private Vector3 centerPosition => _camera.transform.position + (_camera.transform.forward * zDepth);
 
         private float DragThreshold = 0.1f;
@@ -49,11 +55,13 @@ namespace Hsinpa.Utility
         private DragDir dragMode = DragDir.None;
 
         public UnitInspectModule(
+             Vector3 modelRotateDir,
                                 InputWrapper inputWrapper,
                                 System.Func<Transform, bool> SetCurrentSelectedObjectCallback,
                                 System.Action<Face> SetFaceCallback,
                                 System.Action<GestureEvent> ReleaseObjectCallback,
                                 System.Action<DragDir, float, float, Vector3> ProcessVerticalCallback, float dragThreshold, Camera camera) {
+            this.modelRotateDir = modelRotateDir;
             this.inputWrapper = inputWrapper;
             this.SetCurrentSelectedObjectCallback = SetCurrentSelectedObjectCallback;
             this.SetFaceCallback = SetFaceCallback;
@@ -111,10 +119,10 @@ namespace Hsinpa.Utility
 
             DragDir dragDirection = FindDragDirection();
 
-            if (dragDirection == DragDir.Horizontal && dragMode != DragDir.VerticalDown) {
-                dragMode = DragDir.Horizontal;
-                ProcessRotation();
-            }
+            //if (dragDirection == DragDir.Horizontal && dragMode != DragDir.VerticalDown) {
+            //    dragMode = DragDir.Horizontal;
+            //    ProcessRotation();
+            //}
 
             if ((dragDirection == DragDir.VerticalDown || dragDirection == DragDir.VerticalUp) && dragMode != DragDir.Horizontal )
             {
@@ -190,8 +198,7 @@ namespace Hsinpa.Utility
             direction = Mathf.Clamp(direction, -5, 5);
 
             //Rotation
-            UnitInspectorStatic.SharedVectorUnit.Set(0, direction, 0);
-
+            UnitInspectorStatic.SharedVectorUnit.Set(direction * modelRotateDir.x, direction * modelRotateDir.y, direction * modelRotateDir.z);
             SelectedObject.transform.Rotate(UnitInspectorStatic.SharedVectorUnit, Space.Self);
 
             return (direction > 0) ? 1 : -1;
