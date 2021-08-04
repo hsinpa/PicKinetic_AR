@@ -3,15 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using Hsinpa.Utility;
 using Hsinpa.Utility.Input;
+using PicKinetic.View;
 
 namespace PicKinetic.Controller
 {
     public class UnitInspectorCtrl : ObserverPattern.Observer
     {
-        private UnitInspectModule unitInspectModule;
+
+        [Header("UI")]
+        [SerializeField]
+        private MainCanvasView MainCanvasView;
 
         [SerializeField, Range(0.1f, 200)]
         private float DragThreshold = 0.1f;
+
+        private UnitInspectModule unitInspectModule;
 
         private InputWrapper inputWrapper;
 
@@ -60,6 +66,8 @@ namespace PicKinetic.Controller
             selectedMeshObject.enabled = false;
             unitInspectModule.SetInputSelectObject(item);
 
+            MainCanvasView.SetMainCanvasState<ARMainUIView>(false, true);
+
             return true;
         }
 
@@ -71,6 +79,8 @@ namespace PicKinetic.Controller
                 selectedMeshObject = null;
 
                 unitInspectModule.SetInputSelectObject(null);
+                MainCanvasView.SetMainCanvasState<ARMainUIView>(true, true);
+
             }
         }
 

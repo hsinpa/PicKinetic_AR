@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 0
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -383,6 +383,7 @@ GameObject:
   - component: {fileID: 439061701}
   - component: {fileID: 439061700}
   - component: {fileID: 439061699}
+  - component: {fileID: 439061703}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -462,7 +463,7 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 1803408235}
-  - {fileID: 1977336023}
+  - {fileID: 1694115925}
   m_Father: {fileID: 1101505751}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -471,6 +472,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &439061703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 439061698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2619eff8f8faad4aa0a8117c5c63fba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DebugPanel: {fileID: 1803408235}
+  ARMainUIView: {fileID: 1977336026}
 --- !u!1 &596194764
 GameObject:
   m_ObjectHideFlags: 0
@@ -1123,6 +1138,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce201ef8bca7c4b40b4f5b1e78293a18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MainCanvasView: {fileID: 439061703}
   DragThreshold: 0.1
 --- !u!1 &1168780909
 GameObject:
@@ -1685,6 +1701,42 @@ Transform:
   m_Father: {fileID: 596194765}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1694115924
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1694115925}
+  m_Layer: 5
+  m_Name: MainViews
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1694115925
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1694115924}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 1977336023}
+  m_Father: {fileID: 439061702}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: -1}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &1729367508
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1998,6 +2050,7 @@ GameObject:
   - component: {fileID: 1977336023}
   - component: {fileID: 1977336025}
   - component: {fileID: 1977336024}
+  - component: {fileID: 1977336026}
   m_Layer: 5
   m_Name: ARMainView
   m_TagString: Untagged
@@ -2012,14 +2065,14 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1977336022}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1060021056}
   - {fileID: 1037343865}
-  m_Father: {fileID: 439061702}
-  m_RootOrder: 1
+  m_Father: {fileID: 1694115925}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -2034,7 +2087,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1977336022}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -2046,6 +2099,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1977336022}
   m_CullTransparentMesh: 0
+--- !u!114 &1977336026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1977336022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c6bd7465cc17444eaa20e9907cd875d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UIScanBtn: {fileID: 1060021057}
+  _CanvasGroup: {fileID: 1977336024}
 --- !u!1 &2080997024
 GameObject:
   m_ObjectHideFlags: 0
@@ -2162,6 +2229,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RawTexDebug: {fileID: 998715918}
   ImgProcessTexDebug: {fileID: 1471715595}
+  MainCanvasView: {fileID: 439061703}
   UIScanBtn: {fileID: 1060021057}
-  UIARSessionBtn: {fileID: 1037343866}
-  generalCameraView: {fileID: 735521310}
+  generalCameraView: {fileID: 1669611011}

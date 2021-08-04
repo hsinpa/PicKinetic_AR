@@ -175,7 +175,7 @@ namespace Hsinpa.Utility
         private void ProcessVertical(DragDir dragDir)
         {
 
-            float offset = Mathf.Clamp((absY - DragThreshold) * 0.005f, -1, 1);
+            float offset = Mathf.Clamp((absY - DragThreshold) * 0.003f, -1, 1);
             float ratio = 1 - (Mathf.Abs(offset * 2f) / 5f);
             if (dragDir == DragDir.VerticalDown) offset *= -1;
 

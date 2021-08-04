@@ -148,5 +148,14 @@ namespace Utilities
 			return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
 		}
 
+		public static void SetSimpleBtnEvent(Button btn, System.Action eventCallback) {
+			btn.onClick.RemoveAllListeners();
+			btn.onClick.AddListener(() =>
+			{
+				eventCallback();
+			});
+
+		}
+
 	}
 }

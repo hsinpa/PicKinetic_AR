@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PicKinetic.Controller
+namespace PicKinetic.View
 {
     public class MainCanvasView : MonoBehaviour
     {
@@ -11,13 +11,13 @@ namespace PicKinetic.Controller
         private RectTransform DebugPanel;
 
         [SerializeField]
-        private CanvasGroup MainARGroup;
+        private ARMainUIView ARMainUIView;
 
-        private List<CanvasGroup> mainCanvasArray;
+        private List<MainViewInterface> mainCanvasArray;
 
         private void Awake()
         {
-            mainCanvasArray = new List<CanvasGroup>() { MainARGroup };
+            mainCanvasArray = new List<MainViewInterface>() { ARMainUIView };
         }
 
         public void EnableDebugPanel(bool enable)
@@ -25,24 +25,25 @@ namespace PicKinetic.Controller
             DebugPanel.gameObject.SetActive(enable);
         }
 
-        public bool SetMainCanvasState(string canvasName, bool action, bool animation = false) {
+        public bool SetMainCanvasState<T>(bool action, bool animation = false) where T : MainViewInterface
+        {
 
-            int canvasIndex = mainCanvasArray.FindIndex(x=>x.name == canvasName);
+            int canvasIndex = mainCanvasArray.FindIndex(x=>x.GetType() == typeof(T));
 
             if (canvasIndex < 0) return false;
 
-            mainCanvasArray[canvasIndex].interactable = (action);
-            mainCanvasArray[canvasIndex].blocksRaycasts = (action);
+            mainCanvasArray[canvasIndex].CanvasGroup.interactable = (action);
+            mainCanvasArray[canvasIndex].CanvasGroup.blocksRaycasts = (action);
 
             float targetAlpha = (action) ? 1 : 0;
 
             if (animation) {
-                mainCanvasArray[canvasIndex].DOFade(targetAlpha, 0.5f);
+                mainCanvasArray[canvasIndex].CanvasGroup.DOFade(targetAlpha, 0.5f);
 
                 return true;
             }
 
-            mainCanvasArray[canvasIndex].alpha = targetAlpha;
+            mainCanvasArray[canvasIndex].CanvasGroup.alpha = targetAlpha;
 
             return true;
         }

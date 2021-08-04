@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using PicKinetic.View;
 
 namespace PicKinetic.Controller {
     public class ScanCtrl : ObserverPattern.Observer
@@ -15,10 +16,10 @@ namespace PicKinetic.Controller {
         private RawImage ImgProcessTexDebug;
         [Header("UI")]
         [SerializeField]
-        private Button UIScanBtn;
+        private MainCanvasView MainCanvasView;
 
         [SerializeField]
-        private Button UIARSessionBtn;
+        private Button UIScanBtn;
 
         [Header("System")]
         [SerializeField]
@@ -52,11 +53,12 @@ namespace PicKinetic.Controller {
             generalCameraView.OnDebugTextureEvent += OnDebugTextureEvent;
 
             UIScanBtn.onClick.AddListener(() => OnScanBtnClick());
+            MainCanvasView.SetMainCanvasState<ARMainUIView>(true, false);
 
             //Test only
-            UIARSessionBtn.onClick.AddListener(() => {
-                generalCameraView.EnableProcess(!generalCameraView.isEnable);
-            });
+            //UIARSessionBtn.onClick.AddListener(() => {
+            //    generalCameraView.EnableProcess(!generalCameraView.isEnable);
+            //});
 
             generalCameraView.CameraInitProcess();
         }
