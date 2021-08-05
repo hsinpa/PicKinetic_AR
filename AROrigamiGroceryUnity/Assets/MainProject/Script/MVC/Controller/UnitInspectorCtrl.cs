@@ -66,7 +66,11 @@ namespace PicKinetic.Controller
             selectedMeshObject.enabled = false;
             unitInspectModule.SetInputSelectObject(item);
 
-            MainCanvasView.SetMainCanvasState<ARMainUIView>(false, true);
+            MainCanvasView.SetMainCanvasState<ARMainUIView>(false, animation: false);
+
+            var arInsector = MainCanvasView.SetMainCanvasState<ARInspectView>(true, animation: true);
+            arInsector.SetARInsector(selectedMeshObject, () => { });
+            arInsector.PlayHintAnimation(true);
 
             return true;
         }
@@ -79,7 +83,8 @@ namespace PicKinetic.Controller
                 selectedMeshObject = null;
 
                 unitInspectModule.SetInputSelectObject(null);
-                MainCanvasView.SetMainCanvasState<ARMainUIView>(true, true);
+                MainCanvasView.SetMainCanvasState<ARMainUIView>(true, animation:true);
+                MainCanvasView.SetMainCanvasState<ARInspectView>(false, animation: false);
 
             }
         }

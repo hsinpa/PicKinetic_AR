@@ -5,4 +5,6 @@ using UnityEngine;
 public interface MainViewInterface
 {
     CanvasGroup CanvasGroup { get; }
+
+    void Dispose();
 }

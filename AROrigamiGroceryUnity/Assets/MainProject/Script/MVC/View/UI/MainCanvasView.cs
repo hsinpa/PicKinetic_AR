@@ -10,14 +10,18 @@ namespace PicKinetic.View
         [SerializeField]
         private RectTransform DebugPanel;
 
+        [Header("Main AR UI")]
         [SerializeField]
         private ARMainUIView ARMainUIView;
+
+        [SerializeField]
+        private ARInspectView ARInspectView;
 
         private List<MainViewInterface> mainCanvasArray;
 
         private void Awake()
         {
-            mainCanvasArray = new List<MainViewInterface>() { ARMainUIView };
+            mainCanvasArray = new List<MainViewInterface>() { ARMainUIView, ARInspectView };
         }
 
         public void EnableDebugPanel(bool enable)
@@ -25,12 +29,11 @@ namespace PicKinetic.View
             DebugPanel.gameObject.SetActive(enable);
         }
 
-        public bool SetMainCanvasState<T>(bool action, bool animation = false) where T : MainViewInterface
+        public T SetMainCanvasState<T>(bool action, bool animation = false) where T : MainViewInterface
         {
-
             int canvasIndex = mainCanvasArray.FindIndex(x=>x.GetType() == typeof(T));
 
-            if (canvasIndex < 0) return false;
+            if (canvasIndex < 0) return default(T);
 
             mainCanvasArray[canvasIndex].CanvasGroup.interactable = (action);
             mainCanvasArray[canvasIndex].CanvasGroup.blocksRaycasts = (action);
@@ -40,12 +43,15 @@ namespace PicKinetic.View
             if (animation) {
                 mainCanvasArray[canvasIndex].CanvasGroup.DOFade(targetAlpha, 0.5f);
 
-                return true;
+                return (T) mainCanvasArray[canvasIndex];
             }
 
             mainCanvasArray[canvasIndex].CanvasGroup.alpha = targetAlpha;
 
-            return true;
+            if (!action)
+                mainCanvasArray[canvasIndex].Dispose();
+
+            return (T) mainCanvasArray[canvasIndex];
         }
     }
 }

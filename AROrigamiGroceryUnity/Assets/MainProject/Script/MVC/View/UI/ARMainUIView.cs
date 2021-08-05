@@ -19,5 +19,9 @@ namespace PicKinetic.View {
         public void SetScanBtnEvent(System.Action btnCallback) {
             UtilityMethod.SetSimpleBtnEvent(UIScanBtn, btnCallback);   
         }
+
+        public void Dispose()
+        {
+        }
     }
 }
