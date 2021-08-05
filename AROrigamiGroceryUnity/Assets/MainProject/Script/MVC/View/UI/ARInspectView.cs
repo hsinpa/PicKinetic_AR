@@ -39,7 +39,7 @@ namespace PicKinetic.View
             HintText.gameObject.SetActive(play);
 
             if (play)
-                HintText.DOFade(0, 1f).SetLoops(-1, LoopType.Yoyo);
+                HintText.DOFade(0, 2f).SetLoops(-1, LoopType.Yoyo);
         }
 
         public void Dispose() {

@@ -29,29 +29,38 @@ namespace PicKinetic.View
             DebugPanel.gameObject.SetActive(enable);
         }
 
-        public T SetMainCanvasState<T>(bool action, bool animation = false) where T : MainViewInterface
+        public T GetCanvasWithType<T>() where T : MainViewInterface
         {
-            int canvasIndex = mainCanvasArray.FindIndex(x=>x.GetType() == typeof(T));
+            int canvasIndex = mainCanvasArray.FindIndex(x => x.GetType() == typeof(T));
 
             if (canvasIndex < 0) return default(T);
 
-            mainCanvasArray[canvasIndex].CanvasGroup.interactable = (action);
-            mainCanvasArray[canvasIndex].CanvasGroup.blocksRaycasts = (action);
+            return (T) mainCanvasArray[canvasIndex];
+        }
+
+        public T SetMainCanvasState<T>(bool action, bool animation = false) where T : MainViewInterface
+        {
+            MainViewInterface selectCanvas = GetCanvasWithType<T>();
+
+            if (selectCanvas.CanvasGroup == null) return default(T);
+
+            selectCanvas.CanvasGroup.interactable = (action);
+            selectCanvas.CanvasGroup.blocksRaycasts = (action);
 
             float targetAlpha = (action) ? 1 : 0;
 
             if (animation) {
-                mainCanvasArray[canvasIndex].CanvasGroup.DOFade(targetAlpha, 0.5f);
+                selectCanvas.CanvasGroup.DOFade(targetAlpha, 0.5f);
 
-                return (T) mainCanvasArray[canvasIndex];
+                return (T)selectCanvas;
             }
 
-            mainCanvasArray[canvasIndex].CanvasGroup.alpha = targetAlpha;
+            selectCanvas.CanvasGroup.alpha = targetAlpha;
 
             if (!action)
-                mainCanvasArray[canvasIndex].Dispose();
+                selectCanvas.Dispose();
 
-            return (T) mainCanvasArray[canvasIndex];
+            return (T)selectCanvas;
         }
     }
 }

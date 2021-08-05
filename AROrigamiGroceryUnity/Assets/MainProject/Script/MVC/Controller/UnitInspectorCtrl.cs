@@ -4,6 +4,8 @@ using UnityEngine;
 using Hsinpa.Utility;
 using Hsinpa.Utility.Input;
 using PicKinetic.View;
+using DG.Tweening;
+using Hsinpa.View;
 
 namespace PicKinetic.Controller
 {
@@ -23,6 +25,8 @@ namespace PicKinetic.Controller
 
         private MeshObject selectedMeshObject;
 
+        private ARInspectView arInspectView;
+
         public override void OnNotify(string p_event, params object[] p_objects)
         {
             switch (p_event)
@@ -37,6 +41,8 @@ namespace PicKinetic.Controller
             inputWrapper = new InputWrapper();
             unitInspectModule = new UnitInspectModule(new Vector3(0, 0, 1),
                 inputWrapper, SetCurrentSelectedObject, SetFaceInfo, ReleaseSelectObject, ProcessVertical, DragThreshold, camera);
+
+            arInspectView = MainCanvasView.GetCanvasWithType<ARInspectView>();
         }
 
         private void Update()
@@ -57,6 +63,12 @@ namespace PicKinetic.Controller
         private void ProcessVertical(UnitInspectModule.DragDir dragDir, float ratio, float offset, Vector3 puff_center)
         {
             selectedMeshObject.transform.position = new Vector3(puff_center.x, puff_center.y + offset, puff_center.z);
+
+            arInspectView.PlayHintAnimation(false);
+            arInspectView.CanvasGroup.DOKill();
+            arInspectView.CanvasGroup.interactable = false;
+            arInspectView.CanvasGroup.blocksRaycasts = false;
+            arInspectView.CanvasGroup.alpha = ratio * 0.5f;
         }
 
         private bool SetCurrentSelectedObject(Transform item)
@@ -69,10 +81,20 @@ namespace PicKinetic.Controller
             MainCanvasView.SetMainCanvasState<ARMainUIView>(false, animation: false);
 
             var arInsector = MainCanvasView.SetMainCanvasState<ARInspectView>(true, animation: true);
-            arInsector.SetARInsector(selectedMeshObject, () => { });
+            arInsector.SetARInsector(selectedMeshObject, OnSaveBtnClick);
             arInsector.PlayHintAnimation(true);
 
             return true;
+        }
+
+        private void OnSaveBtnClick() {
+
+            var dialogueModal = Modals.instance.OpenModal<DialogueModal>();
+            dialogueModal.SetDialogue("Remove", "Remove this object from disk", new string[] {"Confirm", "Cancel"}, (x=> {
+                if (x == 0) {
+                    Debug.Log("Yes");
+                }
+            }));
         }
 
         private void ReleaseSelectObject(UnitInspectModule.GestureEvent gestureInput)
@@ -86,7 +108,10 @@ namespace PicKinetic.Controller
                 MainCanvasView.SetMainCanvasState<ARMainUIView>(true, animation:true);
                 MainCanvasView.SetMainCanvasState<ARInspectView>(false, animation: false);
 
+                return;
             }
+
+            MainCanvasView.SetMainCanvasState<ARInspectView>(true, animation: true);
         }
 
     }
