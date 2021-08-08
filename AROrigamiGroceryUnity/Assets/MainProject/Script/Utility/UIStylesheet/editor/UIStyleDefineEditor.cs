@@ -11,37 +11,47 @@ namespace Hsinpa.UIStyle
     public class UIStyleDefineEditor : Editor
     {
         SerializedProperty UIStylesheet;
-        SerializedProperty ColorSet;
         SerializedProperty Predefine;
 
         private int _choiceIndex = 0;
 
+        UIStyleDefineView myTarget;
+
+        UIStyle.UIStylesheet.ColorSet ColorSet => myTarget.UIStylesheet.ColorSets[myTarget.colorSetIndex];
+
+        Image ImageUI;
+
         void OnEnable()
         {
+            myTarget = (UIStyleDefineView)target;
+            ImageUI = myTarget.gameObject.GetComponent<Image>();
             UIStylesheet = serializedObject.FindProperty("UIStylesheet");
-            ColorSet = serializedObject.FindProperty("ColorSet");
             Predefine = serializedObject.FindProperty("Predefine");
         }
 
 
         public override void OnInspectorGUI()
         {
-            UIStyleDefineView myTarget = (UIStyleDefineView)target;
-
             serializedObject.Update();
             EditorGUILayout.PropertyField(UIStylesheet);
             EditorGUILayout.PropertyField(Predefine);
-            EditorGUILayout.PropertyField(ColorSet);
 
             if (myTarget.UIStylesheet != null) {
                 var tagArray = myTarget.UIStylesheet.ColorSets.Select(x => x.tag).ToArray();
                 myTarget.colorSetIndex = EditorGUILayout.Popup("Color", myTarget.colorSetIndex, tagArray);
-                myTarget.ColorSet = myTarget.UIStylesheet.ColorSets[_choiceIndex];
             }
 
+            SetImageColor();
             SetStylePredefine(myTarget.Predefine);
-            
+
+            EditorUtility.SetDirty(myTarget);
             serializedObject.ApplyModifiedProperties();
+        }
+
+        private void SetImageColor() {
+            if (ImageUI != null && ColorSet.isValid) {
+                ImageUI.color = ColorSet.color;
+            }
         }
 
         private void SetStylePredefine(UIStylePredefine predefine) {
@@ -54,17 +64,14 @@ namespace Hsinpa.UIStyle
         }
 
         private void SetFontPredefine(UIStyleText uIStyleText) {
-            UIStyleDefineView myTarget = (UIStyleDefineView)target;
-
-            if (!myTarget.ColorSet.isValid) return;
-
+            if (!ColorSet.isValid) return;
 
             Text textObj = myTarget.GetComponent<Text>();
 
             if (textObj != null) {
                 textObj.font = uIStyleText.Font;
                 textObj.fontSize = uIStyleText.FontSize;
-                textObj.color = myTarget.ColorSet.color;
+                textObj.color = ColorSet.color;
 
                 return;
             }
@@ -73,7 +80,7 @@ namespace Hsinpa.UIStyle
             if (proText != null)
             {
                 proText.fontSize = uIStyleText.FontSize;
-                proText.color = myTarget.ColorSet.color;
+                proText.color = ColorSet.color;
                 return;
             }
         }

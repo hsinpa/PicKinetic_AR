@@ -8,14 +8,8 @@ namespace Hsinpa.UIStyle
     {
         public UIStyle.UIStylesheet UIStylesheet;
 
-        public UIStylesheet.ColorSet ColorSet;
         public int colorSetIndex;
 
         public UIStylePredefine Predefine;
-
-        private void OnEnable()
-        {
-
-        }
     }
 }

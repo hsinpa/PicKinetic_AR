@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 722ccf0cb65f1ab4e893ecb202430bdc, type: 3}
-  m_Name: UIStyleText
+  m_Name: UIStyleTextTitle
   m_EditorClassIdentifier: 
-  Font: {fileID: 0}
-  FontSize: 0
+  Font: {fileID: 12800000, guid: 574750f2ff0455a44a6b28af8d52df33, type: 3}
+  FontSize: 24
