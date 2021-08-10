@@ -154,7 +154,26 @@ namespace Utilities
 			{
 				eventCallback();
 			});
+		}
 
+		public static string GenerateUniqueRandomString(int length) {
+			string constant = SystemInfo.deviceUniqueIdentifier;
+
+			return constant + "_" + GenerateRandomString(length);
+		}
+
+		public static string GenerateRandomString(int length) {
+			var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+			int stringLength = chars.Length;
+			var stringChars = new char[length];
+			var random = new System.Random();
+
+			for (int i = 0; i < length; i++)
+			{
+				stringChars[i] = chars[random.Next(stringLength)];
+			}
+
+			return new System.String(stringChars);
 		}
 
 	}

@@ -78,7 +78,7 @@ namespace PicKinetic.Controller {
         {
             StructType.GrabTextures grabTextures = generalCameraView.GetCurrentTexturesClone();
 
-            PicKineticAR.Instance.models.textureModel.SaveTextureToDisk("ScanPhoto.jpg", grabTextures.mainTex);
+            PicKineticAR.Instance.models.textureModel.SaveMesh(grabTextures);
 
             TextureUtility.Dispose2D(grabTextures.mainTex);
             TextureUtility.Dispose2D(grabTextures.processedTex);

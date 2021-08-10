@@ -1084,6 +1084,8 @@ GameObject:
   - component: {fileID: 591976187}
   - component: {fileID: 591976189}
   - component: {fileID: 591976188}
+  - component: {fileID: 591976191}
+  - component: {fileID: 591976190}
   m_Layer: 5
   m_Name: LocalBookView
   m_TagString: Untagged
@@ -1149,6 +1151,32 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 591976186}
   m_CullTransparentMesh: 0
+--- !u!114 &591976190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591976186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db77a1d9c13c22e43ad0928ad378d0fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _CanvasGroup: {fileID: 591976191}
+  MeshTexturePrefab: {fileID: 0}
+--- !u!225 &591976191
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591976186}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &596194764
 GameObject:
   m_ObjectHideFlags: 0
@@ -2860,7 +2888,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3151536e2b35f274da566ce95d68c294, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  background: {fileID: 0}
+  background: {fileID: 1623034137}
 --- !u!1 &1630828619
 GameObject:
   m_ObjectHideFlags: 0

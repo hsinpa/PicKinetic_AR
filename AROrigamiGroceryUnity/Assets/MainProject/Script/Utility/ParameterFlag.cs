@@ -25,5 +25,9 @@ namespace PicKinetic
         public class ColliderLayer {
             public const int FloorLayer = 1 << 8;
         }
+
+        public class SaveSystem {
+            public const string DiskFolder = "MeshTextures";
+        }
     }
 }
