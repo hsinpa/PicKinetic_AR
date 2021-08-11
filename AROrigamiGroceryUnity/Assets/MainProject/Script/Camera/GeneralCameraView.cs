@@ -1,6 +1,7 @@
 ﻿using PicKinetic;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 namespace PicKinetic
@@ -50,7 +51,7 @@ namespace PicKinetic
 
         protected bool _isEnable = false;
         public bool isEnable => this._isEnable;
-        public bool queueContourNextFrame = false;
+        private bool queueContourNextFrame = false; //Prevent thread collide
 
         private bool isScanProcessReady = true;
 
@@ -85,16 +86,13 @@ namespace PicKinetic
             TextureUtility.RotateAndScaleImage(_sourceTexture, modelTexRenderer, rotateMat, _textureStructure, 0);
             TextureUtility.RotateAndScaleImage(_sourceTexture, imageProcessRenderer, rotateMat, _textureStructure, 0);
 
-            texturePreivew.ExecEdgeProcessing(imageProcessRenderer);
+            if (!isScanProcessReady || queueContourNextFrame) return;
 
-            if (!isScanProcessReady) return;
+            texturePreivew.ExecEdgeProcessing(imageProcessRenderer);
 
             isScanProcessReady = false;
 
-            if (queueContourNextFrame) 
-                CaptureContourMesh();
-             else
-                CaptureEdgeMesh();
+            CaptureEdgeMesh();
         }
 
         private void PrepareTexture()
@@ -113,13 +111,15 @@ namespace PicKinetic
             OnMeshLocDone(await texturePreivew.CaptureEdgeBorderMesh(imageProcessRenderer.width, meshBorder, _textureStructure));
         }
 
-        private async void CaptureContourMesh()
+        private async Task<MeshObject> CaptureContourMesh()
         {
             MeshObject meshObject = meshObjManager.CreateMeshObj(meshBorder.transform.position, meshBorder.transform.rotation, true);
 
             OnMeshLocDone(await texturePreivew.CaptureContourMesh(modelTexRenderer, meshObject, _textureStructure));
 
             queueContourNextFrame = false;
+
+            return meshObject;
         }
 
         private void OnMeshLocDone(TextureMeshManager.MeshLocData meshResult)
@@ -135,11 +135,16 @@ namespace PicKinetic
             meshResult.meshObject.SetPosRotation(indictatorData.position, indictatorData.rotation);
         }
 
-        public StructType.GrabTextures GetCurrentTexturesClone() {
-            return new StructType.GrabTextures
+        public async Task<StructType.GrabTextures> GetCurrentTexturesClone() {
+            queueContourNextFrame = true;
+
+            var generateMeshObj = await CaptureContourMesh();
+
+            return new StructType.GrabTextures()
             {
+                meshObject = generateMeshObj,
                 mainTex = TextureUtility.TextureToTexture2D(modelTexRenderer),
-                processedTex = TextureUtility.TextureToTexture2D(imageProcessRenderer)
+                processedTex = texturePreivew.edgeLineTex
             };
         }
 

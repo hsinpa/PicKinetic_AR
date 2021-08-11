@@ -7,6 +7,7 @@ public class StructType
 {
     public struct GrabTextures
     {
+        public PicKinetic.MeshObject meshObject;
         public Texture2D mainTex;
         public Texture2D processedTex;
     }

@@ -74,16 +74,14 @@ namespace PicKinetic.Controller {
             ImgProcessTexDebug.texture = imgProcessTex;
         }
 
-        private void OnScanBtnClick()
+        private async void OnScanBtnClick()
         {
-            StructType.GrabTextures grabTextures = generalCameraView.GetCurrentTexturesClone();
+            var grabTexStruct = await generalCameraView.GetCurrentTexturesClone();
 
-            PicKineticAR.Instance.models.textureModel.SaveMesh(grabTextures);
+            PicKineticAR.Instance.models.textureModel.SaveMesh(grabTexStruct.mainTex, grabTexStruct.processedTex);
 
-            TextureUtility.Dispose2D(grabTextures.mainTex);
-            TextureUtility.Dispose2D(grabTextures.processedTex);
-
-            generalCameraView.queueContourNextFrame = true;
+            //Only discard mainTex, since processTex is actively use by TextureMeshManager
+            TextureUtility.Dispose2D(grabTexStruct.mainTex);
         }
 
         #endregion

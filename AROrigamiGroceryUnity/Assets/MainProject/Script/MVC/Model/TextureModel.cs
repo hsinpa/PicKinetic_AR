@@ -12,11 +12,11 @@ namespace PicKinetic.Model {
         
         }
 
-        public StructType.MeshSaveData SaveMesh(StructType.GrabTextures grabTexType) {
+        public StructType.MeshSaveData SaveMesh(Texture2D mainTex, Texture2D edgeProcessTex) {
             var meshData = CreateMeshData();
 
-            SaveTextureToDisk(meshData.mainTexPath, grabTexType.mainTex);
-            SaveTextureToDisk(meshData.processTexPath, grabTexType.processedTex);
+            SaveTextureToDisk(meshData.mainTexPath, mainTex);
+            SaveTextureToDisk(meshData.processTexPath, edgeProcessTex);
 
             return meshData;
         }
