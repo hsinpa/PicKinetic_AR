@@ -7,7 +7,15 @@ using Utilities;
 namespace PicKinetic.Model {
     public class TextureModel
     {
- 
+        private string saveTexDirPath;
+        private string tempTexDirPath; // Only after confirm, switch to saveTex; Save rom memory
+
+ #region Public API
+        public TextureModel() {
+            saveTexDirPath = Path.Combine(Application.persistentDataPath, ParameterFlag.SaveSystem.DiskFolder);
+            tempTexDirPath = Path.Combine(Application.persistentDataPath, ParameterFlag.SaveSystem.TempFolder);
+        }
+            
         public void ReadSaveTextureFromDisk() { 
         
         }
@@ -21,11 +29,19 @@ namespace PicKinetic.Model {
             return meshData;
         }
 
-        private StructType.MeshSaveData CreateMeshData() {
+        //Remove temporary memory 
+        public void Dispose() {
+            DeleteDirectory(tempTexDirPath);
+        }
 
+        #endregion
+
+        #region Private 
+        private StructType.MeshSaveData CreateMeshData()
+        {
             string uniqueID = UtilityMethod.GenerateUniqueRandomString(4);
-            string mainTexPath = "mainTex-" + uniqueID+".jpg";
-            string processTexPath = "processTex-" + uniqueID+".jpg";
+            string mainTexPath = "mainTex-" + uniqueID + ".jpg";
+            string processTexPath = "processTex-" + uniqueID + ".jpg";
 
             return new StructType.MeshSaveData()
             {
@@ -36,12 +52,14 @@ namespace PicKinetic.Model {
             };
         }
 
-        private void SaveTextureToDisk(string filename, Texture2D texture) {
+        private void SaveTextureToDisk(string filename, Texture2D texture)
+        {
 
             string folderPath = Path.Combine(Application.persistentDataPath, ParameterFlag.SaveSystem.DiskFolder);
             string fullPath = Path.Combine(Application.persistentDataPath, ParameterFlag.SaveSystem.DiskFolder, filename);
 
-            if (!Directory.Exists(folderPath)) {
+            if (!Directory.Exists(folderPath))
+            {
                 Directory.CreateDirectory(folderPath);
             }
 
@@ -50,6 +68,22 @@ namespace PicKinetic.Model {
             System.IO.File.WriteAllBytes(fullPath, texture.EncodeToJPG());
         }
 
+        private bool DeleteDirectory(string absDirectoryPath) {
 
+            if (!Directory.Exists(absDirectoryPath)) return false;
+
+            string[] files = Directory.GetFiles(absDirectoryPath);
+
+            foreach (string file in files)
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+                File.Delete(file);
+            }
+
+            Directory.Delete(absDirectoryPath, false);
+
+            return true;
+        }
+    #endregion
     }
 }

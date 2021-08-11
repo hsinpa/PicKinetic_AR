@@ -28,6 +28,7 @@ namespace PicKinetic
 
         public class SaveSystem {
             public const string DiskFolder = "MeshTextures";
+            public const string TempFolder = "Temps";
         }
     }
 }
