@@ -83,7 +83,10 @@ namespace PicKinetic.Controller {
         {
             var grabTexStruct = await generalCameraView.GetCurrentTexturesClone();
 
-            texModel.SaveTempMesh(grabTexStruct.mainTex, grabTexStruct.processedTex);
+            var saveJson = texModel.SaveTempMesh(grabTexStruct.mainTex, grabTexStruct.processedTex);
+
+            if (grabTexStruct.meshObject != null)
+                grabTexStruct.meshObject.SetMeshJsonData(saveJson);
 
             //Only discard mainTex, since processTex is actively use by TextureMeshManager
             TextureUtility.Dispose2D(grabTexStruct.mainTex);

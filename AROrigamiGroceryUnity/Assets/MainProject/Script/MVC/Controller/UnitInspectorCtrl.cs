@@ -6,6 +6,7 @@ using Hsinpa.Utility.Input;
 using PicKinetic.View;
 using DG.Tweening;
 using Hsinpa.View;
+using PicKinetic.Model;
 
 namespace PicKinetic.Controller
 {
@@ -27,6 +28,8 @@ namespace PicKinetic.Controller
 
         private ARInspectView arInspectView;
 
+        private TextureModel texModel;
+
         public override void OnNotify(string p_event, params object[] p_objects)
         {
             switch (p_event)
@@ -39,10 +42,12 @@ namespace PicKinetic.Controller
         {
             Camera camera = Camera.main;
             inputWrapper = new InputWrapper();
-            unitInspectModule = new UnitInspectModule(new Vector3(0, 0, 1),
-                inputWrapper, SetCurrentSelectedObject, SetFaceInfo, ReleaseSelectObject, ProcessVertical, DragThreshold, camera);
+            unitInspectModule = new UnitInspectModule(new Vector3(0, 0, 1), inputWrapper, 
+                                SetCurrentSelectedObject, SetFaceInfo, ReleaseSelectObject, ProcessVertical, DragThreshold, camera);
 
             arInspectView = MainCanvasView.GetCanvasWithType<ARInspectView>();
+
+            texModel = PicKineticAR.Instance.ModelManager.GetModel<TextureModel>();
         }
 
         private void Update()
@@ -88,13 +93,25 @@ namespace PicKinetic.Controller
         }
 
         private void OnSaveBtnClick() {
+            if (selectedMeshObject == null) return;
 
-            var dialogueModal = Modals.instance.OpenModal<DialogueModal>();
-            dialogueModal.SetDialogue("Remove", "Remove this object from disk", new string[] {"Confirm", "Cancel"}, (x=> {
-                if (x == 0) {
-                    Debug.Log("Yes");
-                }
-            }));
+            bool isSaved = texModel.SRPTextureRoot.IsDataExist(selectedMeshObject.meshJsonData.id);
+
+            if (!isSaved)
+            {
+                texModel.SaveTexData(selectedMeshObject.meshJsonData);
+            }
+            else {
+                var dialogueModal = Modals.instance.OpenModal<DialogueModal>();
+                dialogueModal.SetDialogue(TempStringTable.Scan.DialogueMeshRemoveTitle, TempStringTable.Scan.DialogueMeshRemoveContent, 
+                                            new string[] { TempStringTable.Scan.DialogueGeneralConfirm, TempStringTable.Scan.DialogueGeneralReject }, 
+                (x => {
+                    if (x == 0)
+                    {
+                        texModel.RemoveTexData(selectedMeshObject.meshJsonData);
+                    }
+                }));
+            }
         }
 
         private void ReleaseSelectObject(UnitInspectModule.GestureEvent gestureInput)

@@ -13,16 +13,18 @@ public class StructType
     }
 
     [System.Serializable]
-    public struct MeshSaveData {
+    public struct MeshJsonData {
         public string mainTexPath;
         public string processTexPath;
         public string id;
         public string name;
+
+        public bool isValid => !string.IsNullOrEmpty(mainTexPath);
     }
 
     [System.Serializable]
     public struct MeshSaveType {
-        public MeshSaveData meshSaveData;
+        public MeshJsonData meshSaveData;
 
         public Texture2D mainTex;
         public Texture2D processedTex;

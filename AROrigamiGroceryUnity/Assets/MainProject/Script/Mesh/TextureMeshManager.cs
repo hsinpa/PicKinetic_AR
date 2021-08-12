@@ -8,7 +8,6 @@ using System.Threading;
 
 namespace PicKinetic
 {
-
     public class TextureMeshManager : MonoBehaviour
     {
         #region Inspector
@@ -86,7 +85,6 @@ namespace PicKinetic
                 var edgeTex = edgeDetector.GetEdgeTex(processTex);
 
 #if !UNITY_EDITOR && UNITY_ANDROID
-
                 RenderTexture.active = edgeTex;
                 _edgeLineTex.ReadPixels(androidOnlyEdgeRect, 0, 0);
                 _edgeLineTex.Apply();

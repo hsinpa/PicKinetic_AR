@@ -8,11 +8,27 @@ namespace PicKinetic.Model {
     public class SRPTextures : ScriptableObject
     {
         [SerializeField]
-        private List<StructType.MeshSaveData> _TextureData = new List<StructType.MeshSaveData>();
-        public List<StructType.MeshSaveData> TextureData => this._TextureData;
+        private List<StructType.MeshJsonData> _TextureData = new List<StructType.MeshJsonData>();
+        public List<StructType.MeshJsonData> TextureData => this._TextureData;
 
-        public StructType.MeshSaveData GetDataByID(string id) {
+        public void Insert(StructType.MeshJsonData meshJsonData)
+        {
+            _TextureData.Add(meshJsonData);
+        }
+
+        public void Remove(string id) {
+            int index = this._TextureData.FindIndex(x => x.id == id);
+
+            if (index >= 0)
+                _TextureData.RemoveAt(index);
+        }
+
+        public StructType.MeshJsonData GetDataByID(string id) {
             return this._TextureData.Find(x => x.id == id);
+        }
+
+        public bool IsDataExist(string id) {
+            return this._TextureData.FindIndex(x => x.id == id) >= 0;
         }
     }
 }

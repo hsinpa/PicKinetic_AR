@@ -7,7 +7,9 @@ using Utilities;
 namespace PicKinetic.Model {
     public class TextureModel
     {
-        private SRPTextures srpTextureRoot;
+        private SRPTextures _srpTextureRoot;
+        public SRPTextures SRPTextureRoot => this._srpTextureRoot;
+
         private string saveTexDirPath;
         private string tempTexDirPath; // Only after confirm, switch to saveTex; Save rom memory
 
@@ -15,13 +17,26 @@ namespace PicKinetic.Model {
 
  #region Public API
         public TextureModel(SRPTextures srpTextureRoot) {
-            this.srpTextureRoot = srpTextureRoot;
+            this._srpTextureRoot = srpTextureRoot;
             saveTexDirPath = Path.Combine(Application.persistentDataPath, ParameterFlag.SaveSystem.DiskFolder);
             tempTexDirPath = Path.Combine(Application.persistentDataPath, ParameterFlag.SaveSystem.TempFolder);
+
+            Preparation();
         }
             
         public void ReadSaveTextureFromDisk() { 
         
+        }
+
+        public void SaveTexData(StructType.MeshJsonData meshSaveData) {
+            SRPTextureRoot.Insert(meshSaveData);
+            ExecFileOperation(meshSaveData, TextureModel.Operation.PermanentFolder);
+        }
+
+        public void RemoveTexData(StructType.MeshJsonData meshSaveData)
+        {
+            SRPTextureRoot.Remove(meshSaveData.id);
+            ExecFileOperation(meshSaveData, TextureModel.Operation.TempFolder);
         }
 
         /// <summary>
@@ -30,7 +45,7 @@ namespace PicKinetic.Model {
         /// <param name="mainTex"></param>
         /// <param name="edgeProcessTex"></param>
         /// <returns></returns>
-        public StructType.MeshSaveData SaveTempMesh(Texture2D mainTex, Texture2D edgeProcessTex) {
+        public StructType.MeshJsonData SaveTempMesh(Texture2D mainTex, Texture2D edgeProcessTex) {
             var meshData = CreateMeshData();
 
             SaveTextureToDisk(meshData.mainTexPath, mainTex);
@@ -39,7 +54,7 @@ namespace PicKinetic.Model {
             return meshData;
         }
 
-        public void ExecFileOperation(StructType.MeshSaveData meshSaveData, Operation operation) {
+        public void ExecFileOperation(StructType.MeshJsonData meshSaveData, Operation operation) {
 
             string srcMainTexPath = GetFullPath(meshSaveData.mainTexPath, (operation == Operation.TempFolder) ? false : true );
             string targetMainTexPath = GetFullPath(meshSaveData.mainTexPath, (operation == Operation.TempFolder) ? true : false);
@@ -59,13 +74,18 @@ namespace PicKinetic.Model {
         #endregion
 
         #region Private 
-        private StructType.MeshSaveData CreateMeshData()
+        private void Preparation() {
+            CreateDirectoryIfNotExist(saveTexDirPath);
+            CreateDirectoryIfNotExist(tempTexDirPath);
+        }
+
+        private StructType.MeshJsonData CreateMeshData()
         {
             string uniqueID = UtilityMethod.GenerateUniqueRandomString(4);
             string mainTexPath = "mainTex-" + uniqueID + ".jpg";
             string processTexPath = "processTex-" + uniqueID + ".jpg";
 
-            return new StructType.MeshSaveData()
+            return new StructType.MeshJsonData()
             {
                 mainTexPath = mainTexPath,
                 processTexPath = processTexPath,
@@ -88,10 +108,7 @@ namespace PicKinetic.Model {
             string folderPath = Path.Combine(Application.persistentDataPath, ParameterFlag.SaveSystem.TempFolder);
             string fullPath = Path.Combine(Application.persistentDataPath, ParameterFlag.SaveSystem.TempFolder, filename);
 
-            if (!Directory.Exists(folderPath))
-            {
-                Directory.CreateDirectory(folderPath);
-            }
+            CreateDirectoryIfNotExist(folderPath);
 
             Debug.Log(fullPath);
 
@@ -113,6 +130,13 @@ namespace PicKinetic.Model {
             Directory.Delete(absDirectoryPath, false);
 
             return true;
+        }
+
+        private void CreateDirectoryIfNotExist(string directoryPath) {
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
         }
 
         private string GetFullPath(string filename, bool isTempFolder) {

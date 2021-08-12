@@ -8,10 +8,9 @@ namespace PicKinetic
 {
     public class PicKineticAR : Singleton<PicKineticAR>
     {
-
         [SerializeField]
         private IModelManager _ModelManager;
-        public IModelManager ModelManager;
+        public IModelManager ModelManager => _ModelManager;
 
         protected PicKineticAR() { } // guarantee this will be always a singleton only - can't use the constructor!
 
@@ -64,11 +63,6 @@ namespace PicKinetic
             }
 
             return default(T);
-        }
-
-        private void OnApplicationQuit()
-        {
-
         }
 
     }

@@ -52,7 +52,8 @@ namespace PicKinetic {
         private Mesh _mesh;
         public Mesh mesh => _mesh;
 
- 
+        private StructType.MeshJsonData _meshJsonData;
+        public StructType.MeshJsonData meshJsonData => _meshJsonData;
 
         #region Control Point Variable
         private ControlPoints ctrlPoints;
@@ -113,6 +114,10 @@ namespace PicKinetic {
             originalPoints[2] = ctrlPoints.center_control_point;
 
             UpdateArrayShader("_OriControlPoints", originalPoints);
+        }
+
+        public void SetMeshJsonData(StructType.MeshJsonData meshJsonData) {
+            this._meshJsonData = meshJsonData;
         }
 
         public void SetMesh(Mesh mesh, RenderTexture uvTexture, int size) {

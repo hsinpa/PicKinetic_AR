@@ -15,5 +15,10 @@ namespace PicKinetic.Model
             };
         }
 
+        private void OnApplicationQuit()
+        {
+            TextureModel t = GetModel<TextureModel>();
+            t.Dispose();
+        }
     }
 }
