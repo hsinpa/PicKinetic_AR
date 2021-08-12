@@ -8,19 +8,21 @@ namespace PicKinetic
 {
     public class PicKineticAR : Singleton<PicKineticAR>
     {
+
+        [SerializeField]
+        private IModelManager _ModelManager;
+        public IModelManager ModelManager;
+
         protected PicKineticAR() { } // guarantee this will be always a singleton only - can't use the constructor!
 
         private Subject subject;
 
         private Observer[] observers = new Observer[0];
 
-        private ModelsManager _models;
-        public ModelsManager models => this._models;
-
         private void Awake()
         {
             subject = new Subject();
-            _models = new ModelsManager();
+            _ModelManager.SetUp();
 
             RegisterAllController(subject);
         }

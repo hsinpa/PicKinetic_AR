@@ -7,11 +7,15 @@ using Utilities;
 namespace PicKinetic.Model {
     public class TextureModel
     {
+        private SRPTextures srpTextureRoot;
         private string saveTexDirPath;
         private string tempTexDirPath; // Only after confirm, switch to saveTex; Save rom memory
 
+        public enum Operation {TempFolder, PermanentFolder };
+
  #region Public API
-        public TextureModel() {
+        public TextureModel(SRPTextures srpTextureRoot) {
+            this.srpTextureRoot = srpTextureRoot;
             saveTexDirPath = Path.Combine(Application.persistentDataPath, ParameterFlag.SaveSystem.DiskFolder);
             tempTexDirPath = Path.Combine(Application.persistentDataPath, ParameterFlag.SaveSystem.TempFolder);
         }
@@ -20,13 +24,31 @@ namespace PicKinetic.Model {
         
         }
 
-        public StructType.MeshSaveData SaveMesh(Texture2D mainTex, Texture2D edgeProcessTex) {
+        /// <summary>
+        /// Save textures to temporary folder, which will be destroy during app life end
+        /// </summary>
+        /// <param name="mainTex"></param>
+        /// <param name="edgeProcessTex"></param>
+        /// <returns></returns>
+        public StructType.MeshSaveData SaveTempMesh(Texture2D mainTex, Texture2D edgeProcessTex) {
             var meshData = CreateMeshData();
 
             SaveTextureToDisk(meshData.mainTexPath, mainTex);
             SaveTextureToDisk(meshData.processTexPath, edgeProcessTex);
 
             return meshData;
+        }
+
+        public void ExecFileOperation(StructType.MeshSaveData meshSaveData, Operation operation) {
+
+            string srcMainTexPath = GetFullPath(meshSaveData.mainTexPath, (operation == Operation.TempFolder) ? false : true );
+            string targetMainTexPath = GetFullPath(meshSaveData.mainTexPath, (operation == Operation.TempFolder) ? true : false);
+
+            string srcProcessTexPath = GetFullPath(meshSaveData.processTexPath, (operation == Operation.TempFolder) ? false : true);
+            string targetProcessTexPath = GetFullPath(meshSaveData.processTexPath, (operation == Operation.TempFolder) ? true : false);
+
+            MoveFile(srcMainTexPath, targetMainTexPath);
+            MoveFile(srcProcessTexPath, targetProcessTexPath);
         }
 
         //Remove temporary memory 
@@ -52,11 +74,19 @@ namespace PicKinetic.Model {
             };
         }
 
+        private bool MoveFile(string targetFullPath, string landingFullPath) {
+
+            if (File.Exists(targetFullPath) && !File.Exists(landingFullPath)) {
+                File.Move(targetFullPath, landingFullPath);
+            }
+
+            return false;
+        }
+
         private void SaveTextureToDisk(string filename, Texture2D texture)
         {
-
-            string folderPath = Path.Combine(Application.persistentDataPath, ParameterFlag.SaveSystem.DiskFolder);
-            string fullPath = Path.Combine(Application.persistentDataPath, ParameterFlag.SaveSystem.DiskFolder, filename);
+            string folderPath = Path.Combine(Application.persistentDataPath, ParameterFlag.SaveSystem.TempFolder);
+            string fullPath = Path.Combine(Application.persistentDataPath, ParameterFlag.SaveSystem.TempFolder, filename);
 
             if (!Directory.Exists(folderPath))
             {
@@ -84,6 +114,10 @@ namespace PicKinetic.Model {
 
             return true;
         }
-    #endregion
+
+        private string GetFullPath(string filename, bool isTempFolder) {
+            return Path.Combine((isTempFolder) ? tempTexDirPath : saveTexDirPath, filename);
+        }
+        #endregion
     }
 }

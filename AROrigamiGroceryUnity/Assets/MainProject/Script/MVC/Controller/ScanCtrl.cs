@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using PicKinetic.View;
+using PicKinetic.Model;
 
 namespace PicKinetic.Controller {
     public class ScanCtrl : ObserverPattern.Observer
@@ -24,6 +25,8 @@ namespace PicKinetic.Controller {
         [Header("System")]
         [SerializeField]
         private GeneralCameraView generalCameraView;
+
+        private TextureModel texModel;
 
         public override void OnNotify(string p_event, params object[] p_objects)
         {
@@ -49,6 +52,8 @@ namespace PicKinetic.Controller {
         }
 
         private void ScanInit() {
+            texModel = PicKineticAR.Instance.ModelManager.GetModel<TextureModel>();
+
             generalCameraView.OnCamInitProcessEvent += OnCamInitProcessEvent;
             generalCameraView.OnDebugTextureEvent += OnDebugTextureEvent;
 
@@ -78,7 +83,7 @@ namespace PicKinetic.Controller {
         {
             var grabTexStruct = await generalCameraView.GetCurrentTexturesClone();
 
-            PicKineticAR.Instance.models.textureModel.SaveMesh(grabTexStruct.mainTex, grabTexStruct.processedTex);
+            texModel.SaveTempMesh(grabTexStruct.mainTex, grabTexStruct.processedTex);
 
             //Only discard mainTex, since processTex is actively use by TextureMeshManager
             TextureUtility.Dispose2D(grabTexStruct.mainTex);

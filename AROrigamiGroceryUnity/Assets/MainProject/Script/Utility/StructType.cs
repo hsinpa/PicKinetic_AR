@@ -27,4 +27,6 @@ public class StructType
         public Texture2D mainTex;
         public Texture2D processedTex;
     }
+
+
 }

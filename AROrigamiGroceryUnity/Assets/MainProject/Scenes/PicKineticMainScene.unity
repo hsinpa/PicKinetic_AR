@@ -475,6 +475,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 241750273}
   m_CullTransparentMesh: 0
+--- !u!1 &242287995
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 242287996}
+  - component: {fileID: 242287997}
+  m_Layer: 0
+  m_Name: Model
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &242287996
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 242287995}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1786366692}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &242287997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 242287995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e549af85f0129104eb6cd138479538c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SRTextureRoot: {fileID: 11400000, guid: 7edd99cd9d96c5b41823ce174455c520, type: 2}
 --- !u!1 &243419364
 GameObject:
   m_ObjectHideFlags: 0
@@ -1445,7 +1489,6 @@ MonoBehaviour:
   meshBorder: {fileID: 1729367509}
   meshObjManager: {fileID: 1589271882}
   meshIndicator: {fileID: 652630608}
-  queueContourNextFrame: 0
   arFoundationSystem: {fileID: 243419366}
 --- !u!1 &843139635
 GameObject:
@@ -3093,7 +3136,6 @@ MonoBehaviour:
   meshBorder: {fileID: 1729367509}
   meshObjManager: {fileID: 1589271882}
   meshIndicator: {fileID: 652630608}
-  queueContourNextFrame: 0
   inputTex: {fileID: 2800000, guid: e3654d6f443a30342ac4594bbd64d04f, type: 3}
   fakeDetectionPlane: {fileID: 1637514048}
 --- !u!4 &1669611012
@@ -3519,6 +3561,7 @@ Transform:
   - {fileID: 46262287}
   - {fileID: 596194765}
   - {fileID: 12855405}
+  - {fileID: 242287996}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3534,6 +3577,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53294ba5c6713144c83ab930fda85583, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _ModelManager: {fileID: 0}
+  ModelManager: {fileID: 0}
 --- !u!1 &1803408234
 GameObject:
   m_ObjectHideFlags: 0
