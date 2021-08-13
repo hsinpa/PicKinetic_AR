@@ -28,7 +28,7 @@ namespace PicKinetic.Controller
 
         private ARInspectView arInspectView;
 
-        private TextureModel texModel;
+        private PhotoAlbumModel texModel;
 
         public override void OnNotify(string p_event, params object[] p_objects)
         {
@@ -47,7 +47,7 @@ namespace PicKinetic.Controller
 
             arInspectView = MainCanvasView.GetCanvasWithType<ARInspectView>();
 
-            texModel = PicKineticAR.Instance.ModelManager.GetModel<TextureModel>();
+            texModel = PicKineticAR.Instance.ModelManager.GetModel<PhotoAlbumModel>();
         }
 
         private void Update()

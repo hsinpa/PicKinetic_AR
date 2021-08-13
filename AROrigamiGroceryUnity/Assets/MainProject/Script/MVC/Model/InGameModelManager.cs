@@ -11,13 +11,13 @@ namespace PicKinetic.Model
 
         public override void SetUp() { 
             models = new List<object> {
-                new TextureModel(SRTextureRoot)
+                new PhotoAlbumModel(SRTextureRoot)
             };
         }
 
         private void OnApplicationQuit()
         {
-            TextureModel t = GetModel<TextureModel>();
+            PhotoAlbumModel t = GetModel<PhotoAlbumModel>();
             t.Dispose();
         }
     }

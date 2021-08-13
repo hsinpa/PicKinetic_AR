@@ -6,7 +6,7 @@ namespace PicKinetic.View
 {
     [RequireComponent(typeof(CanvasGroup))]
 
-    public class LocalBookView : MonoBehaviour, MainViewInterface
+    public class PhotoAlbumView : MonoBehaviour, MainViewInterface
     {
         [SerializeField]
         private CanvasGroup _CanvasGroup;
@@ -20,5 +20,11 @@ namespace PicKinetic.View
         public void Dispose()
         {
         }
+
+        public void DisplayAlbum() { 
+        
+        }
+
+
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 using Utilities;
 
 namespace PicKinetic.Model {
-    public class TextureModel
+    public class PhotoAlbumModel
     {
         private SRPTextures _srpTextureRoot;
         public SRPTextures SRPTextureRoot => this._srpTextureRoot;
@@ -16,7 +16,7 @@ namespace PicKinetic.Model {
         public enum Operation {TempFolder, PermanentFolder };
 
  #region Public API
-        public TextureModel(SRPTextures srpTextureRoot) {
+        public PhotoAlbumModel(SRPTextures srpTextureRoot) {
             this._srpTextureRoot = srpTextureRoot;
             saveTexDirPath = Path.Combine(Application.persistentDataPath, ParameterFlag.SaveSystem.DiskFolder);
             tempTexDirPath = Path.Combine(Application.persistentDataPath, ParameterFlag.SaveSystem.TempFolder);
@@ -30,13 +30,13 @@ namespace PicKinetic.Model {
 
         public void SaveTexData(StructType.MeshJsonData meshSaveData) {
             SRPTextureRoot.Insert(meshSaveData);
-            ExecFileOperation(meshSaveData, TextureModel.Operation.PermanentFolder);
+            ExecFileOperation(meshSaveData, PhotoAlbumModel.Operation.PermanentFolder);
         }
 
         public void RemoveTexData(StructType.MeshJsonData meshSaveData)
         {
             SRPTextureRoot.Remove(meshSaveData.id);
-            ExecFileOperation(meshSaveData, TextureModel.Operation.TempFolder);
+            ExecFileOperation(meshSaveData, PhotoAlbumModel.Operation.TempFolder);
         }
 
         /// <summary>

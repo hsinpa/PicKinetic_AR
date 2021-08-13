@@ -26,7 +26,7 @@ namespace PicKinetic.Controller {
         [SerializeField]
         private GeneralCameraView generalCameraView;
 
-        private TextureModel texModel;
+        private PhotoAlbumModel texModel;
 
         public override void OnNotify(string p_event, params object[] p_objects)
         {
@@ -52,7 +52,7 @@ namespace PicKinetic.Controller {
         }
 
         private void ScanInit() {
-            texModel = PicKineticAR.Instance.ModelManager.GetModel<TextureModel>();
+            texModel = PicKineticAR.Instance.ModelManager.GetModel<PhotoAlbumModel>();
 
             generalCameraView.OnCamInitProcessEvent += OnCamInitProcessEvent;
             generalCameraView.OnDebugTextureEvent += OnDebugTextureEvent;
