@@ -73,7 +73,7 @@ namespace PicKinetic.Controller
             arInspectView.CanvasGroup.DOKill();
             arInspectView.CanvasGroup.interactable = false;
             arInspectView.CanvasGroup.blocksRaycasts = false;
-            arInspectView.CanvasGroup.alpha = ratio * 0.5f;
+            arInspectView.CanvasGroup.alpha = ratio * 0.75f;
         }
 
         private bool SetCurrentSelectedObject(Transform item)
@@ -89,6 +89,8 @@ namespace PicKinetic.Controller
             arInsector.SetARInsector(selectedMeshObject, OnSaveBtnClick);
             arInsector.PlayHintAnimation(true);
 
+            AutoSetActionBtnStyle();
+
             return true;
         }
 
@@ -100,6 +102,7 @@ namespace PicKinetic.Controller
             if (!isSaved)
             {
                 texModel.SaveTexData(selectedMeshObject.meshJsonData);
+                arInspectView.SetActionBtnStyle(ParameterFlag.General.NegativeColor, TempStringTable.Scan.DialogueMeshRemoveTitle);
             }
             else {
                 var dialogueModal = Modals.instance.OpenModal<DialogueModal>();
@@ -109,9 +112,19 @@ namespace PicKinetic.Controller
                     if (x == 0)
                     {
                         texModel.RemoveTexData(selectedMeshObject.meshJsonData);
+                        arInspectView.SetActionBtnStyle(ParameterFlag.General.PositiveColor, TempStringTable.Scan.DialogueMeshSaveTitle);
                     }
                 }));
             }
+        }
+
+        private void AutoSetActionBtnStyle() {
+            bool isSaved = texModel.SRPTextureRoot.IsDataExist(selectedMeshObject.meshJsonData.id);
+
+            Color color = isSaved ? ParameterFlag.General.NegativeColor : ParameterFlag.General.PositiveColor;
+            string btnString = isSaved ? TempStringTable.Scan.DialogueMeshRemoveTitle : TempStringTable.Scan.DialogueMeshSaveTitle;
+
+            arInspectView.SetActionBtnStyle(color, btnString);
         }
 
         private void ReleaseSelectObject(UnitInspectModule.GestureEvent gestureInput)

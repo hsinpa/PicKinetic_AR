@@ -29,7 +29,7 @@ namespace PicKinetic.View
             UtilityMethod.SetSimpleBtnEvent(UISaveBtn, btnCallback);
         }
 
-        public void SetSaveBtn(Color btnColor, string btnText) {
+        public void SetActionBtnStyle(Color btnColor, string btnText) {
             UISaveBtn.image.color = btnColor;
             UISaveBtn.GetComponentInChildren<Text>().text = btnText;
         }

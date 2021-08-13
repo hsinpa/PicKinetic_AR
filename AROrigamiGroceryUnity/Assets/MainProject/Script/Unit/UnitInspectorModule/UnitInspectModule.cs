@@ -11,6 +11,7 @@ namespace Hsinpa.Utility
     public class UnitInspectModule
     {
         private bool hasHitOnPuffObj = false;
+        private bool isMoveToCenterPosition = false;
         private Vector2 lastTouchPoint;
         private Vector2 currentTouchPoint;
         private Transform SelectedObject;
@@ -30,6 +31,7 @@ namespace Hsinpa.Utility
         private float moveYDist => (currentTouchPoint - lastTouchPoint).y;
         private float absX => Mathf.Abs(moveXDist);
         private float absY => Mathf.Abs(moveYDist);
+
 
 #if UNITY_EDITOR
         private float zDepth = 2.8f;
@@ -76,15 +78,17 @@ namespace Hsinpa.Utility
         public void SetInputSelectObject(Transform puffItem) {
             this.SelectedObject = puffItem;
 
-            if (this.SelectedObject == null)
+            if (this.SelectedObject == null) {
                 gestureEvent = GestureEvent.None;
+                isMoveToCenterPosition = false;
+            }
         }
 
         private void PlaySmoothAnimation() {
             if (SelectedObject == null) return;
 
             GraduallyRotateToFace(currentFace);
-            GraudaulyFlyToCenter();
+            isMoveToCenterPosition = GraudaulyFlyToCenter();
         }
 
         public void OnUpdate()
@@ -111,7 +115,7 @@ namespace Hsinpa.Utility
 
             if (SelectedObject == null) return;
 
-            if (!hasHitOnPuffObj)
+            if (!hasHitOnPuffObj || !isMoveToCenterPosition)
             {
                 PlaySmoothAnimation();
                 return;
@@ -151,14 +155,16 @@ namespace Hsinpa.Utility
 
         private DragDir FindDragDirection()
         {
-            //Vertical check first
-            if (absY > DragThreshold && dragMode != DragDir.Horizontal)
-            {
-                return (moveYDist > 0) ? DragDir.VerticalUp : DragDir.VerticalDown;
-            }
+            if (inputWrapper.primaryBtnClick.OnClick()) {
+                //Vertical check first
+                if (absY > DragThreshold && dragMode != DragDir.Horizontal)
+                {
+                    return (moveYDist > 0) ? DragDir.VerticalUp : DragDir.VerticalDown;
+                }
 
-            if (absX > DragThreshold && dragMode != DragDir.VerticalDown)
-                return DragDir.Horizontal;
+                if (absX > DragThreshold && dragMode != DragDir.VerticalDown)
+                    return DragDir.Horizontal;
+            }
 
             return DragDir.None;
         }
@@ -218,11 +224,15 @@ namespace Hsinpa.Utility
             return (Face)face;
         }
 
-        private void GraudaulyFlyToCenter()
+        private bool GraudaulyFlyToCenter()
         {
             Vector3 frontPosition = _camera.transform.position + (_camera.transform.forward * zDepth);
+            Vector3 stepPosition = Vector3.Lerp(SelectedObject.transform.position, frontPosition, 0.1f);
+            float distance = Vector3.Distance(frontPosition, stepPosition), threshold = 0.01f;
 
-            SelectedObject.transform.position = Vector3.Lerp(SelectedObject.transform.position, frontPosition, 0.1f);
+            SelectedObject.transform.position = stepPosition;
+
+            return distance < threshold;
         }
 
         private void GraduallyRotateToFace(Face face)
