@@ -14,6 +14,8 @@ public class EventFlag
         public const string OnPhotoAlbumOpen = "event@open_photo_album";
         public const string OnPhotoAlbumClose = "event@close_photo_album";
 
+        public const string OnAlbumSummon = "event@album_summon";
+
 
     }
 }

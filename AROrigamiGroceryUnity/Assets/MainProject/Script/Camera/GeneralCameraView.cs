@@ -111,11 +111,11 @@ namespace PicKinetic
             OnMeshLocDone(await texturePreivew.CaptureEdgeBorderMesh(imageProcessRenderer.width, meshBorder, _textureStructure));
         }
 
-        private async Task<MeshObject> CaptureContourMesh()
+        private async Task<MeshObject> CaptureContourMesh(RenderTexture textureRenderer)
         {
             MeshObject meshObject = meshObjManager.CreateMeshObj(meshBorder.transform.position, meshBorder.transform.rotation, true);
 
-            OnMeshLocDone(await texturePreivew.CaptureContourMesh(modelTexRenderer, meshObject, _textureStructure));
+            OnMeshLocDone(await texturePreivew.CaptureContourMesh(textureRenderer, meshObject, _textureStructure));
 
             queueContourNextFrame = false;
 
@@ -135,19 +135,6 @@ namespace PicKinetic
             meshResult.meshObject.SetPosRotation(indictatorData.position, indictatorData.rotation);
         }
 
-        public async Task<StructType.GrabTextures> GetCurrentTexturesClone() {
-            queueContourNextFrame = true;
-
-            var generateMeshObj = await CaptureContourMesh();
-
-            return new StructType.GrabTextures()
-            {
-                meshObject = generateMeshObj,
-                mainTex = TextureUtility.TextureToTexture2D(modelTexRenderer),
-                processedTex = texturePreivew.edgeLineTex
-            };
-        }
-
         protected virtual TextureUtility.RaycastResult GetRaycastResult(Vector2 screenPos)
         {
             return default(TextureUtility.RaycastResult);
@@ -158,10 +145,34 @@ namespace PicKinetic
             return TextureUtility.GrabTextureRadius(width, height, _CropSize);
         }
 
+
+        #region Public API
         public virtual void EnableProcess(bool enable)
         {
             _isEnable = enable;
         }
+
+        public async Task<StructType.GrabTextures> GetCurrentTexturesClone()
+        {
+            queueContourNextFrame = true;
+
+            var generateMeshObj = await CaptureContourMesh(modelTexRenderer);
+
+            return new StructType.GrabTextures()
+            {
+                meshObject = generateMeshObj,
+                mainTex = TextureUtility.TextureToTexture2D(modelTexRenderer),
+                processedTex = texturePreivew.edgeLineTex
+            };
+        }
+
+        public async Task LoadAlbumTextureToMesh(RenderTexture textureRenderer)
+        {
+            queueContourNextFrame = true;
+
+            var generateMeshObj = await CaptureContourMesh(textureRenderer);
+        }
+        #endregion
 
     }
 }

@@ -19,14 +19,12 @@ namespace PicKinetic.Controller {
         [SerializeField]
         private MainCanvasView MainCanvasView;
 
-        [SerializeField]
-        private Button UIScanBtn;
-
         [Header("System")]
         [SerializeField]
         private GeneralCameraView generalCameraView;
 
         private PhotoAlbumModel texModel;
+        private ARMainUIView arMainUIView;
 
         public override void OnNotify(string p_event, params object[] p_objects)
         {
@@ -48,6 +46,12 @@ namespace PicKinetic.Controller {
                     {
                     }
                     break;
+
+                case EventFlag.Event.OnAlbumSummon:
+                    if (p_objects.Length == 2)
+                        OnAlbumSummonEvent((StructType.MeshJsonData) p_objects[0], (RenderTexture)p_objects[1]);
+
+                    break;
             }
         }
 
@@ -57,8 +61,9 @@ namespace PicKinetic.Controller {
             generalCameraView.OnCamInitProcessEvent += OnCamInitProcessEvent;
             generalCameraView.OnDebugTextureEvent += OnDebugTextureEvent;
 
-            UIScanBtn.onClick.AddListener(() => OnScanBtnClick());
-            MainCanvasView.SetMainCanvasState<ARMainUIView>(true, false);
+            this.arMainUIView = MainCanvasView.SetMainCanvasState<ARMainUIView>(true, false);
+            this.arMainUIView.SetScanBtnEvent(OnScanBtnClick);
+            this.arMainUIView.SetAlbumBtnEvent(OnAlbumBtnClick);
 
             //Test only
             //UIARSessionBtn.onClick.AddListener(() => {
@@ -92,6 +97,15 @@ namespace PicKinetic.Controller {
             TextureUtility.Dispose2D(grabTexStruct.mainTex);
         }
 
+        private void OnAlbumBtnClick()
+        {
+            PicKineticAR.Instance.Notify(EventFlag.Event.OnPhotoAlbumOpen);
+        }
+
+        private async void OnAlbumSummonEvent(StructType.MeshJsonData meshData, RenderTexture renderTexture) {
+            await generalCameraView.LoadAlbumTextureToMesh(renderTexture);
+
+        }
         #endregion
 
         private void OnDestroy()

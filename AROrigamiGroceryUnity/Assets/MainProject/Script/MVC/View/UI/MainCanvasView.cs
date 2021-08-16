@@ -17,11 +17,14 @@ namespace PicKinetic.View
         [SerializeField]
         private ARInspectView ARInspectView;
 
+        [SerializeField]
+        private PhotoAlbumView PhotoAlbumView;
+
         private List<MainViewInterface> mainCanvasArray;
 
         private void Awake()
         {
-            mainCanvasArray = new List<MainViewInterface>() { ARMainUIView, ARInspectView };
+            mainCanvasArray = new List<MainViewInterface>() { ARMainUIView, ARInspectView, PhotoAlbumView };
         }
 
         public void EnableDebugPanel(bool enable)
@@ -36,6 +39,15 @@ namespace PicKinetic.View
             if (canvasIndex < 0) return default(T);
 
             return (T) mainCanvasArray[canvasIndex];
+        }
+
+        public void CloseAll() {
+            mainCanvasArray.ForEach(x =>
+            {
+                x.CanvasGroup.alpha = 0;
+                x.CanvasGroup.blocksRaycasts = false;
+                x.CanvasGroup.interactable = false;
+            });
         }
 
         public T SetMainCanvasState<T>(bool action, bool animation = false) where T : MainViewInterface

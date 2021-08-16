@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5587538341184710264}
   - component: {fileID: 855794871481630469}
   - component: {fileID: 6428683021395307293}
+  - component: {fileID: 6814131289983416100}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -71,6 +72,49 @@ MonoBehaviour:
     y: 0
     width: 1
     height: 1
+--- !u!114 &6814131289983416100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2740659207347900798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.7921569, g: 0.7921569, b: 0.7921569, a: 1}
+    m_PressedColor: {r: 0.54901963, g: 0.54901963, b: 0.54901963, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 6428683021395307293}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &2935725480512167269
 GameObject:
   m_ObjectHideFlags: 0
@@ -83,6 +127,7 @@ GameObject:
   - component: {fileID: 5894586395506274033}
   - component: {fileID: 6545986180676012643}
   - component: {fileID: 5114456546331124299}
+  - component: {fileID: 8223335350243325350}
   m_Layer: 5
   m_Name: SavedMeshTex [Prefab]
   m_TagString: Untagged
@@ -132,7 +177,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -160,3 +205,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 0
+--- !u!114 &8223335350243325350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2935725480512167269}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8f601b2ab01a6241af0019430018f7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SlotRawImage: {fileID: 6428683021395307293}
+  SlotButton: {fileID: 6814131289983416100}

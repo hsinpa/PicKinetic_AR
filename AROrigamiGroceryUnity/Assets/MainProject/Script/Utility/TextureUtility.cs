@@ -82,27 +82,14 @@ public class TextureUtility
         return texture2D;
     }
 
-    //public static void GetTexture(string url, System.Action<Texture2D> callback)
-    //{
+    public static RenderTexture TextureToRenderTexture(Texture texture) {
+        RenderTexture rt = new RenderTexture(texture.width, texture.height, 0);
+        RenderTexture.active = rt;
+        // Copy your texture ref to the render texture
+        Graphics.Blit(texture, rt);
 
-    //    if (textureDict.TryGetValue(url, out Texture2D cacheTexture))
-    //    {
-
-    //        callback(cacheTexture);
-
-    //        return;
-    //    }
-
-
-    //    APIHttpRequest.CurlTexture(url, (Texture2D p_texture) => {
-    //        if (p_texture != null)
-    //        {
-    //            textureDict = UtilityMethod.SaveFromDict<Texture2D>(textureDict, url, p_texture);
-
-    //            callback(p_texture);
-    //        }
-    //    });
-    //}
+        return rt;
+    }
 
     public static void Dispose2D(Texture2D t) {
         Object.Destroy(t);

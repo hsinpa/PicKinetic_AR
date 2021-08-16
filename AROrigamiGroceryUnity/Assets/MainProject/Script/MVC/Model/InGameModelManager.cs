@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Hsinpa;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,9 +10,10 @@ namespace PicKinetic.Model
         [SerializeField]
         private SRPTextures SRTextureRoot;
 
-        public override void SetUp() { 
+        public override void SetUp() {
             models = new List<object> {
-                new PhotoAlbumModel(SRTextureRoot)
+                new PhotoAlbumModel(SRTextureRoot),
+                new TexturePool(this)
             };
         }
 

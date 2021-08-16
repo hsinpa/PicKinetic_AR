@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Hsinpa;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -15,7 +16,7 @@ namespace PicKinetic.Model {
 
         public enum Operation {TempFolder, PermanentFolder };
 
- #region Public API
+        #region Public API
         public PhotoAlbumModel(SRPTextures srpTextureRoot) {
             this._srpTextureRoot = srpTextureRoot;
             saveTexDirPath = Path.Combine(Application.persistentDataPath, ParameterFlag.SaveSystem.DiskFolder);
@@ -139,7 +140,7 @@ namespace PicKinetic.Model {
             }
         }
 
-        private string GetFullPath(string filename, bool isTempFolder) {
+        public string GetFullPath(string filename, bool isTempFolder) {
             return Path.Combine((isTempFolder) ? tempTexDirPath : saveTexDirPath, filename);
         }
         #endregion

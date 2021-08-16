@@ -9,6 +9,9 @@ namespace PicKinetic.View {
     public class ARMainUIView : MonoBehaviour, MainViewInterface
     {
         [SerializeField]
+        private Button UIAlbumBtn;
+
+        [SerializeField]
         private Button UIScanBtn;
 
         [SerializeField]
@@ -18,6 +21,11 @@ namespace PicKinetic.View {
 
         public void SetScanBtnEvent(System.Action btnCallback) {
             UtilityMethod.SetSimpleBtnEvent(UIScanBtn, btnCallback);   
+        }
+
+        public void SetAlbumBtnEvent(System.Action btnCallback)
+        {
+            UtilityMethod.SetSimpleBtnEvent(UIAlbumBtn, btnCallback);
         }
 
         public void Dispose()

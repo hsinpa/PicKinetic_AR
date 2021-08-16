@@ -95,19 +95,19 @@ namespace PicKinetic {
         public void GenerateControlPoints() {
             UtilityMethod.ClearChildObject(controlPointsHolder);
 
-            GameObject c_point1 = UtilityMethod.CreateObjectToParent(controlPointsHolder, controlPointPrefab);
+            GameObject c_point1 = Instantiate(controlPointPrefab, controlPointsHolder);
             c_point1.transform.localPosition = ctrlPoints.top_control_point;
             c_point1.transform.name = "top_control_point";
-            worldControlPoint[0] = c_point1;
+            worldControlPoint[0] = c_point1.gameObject;
             originalPoints[0] = ctrlPoints.top_control_point;
 
-            GameObject c_point2 = UtilityMethod.CreateObjectToParent(controlPointsHolder, controlPointPrefab);
+            GameObject c_point2 = Instantiate(controlPointPrefab, controlPointsHolder);
             c_point2.transform.localPosition = ctrlPoints.bottom_control_point;
             c_point2.transform.name = "bottom_control_point";
             worldControlPoint[1] = c_point2;
             originalPoints[1] = ctrlPoints.bottom_control_point;
 
-            GameObject c_point3 = UtilityMethod.CreateObjectToParent(controlPointsHolder, controlPointPrefab);
+            GameObject c_point3 = Instantiate(controlPointPrefab, controlPointsHolder);
             c_point3.transform.localPosition = ctrlPoints.center_control_point;
             c_point3.transform.name = "center_control_point";
             worldControlPoint[2] = c_point3;
