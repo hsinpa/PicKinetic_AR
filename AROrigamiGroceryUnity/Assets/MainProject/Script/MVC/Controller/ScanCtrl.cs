@@ -103,8 +103,8 @@ namespace PicKinetic.Controller {
         }
 
         private async void OnAlbumSummonEvent(StructType.MeshJsonData meshData, RenderTexture renderTexture) {
-            await generalCameraView.LoadAlbumTextureToMesh(renderTexture);
-
+            var meshObject = await generalCameraView.LoadAlbumTextureToMesh(renderTexture);
+            meshObject.SetMeshJsonData(meshData);
         }
         #endregion
 

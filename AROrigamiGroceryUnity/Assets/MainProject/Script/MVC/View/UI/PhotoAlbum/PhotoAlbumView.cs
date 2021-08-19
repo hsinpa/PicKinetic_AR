@@ -29,6 +29,9 @@ namespace PicKinetic.View
             UtilityMethod.ClearChildObject(Content);
         }
 
+        public void EnableGridLayout(bool enable) {
+            Content.GetComponent<GridLayoutGroup>().enabled = enable;
+        }
 
         public void LoadAlbum(List<StructType.MeshJsonData> meshDataArray, System.Action<PhotoSlotView> OnSlotCreateEvent) {
             Dispose();

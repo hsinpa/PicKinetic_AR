@@ -13,6 +13,8 @@ namespace PicKinetic.Controller
         [SerializeField]
         private MainCanvasView MainCanvasView;
 
+        private PhotoAlbumView photoAlbumView;
+
         private PhotoAlbumModel textureModel;
         private TexturePool texturePool;
 
@@ -23,6 +25,9 @@ namespace PicKinetic.Controller
                 case EventFlag.Event.GameStart:
                     texturePool = PicKineticAR.Instance.ModelManager.GetModel<TexturePool>();
                     textureModel = PicKineticAR.Instance.ModelManager.GetModel<PhotoAlbumModel>();
+
+                    photoAlbumView = MainCanvasView.GetCanvasWithType<PhotoAlbumView>();
+
                     break;
 
                 case EventFlag.Event.OnPhotoAlbumOpen:
@@ -50,6 +55,7 @@ namespace PicKinetic.Controller
                 PicKineticAR.Instance.Notify(EventFlag.Event.OnPhotoAlbumClose);
             });
 
+            photoAlbumView.EnableGridLayout(true);
             photoAlbumView.LoadAlbum(textureModel.SRPTextureRoot.TextureData, OnSlotViewCreate);
         }
 
@@ -68,7 +74,14 @@ namespace PicKinetic.Controller
             if (slotView.SlotTexture != null) {
                 var renderTex = TextureUtility.TextureToRenderTexture(slotView.SlotTexture);
 
-                PicKineticAR.Instance.Notify(EventFlag.Event.OnAlbumSummon, slotView.meshJsonData, renderTex);
+                var rectTransform = slotView.GetComponent<RectTransform>();
+                Debug.Log(slotView.transform.position);
+                Debug.Log(rectTransform.sizeDelta   );
+
+                photoAlbumView.EnableGridLayout(false);
+                rectTransform.anchoredPosition = new Vector2(0,0);
+
+                //PicKineticAR.Instance.Notify(EventFlag.Event.OnAlbumSummon, slotView.meshJsonData, renderTex);
             }
         }
         #endregion

@@ -166,11 +166,11 @@ namespace PicKinetic
             };
         }
 
-        public async Task LoadAlbumTextureToMesh(RenderTexture textureRenderer)
+        public async Task<MeshObject> LoadAlbumTextureToMesh(RenderTexture textureRenderer)
         {
             queueContourNextFrame = true;
 
-            var generateMeshObj = await CaptureContourMesh(textureRenderer);
+            return await CaptureContourMesh(textureRenderer);
         }
         #endregion
 
