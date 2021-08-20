@@ -2,6 +2,7 @@
 {
     Properties
     {
+        _MainColor("Color", Color) = (1.0, 1.0, 1.0, 1.0)
         _MainTex ("Texture", 2D) = "white" {}
         _SideTex ("Side Texture", 2D) = "white" {}
         _NoiseTex("Noise Texture", 2D) = "white" {}
@@ -54,6 +55,8 @@
                 float2 local_vertex : TEXCOORD1;
                 fixed4 color : COLOR;
             };
+
+            uniform float4 _MainColor;
 
             uniform sampler2D _MainTex;
             float4 _MainTex_ST;
@@ -123,7 +126,7 @@
                 }
 
 
-                return col;
+                return col * _MainColor;
             }
             ENDCG
         }

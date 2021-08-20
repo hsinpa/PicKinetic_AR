@@ -67,25 +67,25 @@ namespace PicKinetic.Controller
                 slotView.SetSlotImage(tex);
             });
 
-            slotView.SetClickEvent(OnSlotViewClick);
+            slotView.SetClickEvent(OnSlotViewClick, OnSlotSummonClick);
         }
 
         private void OnSlotViewClick(PhotoSlotView slotView) {
-            if (slotView.SlotTexture != null) {
-                var renderTex = TextureUtility.TextureToRenderTexture(slotView.SlotTexture);
-
                 var rectTransform = slotView.GetComponent<RectTransform>();
-                Debug.Log(slotView.transform.position);
-                Debug.Log(rectTransform.sizeDelta   );
+
+                Vector3 targetPosition = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 1);
 
                 photoAlbumView.EnableGridLayout(false);
-                rectTransform.anchoredPosition = new Vector2(0,0);
+                photoAlbumView.EnlargeSlot(slotView, size: new Vector2(Screen.width * 0.7f, Screen.width * 0.7f), targetPosition);
+                //PicKineticAR.Instance.Notify(EventFlag.Event.OnAlbumSummon, slotView.meshJsonData, renderTex);            
+        }
 
-                //PicKineticAR.Instance.Notify(EventFlag.Event.OnAlbumSummon, slotView.meshJsonData, renderTex);
+        private void OnSlotSummonClick(PhotoSlotView slotView, bool isSummon) {
+            if (slotView.SlotTexture != null)
+            {
+                var renderTex = TextureUtility.TextureToRenderTexture(slotView.SlotTexture);
             }
         }
         #endregion
-
-
     }
 }
