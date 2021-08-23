@@ -22,6 +22,7 @@ namespace PicKinetic
 
         public class ShaderProperty {
             public const string MainTex = "_MainTex";
+            public const string MainColor = "_MainColor";
             public const string ShowSideTex = "_ShowSideTex";
             public const string ControlPoints = "_ControlPoints";
             public const string RenderTransition = "_RenderTransition";

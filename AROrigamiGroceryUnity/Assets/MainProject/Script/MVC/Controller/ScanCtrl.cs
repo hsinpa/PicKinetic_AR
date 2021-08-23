@@ -26,12 +26,18 @@ namespace PicKinetic.Controller {
         private PhotoAlbumModel texModel;
         private ARMainUIView arMainUIView;
 
+        public enum ScanMode {Capture, Preview}
+        private ScanMode scanMode;
+
+        private MeshObject previewModeObject;
+
         public override void OnNotify(string p_event, params object[] p_objects)
         {
             switch (p_event)
             {
                 case EventFlag.Event.GameStart:
                 {
+                        scanMode = ScanMode.Capture;
                         ScanInit();
                 }
                 break;
@@ -55,7 +61,19 @@ namespace PicKinetic.Controller {
             }
         }
 
-        private void ScanInit() {
+        #region Monobehavior Function
+
+        private void Update()
+        {
+            if (scanMode == ScanMode.Preview && previewModeObject != null) {
+                generalCameraView.PlaceObjectOnScanPoint(previewModeObject);
+            }
+        }
+        #endregion
+
+        #region Private Function
+        private void ScanInit()
+        {
             texModel = PicKineticAR.Instance.ModelManager.GetModel<PhotoAlbumModel>();
 
             generalCameraView.OnCamInitProcessEvent += OnCamInitProcessEvent;
@@ -72,7 +90,18 @@ namespace PicKinetic.Controller {
 
             generalCameraView.CameraInitProcess();
         }
-            
+
+        private void BackToCaptureMode() {
+            scanMode = ScanMode.Capture;
+
+            if (previewModeObject != null)
+            {
+                previewModeObject.SetColor(new Color(1, 1, 1, 1f));
+                previewModeObject = null;
+            }
+        }
+        #endregion
+
         #region Event
         private void OnCamInitProcessEvent(bool success) { 
             
@@ -86,6 +115,11 @@ namespace PicKinetic.Controller {
 
         private async void OnScanBtnClick()
         {
+            if (scanMode == ScanMode.Preview) {
+                BackToCaptureMode();
+                return;
+            }
+
             var grabTexStruct = await generalCameraView.GetCurrentTexturesClone();
 
             var saveJson = texModel.SaveTempMesh(grabTexStruct.mainTex, grabTexStruct.processedTex);
@@ -103,8 +137,11 @@ namespace PicKinetic.Controller {
         }
 
         private async void OnAlbumSummonEvent(StructType.MeshJsonData meshData, RenderTexture renderTexture) {
-            var meshObject = await generalCameraView.LoadAlbumTextureToMesh(renderTexture);
-            meshObject.SetMeshJsonData(meshData);
+            scanMode = ScanMode.Preview;
+
+            previewModeObject = await generalCameraView.LoadAlbumTextureToMesh(renderTexture);
+            previewModeObject.SetMeshJsonData(meshData);
+            previewModeObject.SetColor(new Color(1, 1, 1, 0.8f));
         }
         #endregion
 

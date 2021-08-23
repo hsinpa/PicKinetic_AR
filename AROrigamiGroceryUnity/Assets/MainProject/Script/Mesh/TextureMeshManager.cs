@@ -203,7 +203,6 @@ namespace PicKinetic
             _meshPosition.Set(x, y);
 
             meshCalResult.screenPoint = _meshPosition;
-            meshCalResult.meshObject = meshObject;
             meshCalResult.type = type;
 
             return meshCalResult;
@@ -213,10 +212,10 @@ namespace PicKinetic
 
             public enum Type {Edge, Contour}
             public Type type;
-            public MeshObject meshObject;
+            //public MeshObject meshObject;
             public Vector2 screenPoint;
 
-            public bool isValid => this.meshObject != null;
+            public bool isValid => this.screenPoint != null;
         }
 
         private struct ParallelMeshResult

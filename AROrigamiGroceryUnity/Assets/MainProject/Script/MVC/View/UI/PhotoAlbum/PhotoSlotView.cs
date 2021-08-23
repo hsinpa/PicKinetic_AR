@@ -13,7 +13,8 @@ namespace PicKinetic.View
         public Texture SlotTexture => SlotRawImage.texture;
 
         [SerializeField]
-        private Button SlotButton;
+        private Button _SlotButton;
+        public Button SlotButton => _SlotButton;
 
         [Header("Hidden Panel")]
         [SerializeField]

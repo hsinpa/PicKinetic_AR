@@ -80,7 +80,6 @@ namespace PicKinetic
         protected void OnUpdate()
         {
             if (_sourceTexture == null || !isEnable) return;
-
             meshIndicator.DisplayOnScreenPos(_textureStructure, _CropSize);
 
             TextureUtility.RotateAndScaleImage(_sourceTexture, modelTexRenderer, rotateMat, _textureStructure, 0);
@@ -108,31 +107,33 @@ namespace PicKinetic
         {
             texturePreivew.ProcessCSTextureColor();
 
-            OnMeshLocDone(await texturePreivew.CaptureEdgeBorderMesh(imageProcessRenderer.width, meshBorder, _textureStructure));
+            OnMeshLocDone(meshBorder, await texturePreivew.CaptureEdgeBorderMesh(imageProcessRenderer.width, meshBorder, _textureStructure));
         }
 
         private async Task<MeshObject> CaptureContourMesh(RenderTexture textureRenderer)
         {
             MeshObject meshObject = meshObjManager.CreateMeshObj(meshBorder.transform.position, meshBorder.transform.rotation, true);
+            TextureMeshManager.MeshLocData meshLocData = await texturePreivew.CaptureContourMesh(textureRenderer, meshObject, _textureStructure);
 
-            OnMeshLocDone(await texturePreivew.CaptureContourMesh(textureRenderer, meshObject, _textureStructure));
+            meshObject.SetMeshLocData(meshLocData);
+            OnMeshLocDone(meshObject, meshLocData);
 
             queueContourNextFrame = false;
 
             return meshObject;
         }
 
-        private void OnMeshLocDone(TextureMeshManager.MeshLocData meshResult)
+        private void OnMeshLocDone(MeshObject meshObject, TextureMeshManager.MeshLocData locationData)
         {
             isScanProcessReady = true;
-            if (!meshResult.isValid) return;
+            if (!locationData.isValid) return;
 
-            MeshIndicator.IndictatorData indictatorData = meshIndicator.GetRelativePosRot(meshResult.screenPoint);
+            MeshIndicator.IndictatorData indictatorData = meshIndicator.GetRelativePosRot(locationData.screenPoint);
 
-            float sizeMagnitue = (_camera.transform.position - meshResult.meshObject.transform.position).magnitude * _SizeStrength;
-            meshResult.meshObject.transform.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
+            float sizeMagnitue = (_camera.transform.position - meshObject.transform.position).magnitude * _SizeStrength;
+            meshObject.transform.localScale = new Vector3(sizeMagnitue, sizeMagnitue, sizeMagnitue);
 
-            meshResult.meshObject.SetPosRotation(indictatorData.position, indictatorData.rotation);
+            meshObject.SetPosRotation(indictatorData.position, indictatorData.rotation);
         }
 
         protected virtual TextureUtility.RaycastResult GetRaycastResult(Vector2 screenPos)
@@ -171,6 +172,12 @@ namespace PicKinetic
             queueContourNextFrame = true;
 
             return await CaptureContourMesh(textureRenderer);
+        }
+
+        public void PlaceObjectOnScanPoint(MeshObject meshObject)
+        {
+            if (meshObject.meshLocData.isValid)
+                OnMeshLocDone(meshObject, meshObject.meshLocData);
         }
         #endregion
 
