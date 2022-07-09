@@ -71,10 +71,15 @@ namespace PicKinetic.Controller
         }
 
         private void OnSlotViewClick(PhotoSlotView slotView) {
-                Vector3 targetPosition = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 1);
+            Vector3 targetPosition = new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 1);
 
-                photoAlbumView.EnableGridLayout(false);
-                photoAlbumView.EnlargeSlot(slotView, size: new Vector2(Screen.width * 0.7f, Screen.width * 0.7f), targetPosition);
+            photoAlbumView.EnableGridLayout(false);
+
+            float base_size = Screen.width;
+            if (Screen.width > Screen.height)
+                base_size = Screen.height;
+
+            photoAlbumView.EnlargeSlot(slotView, size: new Vector2(base_size * 0.5f, base_size * 0.5f), targetPosition);
         }
 
         private void OnSlotSummonClick(PhotoSlotView slotView, bool isSummon) {

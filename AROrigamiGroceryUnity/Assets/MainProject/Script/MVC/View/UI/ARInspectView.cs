@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Utilities;
 using DG.Tweening;
+using TMPro;
 
 namespace PicKinetic.View
 {
@@ -11,7 +12,7 @@ namespace PicKinetic.View
     public class ARInspectView : MonoBehaviour, MainViewInterface
     {
         [SerializeField]
-        private Text HintText;
+        private TextMeshProUGUI HintText;
 
         [SerializeField]
         private Button UISaveBtn;
@@ -31,7 +32,7 @@ namespace PicKinetic.View
 
         public void SetActionBtnStyle(Color btnColor, string btnText) {
             UISaveBtn.image.color = btnColor;
-            UISaveBtn.GetComponentInChildren<Text>().text = btnText;
+            UISaveBtn.GetComponentInChildren<TextMeshProUGUI>().text = btnText;
         }
 
         public void PlayHintAnimation(bool play)

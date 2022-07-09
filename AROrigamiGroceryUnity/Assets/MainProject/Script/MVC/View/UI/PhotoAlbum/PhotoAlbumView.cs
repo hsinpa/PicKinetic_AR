@@ -1,15 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.Playables;
 using UnityEngine;
 using UnityEngine.UI;
 using Utilities;
 using DG.Tweening;
-using UnityEditor.ProjectWindowCallback;
 
 namespace PicKinetic.View
 {
-
     [RequireComponent(typeof(CanvasGroup))]
     public class PhotoAlbumView : MonoBehaviour, MainViewInterface
     {
@@ -49,6 +46,8 @@ namespace PicKinetic.View
             Dispose();
 
             int len = meshDataArray.Count;
+
+            Debug.Log("LoadAlbum count " + len);
 
             for (int i = 0; i < len; i++) {
                 PhotoSlotView gSlotView = UtilityMethod.CreateObjectToParent<PhotoSlotView>(_Content, MeshTexturePrefab);

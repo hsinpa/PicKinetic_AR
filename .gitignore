@@ -4,7 +4,9 @@ AROrigamiGroceryUnity/[Oo]bj/
 AROrigamiGroceryUnity/[Bb]uild/
 AROrigamiGroceryUnity/[Bb]uilds/
 AROrigamiGroceryUnity/.vs/
-
+AROrigamiGroceryUnity/Logs/
+AROrigamiGroceryUnity/MemoryCaptures/
+AROrigamiGroceryUnity/UserSettings/
 *.lock
 *.env
 

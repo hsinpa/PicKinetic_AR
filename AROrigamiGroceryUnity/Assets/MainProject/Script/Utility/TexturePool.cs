@@ -30,6 +30,10 @@ namespace Hsinpa {
                 yield break;
             }
 
+#if UNITY_ANDROID && !UNITY_EDITOR
+            texturePath = "file://" + texturePath;
+#endif
+
             using (UnityWebRequest uwr = UnityWebRequestTexture.GetTexture(texturePath))
             {
                 yield return uwr.SendWebRequest();
